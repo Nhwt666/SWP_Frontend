@@ -1,0 +1,92 @@
+.topup-page {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 30px 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.topup-page h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.topup-page input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.topup-page input:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+    outline: none;
+}
+
+.topup-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.topup-actions button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.topup-actions button:first-child {
+    background-color: #4caf50;
+    color: #fff;
+}
+
+.topup-actions button:first-child:hover {
+    background-color: #45a049;
+}
+
+.topup-actions button:last-child {
+    background-color: #f44336;
+    color: #fff;
+}
+
+.topup-actions button:last-child:hover {
+    background-color: #e53935;
+}
+
+.topup-actions button:active {
+    transform: scale(0.98);
+}
+
+.topup-page p[role="alert"] {
+    color: #f44336;
+    font-weight: bold;
+    margin-top: 10px;
+    word-break: break-word;
+}
+
+@media (max-width: 480px) {
+    .topup-page {
+        margin: 50px 15px;
+        padding: 20px 15px;
+    }
+
+    .topup-actions {
+        flex-direction: column;
+    }
+
+    .topup-actions button {
+        width: 100%;
+    }
+}

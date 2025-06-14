@@ -1,0 +1,172 @@
+/* ===== Header Chính ===== */
+.header {
+  background-color: #004aad;
+  color: white;
+  padding: 0;
+}
+
+.header-container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo-title {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  margin-right: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.logo-title h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+/* ===== Liên kết đăng nhập / đăng ký ===== */
+.auth-links a {
+  margin-left: 15px;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  transition: text-decoration 0.2s ease;
+}
+
+.auth-links a:hover,
+.auth-links a:focus {
+  text-decoration: underline;
+  outline: none;
+}
+
+/* ===== Thông tin người dùng ===== */
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-info-text {
+  text-align: right;
+}
+
+.user-name {
+  font-weight: bold;
+}
+
+.user-wallet {
+  font-size: 0.9rem;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #ccc;
+  border-radius: 50%;
+}
+
+/* ===== Nút Nạp tiền và Đăng xuất ===== */
+.topup-btn,
+.logout-btn {
+  background: none;
+  border: 2px solid white;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.topup-btn:hover,
+.topup-btn:focus,
+.logout-btn:hover,
+.logout-btn:focus {
+  background-color: white;
+  color: #004aad;
+  outline: none;
+}
+
+/* ===== Menu Điều Hướng Chính ===== */
+.main-nav {
+  background-color: #e6ecf2;
+  box-shadow: inset 0 -1px 0 #ccc;
+  padding: 10px 0;
+}
+
+.main-nav-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.nav-btn {
+  background-color: #007bff;
+  color: white;
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.nav-btn:hover,
+.nav-btn:focus {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+  outline: none;
+}
+
+/* ===== Responsive (Mobile) ===== */
+@media (max-width: 768px) {
+  .header-container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .logo-title {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .logo {
+    margin-bottom: 5px;
+  }
+
+  .main-nav-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-btn {
+    width: 90%;
+    text-align: center;
+  }
+
+  .auth-links {
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topup-btn,
+  .logout-btn {
+    padding: 6px 10px;
+  }
+}

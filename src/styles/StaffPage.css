@@ -1,0 +1,105 @@
+.staff-page {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 30px;
+    font-family: Arial, sans-serif;
+    background: #fefefe;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+}
+
+.staff-page h2 {
+    color: #004aad;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.ticket-list {
+    margin-bottom: 30px;
+}
+
+.ticket-list ul {
+    list-style: none;
+    padding-left: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+.ticket-item {
+    padding: 12px 18px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.ticket-item:hover {
+    background-color: #e7f0ff;
+}
+
+.ticket-item.selected {
+    background-color: #004aad;
+    color: white;
+    font-weight: bold;
+}
+
+.ticket-item.done {
+    color: gray;
+    text-decoration: line-through;
+    cursor: default;
+}
+
+.ticket-detail {
+    border-top: 2px solid #004aad;
+    padding-top: 20px;
+}
+
+.ticket-detail p {
+    margin: 8px 0;
+    font-size: 16px;
+}
+
+.form-group {
+    margin: 15px 0;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+}
+
+textarea {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+.btn-processing,
+.btn-submit-result {
+    background-color: #004aad;
+    color: white;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 22px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 15px;
+}
+
+.btn-processing:hover,
+.btn-submit-result:hover {
+    background-color: #003080;
+}
+
+.done-msg {
+    font-style: italic;
+    color: green;
+    font-weight: bold;
+    margin-top: 20px;
+}

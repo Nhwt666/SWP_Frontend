@@ -1,0 +1,22 @@
+.login-container {
+  width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.login-form input {
+  width: 90%;
+  padding: 10px;
+  margin: 10px 0;
+}
+
+.login-form button {
+  background-color: #004aad;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+}
