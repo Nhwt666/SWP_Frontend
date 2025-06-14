@@ -14,6 +14,7 @@ import TestHistoryPage from './pages/TestHistoryPage';
 import Layout from './components/Layout';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import PricingPage from './pages/PricingPage';
 
 function App() {
     return (
@@ -30,6 +31,7 @@ function App() {
                     <Route path="/test-history" element={<TestHistoryPage />} />
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+                    <Route path="/pricing" element={<PricingPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />
