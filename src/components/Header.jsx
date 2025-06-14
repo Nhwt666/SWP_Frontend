@@ -1,18 +1,27 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/Header.css';
 
 const Header = () => {
     const navigate = useNavigate();
 
-    const fullName = localStorage.getItem('fullName');
-    const email = localStorage.getItem('email');
+    const [wallet, setWallet] = useState(() => {
+        const raw = localStorage.getItem('wallet');
+        const value = Number(raw);
+        return isNaN(value) ? 0 : value;
+    });
+
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    const fullName = localStorage.getItem('fullName') || '';
+    const email = localStorage.getItem('email') || '';
     const isLoggedIn = !!email;
 
     const handleLogout = () => {
-        localStorage.clear();
-        navigate('/');
-        window.location.reload();
+        if (window.confirm('Bạn có chắc muốn đăng xuất?')) {
+            localStorage.clear();
+            navigate('/');
+        }
     };
 
     const refreshWallet = async () => {
@@ -22,10 +31,12 @@ const Header = () => {
                     Authorization: `Bearer ${localStorage.getItem('token')}`
                 }
             });
-
             if (res.ok) {
                 const user = await res.json();
-                localStorage.setItem('wallet', user.walletBalance);
+                const balance = Number(user.walletBalance);
+                const safeBalance = isNaN(balance) ? 0 : balance;
+                localStorage.setItem('wallet', safeBalance);
+                setWallet(safeBalance);
             }
         } catch (err) {
             console.error('❌ Lỗi cập nhật ví:', err);
@@ -33,10 +44,14 @@ const Header = () => {
     };
 
     useEffect(() => {
-        if (isLoggedIn) {
+        if (isLoggedIn && localStorage.getItem('token')) {
             refreshWallet();
         }
     }, [isLoggedIn]);
+
+    const toggleDropdown = () => {
+        setShowDropdown(prev => !prev);
+    };
 
     return (
         <header className="header" role="banner">
@@ -54,24 +69,26 @@ const Header = () => {
                             <div className="user-info-text">
                                 <div className="user-name">{fullName}</div>
                                 <div className="user-wallet">
-                                    Ví: {(Number(localStorage.getItem('wallet')) || 0).toLocaleString()}đ
+                                    Ví: {wallet.toLocaleString('vi-VN')} ₫
                                 </div>
                             </div>
-                            <div className="avatar" />
-                            <button
-                                className="topup-btn"
-                                onClick={() => navigate('/topup')}
-                                aria-label="Nạp tiền vào ví"
-                            >
-                                Nạp tiền
-                            </button>
-                            <button
-                                className="logout-btn"
-                                onClick={handleLogout}
-                                aria-label="Đăng xuất khỏi tài khoản"
-                            >
-                                Đăng xuất
-                            </button>
+                            <div className="avatar-container">
+                                <div
+                                    className="avatar"
+                                    role="button"
+                                    aria-label="Avatar người dùng"
+                                    onClick={toggleDropdown}
+                                ></div>
+                                {showDropdown && (
+                                    <div className="dropdown-menu">
+                                        <button onClick={() => {navigate('/update-profile'); setShowDropdown(false);}}>Cập nhật thông tin</button>
+                                        <button onClick={() => {navigate('/topup-history'); setShowDropdown(false);}}>Lịch sử nạp tiền</button>
+                                        <button onClick={() => {navigate('/test-history'); setShowDropdown(false);}}>Lịch sử xét nghiệm</button>
+                                        <button onClick={() => {navigate('/topup'); setShowDropdown(false);}}>Nạp tiền</button>
+                                        <button onClick={() => {handleLogout(); setShowDropdown(false);}}>Đăng xuất</button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <>

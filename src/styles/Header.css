@@ -67,12 +67,49 @@
   font-size: 0.9rem;
 }
 
+/* ===== Avatar + Dropdown ===== */
+.avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
 .avatar {
   width: 40px;
   height: 40px;
   background-color: #ccc;
   border-radius: 50%;
+  cursor: pointer;
 }
+
+.dropdown-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  min-width: 180px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Bỏ hoàn toàn rule hover hiển thị dropdown (vì ta dùng click) */
+/* .avatar-container:hover .dropdown-menu {
+  display: block;
+} */
 
 /* ===== Nút Nạp tiền và Đăng xuất ===== */
 .topup-btn,

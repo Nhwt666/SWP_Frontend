@@ -1,0 +1,67 @@
+.profile-box {
+    max-width: 400px;
+    margin: 50px auto;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px 30px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.profile-header h2 {
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+input {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.cancel-btn {
+    border: 1px solid #ccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.save-btn {
+    background: #7a34eb;
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #5a25c2;
+}

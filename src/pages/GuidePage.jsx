@@ -1,11 +1,10 @@
 import React from 'react';
-import Header from '../components/Header';
 import '../styles/GuidePage.css';
 
 const GuidePage = () => {
     return (
         <>
-            <Header />
+
             <div className="guide-container">
                 <h1>Hướng dẫn chi tiết cách lấy mẫu xét nghiệm ADN tại nhà</h1>
                 <p>

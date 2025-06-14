@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
 import '../styles/HomePage.css';
 
 const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg'];
@@ -7,7 +6,6 @@ const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg'];
 const HomePage = () => {
     const [currentImage, setCurrentImage] = useState(0);
 
-    // Tự động chuyển ảnh sau mỗi 4 giây
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImage((prev) => (prev + 1) % images.length);
@@ -20,10 +18,8 @@ const HomePage = () => {
 
     return (
         <>
-            <Header />
             <section className="gallery">
                 <div className="container">
-                    {/* ✅ Slideshow với animation fade + nút điều hướng */}
                     <div className="slideshow fade-style">
                         {images.map((img, index) => (
                             <img

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Header from '../components/Header';
 import '../styles/ConfirmRegisterPage.css';
 
 const ConfirmRegisterPage = () => {
@@ -16,7 +15,7 @@ const ConfirmRegisterPage = () => {
             const res = await fetch(`http://localhost:8080/auth/confirm-register?${params.toString()}`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded', // 🔥 BẮT BUỘC cho POST có query param
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 }
             });
 
@@ -33,30 +32,27 @@ const ConfirmRegisterPage = () => {
     };
 
     return (
-        <>
-            <Header />
-            <div className="confirm-container">
-                <h2>Xác nhận đăng ký</h2>
-                <form className="confirm-form" onSubmit={handleSubmit}>
-                    <input
-                        type="email"
-                        placeholder="Email đã đăng ký"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="text"
-                        placeholder="Mã OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        required
-                    />
-                    <button type="submit">Xác nhận</button>
-                </form>
-                {message && <p className="message">{message}</p>}
-            </div>
-        </>
+        <div className="confirm-container">
+            <h2>Xác nhận đăng ký</h2>
+            <form className="confirm-form" onSubmit={handleSubmit}>
+                <input
+                    type="email"
+                    placeholder="Email đã đăng ký"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Mã OTP"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    required
+                />
+                <button type="submit">Xác nhận</button>
+            </form>
+            {message && <p className="message">{message}</p>}
+        </div>
     );
 };
 
