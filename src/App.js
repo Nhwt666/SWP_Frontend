@@ -12,6 +12,8 @@ import UpdateProfilePage from './pages/UpdateProfilePage';
 import TopUpHistoryPage from './pages/TopUpHistoryPage';
 import TestHistoryPage from './pages/TestHistoryPage';
 import Layout from './components/Layout';
+import ProfilePage from './pages/ProfilePage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 
 function App() {
     return (
@@ -26,6 +28,8 @@ function App() {
                     <Route path="/update-profile" element={<UpdateProfilePage />} />
                     <Route path="/topup-history" element={<TopUpHistoryPage />} />
                     <Route path="/test-history" element={<TestHistoryPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />

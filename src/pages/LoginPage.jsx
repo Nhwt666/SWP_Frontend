@@ -26,34 +26,49 @@ const LoginPage = () => {
                 body: JSON.stringify({ email, password }),
             });
 
-            if (res.ok) {
-                const data = await res.json();
-                const token = data.token;
-
-                localStorage.setItem('token', token);
-                localStorage.setItem('email', email);
-
-                const meRes = await fetch('/auth/me', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (meRes.ok) {
-                    const user = await meRes.json();
-                    localStorage.setItem('fullName', user.fullName);
-                    localStorage.setItem('wallet', user.walletBalance);
-                }
-
-                setMessage('🎉 Đăng nhập thành công!');
-                setTimeout(() => {
-                    navigate('/');
-                    window.location.reload();
-                }, 1000);
-            } else {
+            if (!res.ok) {
                 const err = await res.json();
-                setMessage('❌ Đăng nhập thất bại: ' + (err.error || 'Sai thông tin đăng nhập'));
+                setMessage(`❌ Đăng nhập thất bại: ${err.error || 'Sai thông tin đăng nhập'}`);
+                localStorage.clear();
+                setIsLoading(false);
+                return;
             }
-        } catch {
-            setMessage('❌ Không thể kết nối đến server.');
+
+            const data = await res.json();
+            const token = data.token;
+            localStorage.setItem('token', token);
+            localStorage.setItem('email', email);
+
+            // Lấy thông tin người dùng
+            const meRes = await fetch('/auth/me', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            if (!meRes.ok) {
+                setMessage('❌ Không thể lấy thông tin người dùng');
+                localStorage.clear();
+                setIsLoading(false);
+                return;
+            }
+
+            const user = await meRes.json();
+            localStorage.setItem('fullName', user.fullName);
+            localStorage.setItem('wallet', user.walletBalance);
+            localStorage.setItem('role', user.role);
+
+            setMessage('🎉 Đăng nhập thành công!');
+
+            setTimeout(() => {
+                if (user.role?.toUpperCase() === 'ADMIN') {
+                    navigate('/admin/dashboard');
+                } else {
+                    navigate('/');
+                }
+            }, 500);
+
+        } catch (err) {
+            setMessage(`❌ Đăng nhập thất bại: ${err.message}`);
+            localStorage.clear();
         } finally {
             setIsLoading(false);
         }
@@ -61,6 +76,7 @@ const LoginPage = () => {
 
     const handleRequestReset = async (e) => {
         e.preventDefault();
+        setMessage('');
         try {
             await fetch(`/auth/request-reset?email=${email}`, { method: 'POST' });
             setMessage('📨 Đã gửi mã xác nhận đến email.');
@@ -72,6 +88,7 @@ const LoginPage = () => {
 
     const handleConfirmOtp = async (e) => {
         e.preventDefault();
+        setMessage('');
         try {
             await fetch(`/auth/confirm-reset?email=${email}&otp=${otp}`, { method: 'POST' });
             setMessage('✅ OTP hợp lệ. Nhập mật khẩu mới.');
@@ -83,6 +100,7 @@ const LoginPage = () => {
 
     const handleUpdatePassword = async (e) => {
         e.preventDefault();
+        setMessage('');
         try {
             await fetch(`/auth/update-password?email=${email}&newPassword=${newPassword}`, {
                 method: 'POST'
@@ -93,7 +111,7 @@ const LoginPage = () => {
                 setPassword('');
                 setOtp('');
                 setNewPassword('');
-            }, 1500);
+            }, 1000);
         } catch {
             setMessage('❌ Không thể cập nhật mật khẩu.');
         }
@@ -111,12 +129,10 @@ const LoginPage = () => {
             <Header />
             <div className="login-container">
                 <h2>
-                    {{
-                        login: 'Đăng Nhập',
-                        email: 'Quên mật khẩu',
-                        otp: 'Nhập mã OTP',
-                        newpass: 'Đặt lại mật khẩu',
-                    }[step]}
+                    {step === 'login' && 'Đăng Nhập'}
+                    {step === 'email' && 'Quên mật khẩu'}
+                    {step === 'otp' && 'Nhập mã OTP'}
+                    {step === 'newpass' && 'Đặt lại mật khẩu'}
                 </h2>
 
                 <form className="login-form" onSubmit={handleSubmit}>
@@ -175,12 +191,9 @@ const LoginPage = () => {
                                 cursor: 'pointer'
                             }}
                         >
-                            {{
-                                login: isLoading ? 'Đang đăng nhập...' : 'Đăng nhập',
-                                email: 'Gửi liên kết',
-                                otp: 'Xác minh',
-                                newpass: 'Đổi mật khẩu'
-                            }[step]}
+                            {step === 'login' ? (isLoading ? 'Đang đăng nhập...' : 'Đăng nhập') :
+                                step === 'email' ? 'Gửi liên kết' :
+                                    step === 'otp' ? 'Xác minh' : 'Đổi mật khẩu'}
                         </button>
 
                         {step === 'login' ? (
