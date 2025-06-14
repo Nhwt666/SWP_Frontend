@@ -6,7 +6,6 @@ import RegisterPage from './pages/RegisterPage';
 import TicketPage from './pages/TicketPage';
 import GuidePage from './pages/GuidePage';
 import PaymentSuccess from './pages/PaymentSuccess';
-import ForgotPassword from './pages/ForgotPassword';
 import TopUpPage from './pages/TopUpPage';
 import UpdateProfilePage from './pages/UpdateProfilePage';
 import TopUpHistoryPage from './pages/TopUpHistoryPage';
@@ -16,6 +15,7 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PricingPage from './pages/PricingPage';
 
+// Các trang cho flow quên mật khẩu mới
 function App() {
     return (
         <Router>
@@ -36,7 +36,8 @@ function App() {
 
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
+
+                {/* Flow quên mật khẩu mới */}
             </Routes>
         </Router>
     );
