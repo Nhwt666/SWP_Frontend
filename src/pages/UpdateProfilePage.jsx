@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 import '../styles/UpdateProfilePage.css';
 
 const UpdateProfilePage = () => {
     const navigate = useNavigate();
+    const { updateFullName } = useContext(UserContext);
+
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');
     const [address, setAddress] = useState('');
@@ -16,9 +19,9 @@ const UpdateProfilePage = () => {
         setSuccessMsg('');
 
         const profileData = {};
-        if (name.trim() !== '') profileData.fullName = name.trim();
-        if (phone.trim() !== '') profileData.phone = phone.trim();
-        if (address.trim() !== '') profileData.address = address.trim();
+        if (name.trim()) profileData.fullName = name.trim();
+        if (phone.trim()) profileData.phone = phone.trim();
+        if (address.trim()) profileData.address = address.trim();
 
         if (Object.keys(profileData).length === 0) {
             setErrors({ general: 'Vui lòng nhập ít nhất một thông tin để cập nhật.' });
@@ -35,26 +38,18 @@ const UpdateProfilePage = () => {
                 body: JSON.stringify(profileData)
             });
 
-            const contentType = res.headers.get('content-type');
-            let data = {};
-
-            if (contentType && contentType.includes('application/json')) {
-                data = await res.json();
-            } else {
-                const text = await res.text();
-                data = { message: text };
-            }
-
             if (res.ok) {
-                setSuccessMsg(data.message || 'Cập nhật thành công!');
-                // Nếu muốn tự động quay về:
-                // setTimeout(() => navigate(-1), 1500);
-            } else {
-                if (typeof data === 'object' && data !== null) {
-                    setErrors(data);
-                } else {
-                    setErrors({ general: 'Đã có lỗi xảy ra' });
+                const meRes = await fetch('/auth/me', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (meRes.ok) {
+                    const user = await meRes.json();
+                    updateFullName(user.fullName);
                 }
+                setSuccessMsg('Cập nhật thành công!');
+            } else {
+                const data = await res.json();
+                setErrors(data || { general: 'Đã có lỗi xảy ra' });
             }
         } catch (err) {
             console.error(err);
@@ -71,30 +66,15 @@ const UpdateProfilePage = () => {
 
             <form onSubmit={handleSubmit}>
                 <label>Tên</label>
-                <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Nhập tên"
-                />
+                <input value={name} onChange={e => setName(e.target.value)} placeholder="Nhập tên" />
                 {errors.fullName && <div className="error-msg">{errors.fullName}</div>}
 
                 <label>Số điện thoại</label>
-                <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="Nhập số điện thoại"
-                />
+                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Nhập số điện thoại" />
                 {errors.phone && <div className="error-msg">{errors.phone}</div>}
 
                 <label>Địa chỉ</label>
-                <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="Nhập địa chỉ"
-                />
+                <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Nhập địa chỉ" />
                 {errors.address && <div className="error-msg">{errors.address}</div>}
 
                 {errors.general && <div className="error-msg">{errors.general}</div>}

@@ -37,7 +37,7 @@ const RegisterPage = () => {
                 setShowOtpForm(true);
             } else {
                 const err = await res.text();
-                setMessage('❌ Lỗi: ' + err);
+                setMessage('❌' + err);
             }
         } catch (error) {
             setMessage('❌ Không thể kết nối đến server.');

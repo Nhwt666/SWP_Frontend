@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 import '../styles/Header.css';
 
 const Header = () => {
     const navigate = useNavigate();
-
+    const { fullName } = useContext(UserContext);
     const [wallet, setWallet] = useState(() => {
         const raw = localStorage.getItem('wallet');
         const value = Number(raw);
         return isNaN(value) ? 0 : value;
     });
-
-    const [fullName, setFullName] = useState(localStorage.getItem('fullName') || '');
     const [showDropdown, setShowDropdown] = useState(false);
-
     const email = localStorage.getItem('email') || '';
     const isLoggedIn = !!email;
 
@@ -25,11 +23,8 @@ const Header = () => {
     const refreshWallet = async () => {
         try {
             const res = await fetch('/auth/me', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
-
             if (res.ok) {
                 const user = await res.json();
                 const balance = Number(user.walletBalance);
@@ -48,36 +43,17 @@ const Header = () => {
         }
     }, [isLoggedIn]);
 
-    useEffect(() => {
-        const handleNameUpdate = () => {
-            const updatedName = localStorage.getItem('fullName') || '';
-            setFullName(updatedName);
-        };
-
-        window.addEventListener('fullNameUpdated', handleNameUpdate);
-        window.addEventListener('storage', handleNameUpdate); // hỗ trợ nhiều tab
-
-        return () => {
-            window.removeEventListener('fullNameUpdated', handleNameUpdate);
-            window.removeEventListener('storage', handleNameUpdate);
-        };
-    }, []);
-
-    const toggleDropdown = () => {
-        setShowDropdown(prev => !prev);
-    };
-
     return (
-        <header className="header" role="banner">
+        <header className="header">
             <div className="header-container">
                 <div className="logo-title">
-                    <Link to="/" aria-label="Trang chủ">
-                        <img src="/logo.png" alt="Logo Trung Tâm Xét nghiệm ADN" className="logo" />
+                    <Link to="/">
+                        <img src="/logo.png" alt="Logo" className="logo" />
                     </Link>
                     <h1>Trung Tâm Xét nghiệm ADN</h1>
                 </div>
 
-                <nav className="auth-links" aria-label="Liên kết đăng nhập và đăng ký">
+                <nav className="auth-links">
                     {isLoggedIn ? (
                         <div className="user-info-container">
                             <div className="user-info-text">
@@ -85,12 +61,7 @@ const Header = () => {
                                 <div className="user-wallet">Ví: {wallet.toLocaleString()}đ</div>
                             </div>
                             <div className="avatar-container">
-                                <div
-                                    className="avatar"
-                                    role="img"
-                                    aria-label="Avatar người dùng"
-                                    onClick={toggleDropdown}
-                                >
+                                <div className="avatar" onClick={() => setShowDropdown(!showDropdown)}>
                                     {fullName.charAt(0).toUpperCase()}
                                 </div>
                                 {showDropdown && (
@@ -113,16 +84,6 @@ const Header = () => {
                     )}
                 </nav>
             </div>
-
-            <section className="main-nav">
-                <nav className="main-nav-container">
-                    <Link to="/" className="nav-btn">Trang Chủ</Link>
-                    <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
-                    <Link to="/pricing" className="nav-btn">Bảng giá</Link>
-                    <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
-                    <Link to="/blog" className="nav-btn">Blog chia sẻ</Link>
-                </nav>
-            </section>
         </header>
     );
 };

@@ -117,7 +117,7 @@ const LoginPage = () => {
         });
 
         if (!res.ok) {
-            setMessage('❌ Không thể đổi mật khẩu.');
+            setMessage('❌ Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt');
         } else {
             setMessage('🔐 Mật khẩu đã được đổi thành công!');
             sessionStorage.removeItem('verifiedOtp');
@@ -194,7 +194,7 @@ const LoginPage = () => {
                             }}
                         >
                             {step === 'login' ? (isLoading ? 'Đang đăng nhập...' : 'Đăng nhập') :
-                                step === 'email' ? 'Gửi liên kết' :
+                                step === 'email' ? 'Xác Nhận' :
                                     step === 'otp' ? 'Xác minh' :
                                         'Đổi mật khẩu'}
                         </button>
