@@ -2,25 +2,40 @@ import React, { useEffect, useState } from 'react';
 
 const TopUpHistoryPage = () => {
     const [history, setHistory] = useState([]);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
-        // Gọi API lấy dữ liệu lịch sử nạp tiền
         const fetchHistory = async () => {
             try {
-                const res = await fetch('/api/topup/history', {
+                // Gọi /auth/me lấy user info
+                const meRes = await fetch('/auth/me', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (!meRes.ok) throw new Error("Không thể lấy thông tin user");
+                const user = await meRes.json();
+
+                // Giả sử BE trả userId (nếu chưa có thì cần BE bổ sung userId vào /auth/me)
+                const userId = user.userId;
+                if (!userId) {
+                    setMessage("Không tìm thấy userId trong thông tin người dùng");
+                    return;
+                }
+
+                // Gọi API topup history
+                const historyRes = await fetch(`/api/paypal/topup-history?userId=${userId}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    setHistory(data);
-                } else {
-                    console.error('Không thể tải lịch sử nạp tiền');
-                }
+                if (!historyRes.ok) throw new Error("Không thể tải lịch sử nạp tiền");
+                const data = await historyRes.json();
+                setHistory(data);
             } catch (err) {
-                console.error('Lỗi khi tải lịch sử nạp tiền:', err);
+                console.error(err);
+                setMessage(err.message);
             }
         };
 
@@ -30,7 +45,8 @@ const TopUpHistoryPage = () => {
     return (
         <div className="topup-history-page" style={{ padding: '20px' }}>
             <h2>Lịch sử nạp tiền</h2>
-            {history.length === 0 ? (
+            {message && <p style={{ color: 'red' }}>{message}</p>}
+            {history.length === 0 && !message ? (
                 <p>Không có dữ liệu nạp tiền.</p>
             ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -38,15 +54,22 @@ const TopUpHistoryPage = () => {
                     <tr>
                         <th style={{ border: '1px solid #ccc', padding: '8px' }}>Ngày</th>
                         <th style={{ border: '1px solid #ccc', padding: '8px' }}>Số tiền</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Trạng thái</th>
+                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Thông tin PayPal</th>
                     </tr>
                     </thead>
                     <tbody>
                     {history.map((item, index) => (
                         <tr key={index}>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{new Date(item.date).toLocaleString()}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.amount.toLocaleString()} đ</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.status}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                                {new Date(item.createdAt).toLocaleString('vi-VN')}
+                            </td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                                {Number(item.amount).toLocaleString('vi-VN')} đ
+                            </td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                                PayID: {item.paymentId} <br />
+                                PayerID: {item.payerId}
+                            </td>
                         </tr>
                     ))}
                     </tbody>
