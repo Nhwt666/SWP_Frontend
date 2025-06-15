@@ -137,3 +137,15 @@
 .forgot-password:hover {
   text-decoration: underline;
 }
+
+.error-msg {
+  color: red;
+  font-size: 0.85em;
+  margin-top: 2px;
+}
+
+.success-msg {
+  color: green;
+  font-size: 0.9em;
+  margin-top: 8px;
+}

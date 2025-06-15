@@ -11,9 +11,9 @@ const Header = () => {
         return isNaN(value) ? 0 : value;
     });
 
+    const [fullName, setFullName] = useState(localStorage.getItem('fullName') || '');
     const [showDropdown, setShowDropdown] = useState(false);
 
-    const fullName = localStorage.getItem('fullName') || '';
     const email = localStorage.getItem('email') || '';
     const isLoggedIn = !!email;
 
@@ -47,6 +47,21 @@ const Header = () => {
             refreshWallet();
         }
     }, [isLoggedIn]);
+
+    useEffect(() => {
+        const handleNameUpdate = () => {
+            const updatedName = localStorage.getItem('fullName') || '';
+            setFullName(updatedName);
+        };
+
+        window.addEventListener('fullNameUpdated', handleNameUpdate);
+        window.addEventListener('storage', handleNameUpdate); // hỗ trợ nhiều tab
+
+        return () => {
+            window.removeEventListener('fullNameUpdated', handleNameUpdate);
+            window.removeEventListener('storage', handleNameUpdate);
+        };
+    }, []);
 
     const toggleDropdown = () => {
         setShowDropdown(prev => !prev);
