@@ -28,61 +28,54 @@ const UpdateProfilePage = () => {
             return;
         }
 
-        const token = localStorage.getItem('token');
-        if (!token) {
-            setErrors({ general: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.' });
-            navigate('/login');
-            return;
-        }
-
         try {
             const res = await fetch('/customer/update_profile', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify(profileData)
             });
 
             if (res.ok) {
                 const meRes = await fetch('/auth/me', {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
                 if (meRes.ok) {
                     const user = await meRes.json();
                     updateFullName(user.fullName);
-                    localStorage.setItem('fullName', user.fullName);
                 }
-                setSuccessMsg('✅ Cập nhật thành công!');
-            } else if (res.status === 403) {
-                setErrors({ general: '❌ Bạn không có quyền thực hiện thao tác này.' });
+                setSuccessMsg('Cập nhật thành công!');
             } else {
                 const data = await res.json();
-                setErrors(data || { general: 'Đã có lỗi xảy ra khi cập nhật.' });
+                setErrors(data || { general: 'Đã có lỗi xảy ra' });
             }
         } catch (err) {
             console.error(err);
-            setErrors({ general: '❌ Không thể kết nối đến máy chủ.' });
+            setErrors({ general: 'Không thể kết nối đến máy chủ' });
         }
     };
 
     return (
         <div className="profile-box">
             <div className="profile-header">
-                <h2>My Profile</h2>
+                <h2>My profile</h2>
                 <button className="close-btn" onClick={() => navigate(-1)}>✕</button>
             </div>
 
             <form onSubmit={handleSubmit}>
                 <label>Tên</label>
                 <input value={name} onChange={e => setName(e.target.value)} placeholder="Nhập tên" />
+                {errors.fullName && <div className="error-msg">{errors.fullName}</div>}
 
                 <label>Số điện thoại</label>
                 <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Nhập số điện thoại" />
+                {errors.phone && <div className="error-msg">{errors.phone}</div>}
 
                 <label>Địa chỉ</label>
                 <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Nhập địa chỉ" />
+                {errors.address && <div className="error-msg">{errors.address}</div>}
 
                 {errors.general && <div className="error-msg">{errors.general}</div>}
                 {successMsg && <div className="success-msg">{successMsg}</div>}
