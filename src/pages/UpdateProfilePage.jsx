@@ -39,14 +39,21 @@ const UpdateProfilePage = () => {
             });
 
             if (res.ok) {
+                // Sau khi update thành công, lấy lại profile mới
                 const meRes = await fetch('/auth/me', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
                 });
                 if (meRes.ok) {
                     const user = await meRes.json();
                     updateFullName(user.fullName);
                 }
                 setSuccessMsg('Cập nhật thành công!');
+                // Reset input form
+                setName('');
+                setPhone('');
+                setAddress('');
             } else {
                 const data = await res.json();
                 setErrors(data || { general: 'Đã có lỗi xảy ra' });

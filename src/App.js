@@ -15,7 +15,6 @@ import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PricingPage from './pages/PricingPage';
 
-// Các trang cho flow quên mật khẩu mới
 function App() {
     return (
         <Router>
@@ -36,8 +35,6 @@ function App() {
 
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/register" element={<RegisterPage />} />
-
-                {/* Flow quên mật khẩu mới */}
             </Routes>
         </Router>
     );
