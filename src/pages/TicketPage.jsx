@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/TicketPage.css';
 
 const TicketPage = () => {
@@ -9,6 +9,7 @@ const TicketPage = () => {
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -22,8 +23,31 @@ const TicketPage = () => {
         'Xác minh quyền thừa kế trong di chúc',
     ];
 
-    const handleSubmit = (e) => {
+    // Lấy thông tin user khi load trang
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const res = await fetch('/auth/me', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.address) setAddress(data.address);
+                    if (data.phone) setPhone(data.phone);
+                    if (data.email) setEmail(data.email);
+                }
+            } catch (err) {
+                console.error('Lỗi lấy thông tin người dùng:', err);
+            }
+        };
+        fetchUserInfo();
+    }, []);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
 
         const ticketData = {
             category,
@@ -33,8 +57,43 @@ const TicketPage = () => {
             ...(method === 'Tự gửi mẫu' && { address, phone, email }),
         };
 
-        console.log(ticketData);
-        alert('Ticket đã được tạo thành công!');
+        try {
+            const res = await fetch('/tickets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(ticketData)
+            });
+
+            if (res.ok) {
+                const ticket = await res.json();
+
+                // Lưu ID ticket vào lịch sử localStorage
+                let history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
+                history.push(ticket.id);
+                localStorage.setItem('ticketHistory', JSON.stringify(history));
+
+                alert(`🎉 Ticket đã được tạo thành công! ID: ${ticket.id}`);
+                // Reset form
+                setCategory('');
+                setService('');
+                setCustomReason('');
+                setMethod('');
+                setAddress('');
+                setPhone('');
+                setEmail('');
+            } else {
+                const errData = await res.json();
+                alert(`❌ Tạo ticket thất bại: ${errData.message || 'Lỗi không xác định'}`);
+            }
+        } catch (err) {
+            console.error('Lỗi:', err);
+            alert('❌ Không thể kết nối server');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -162,8 +221,8 @@ const TicketPage = () => {
                     </div>
                 )}
 
-                <button type="submit" className="submit-btn">
-                    Tạo Đơn
+                <button type="submit" className="submit-btn" disabled={loading}>
+                    {loading ? 'Đang tạo...' : 'Tạo Đơn'}
                 </button>
             </form>
         </div>

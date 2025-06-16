@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import '../styles/Header.css';
@@ -12,15 +12,18 @@ const Header = () => {
         return isNaN(value) ? 0 : value;
     });
     const [showDropdown, setShowDropdown] = useState(false);
+    const [role, setRole] = useState(localStorage.getItem('role') || '');
+
     const email = localStorage.getItem('email') || '';
     const isLoggedIn = !!email;
+    const dropdownRef = useRef();
 
     const handleLogout = () => {
         localStorage.clear();
         navigate('/');
     };
 
-    const refreshWallet = async () => {
+    const refreshWalletAndRole = async () => {
         try {
             const res = await fetch('/auth/me', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -30,24 +33,36 @@ const Header = () => {
                 const balance = Number(user.walletBalance);
                 const safeBalance = isNaN(balance) ? 0 : balance;
                 localStorage.setItem('wallet', safeBalance);
+                localStorage.setItem('role', user.role);
                 setWallet(safeBalance);
+                setRole(user.role);
             }
         } catch (err) {
-            console.error('❌ Lỗi cập nhật ví:', err);
+            console.error('❌ Lỗi cập nhật thông tin:', err);
         }
     };
 
     useEffect(() => {
         if (isLoggedIn && localStorage.getItem('token')) {
-            refreshWallet();
+            refreshWalletAndRole();
         }
     }, [isLoggedIn]);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
 
     return (
         <header className="header">
             <div className="header-container">
                 <div className="logo-title">
-                    <Link to="/">
+                    <Link to={role === 'ADMIN' ? '/admin/dashboard' : '/'}>
                         <img src="/logo.png" alt="Logo" className="logo" />
                     </Link>
                     <h1>Trung Tâm Xét nghiệm ADN</h1>
@@ -55,23 +70,39 @@ const Header = () => {
 
                 <nav className="auth-links">
                     {isLoggedIn ? (
-                        <div className="user-info-container">
+                        <div className="user-info-container" ref={dropdownRef}>
                             <div className="user-info-text">
-                                <div className="user-greeting">Xin chào, {fullName}</div>
-                                <div className="user-wallet">Ví: {wallet.toLocaleString()}đ</div>
+                                <div className="user-greeting">
+                                    Xin chào, {fullName || 'Người dùng'} {role === 'ADMIN' && '(Quản trị)'}
+                                </div>
+                                {role !== 'ADMIN' && (
+                                    <div className="user-wallet">Ví: {wallet.toLocaleString()}đ</div>
+                                )}
                             </div>
                             <div className="avatar-container">
-                                <div className="avatar" onClick={() => setShowDropdown(!showDropdown)}>
-                                    {fullName.charAt(0).toUpperCase()}
+                                <div
+                                    className="avatar"
+                                    onClick={() => setShowDropdown(!showDropdown)}
+                                >
+                                    {(fullName || 'U').charAt(0).toUpperCase()}
                                 </div>
                                 {showDropdown && (
                                     <div className="dropdown-menu">
-                                        <button onClick={() => navigate('/profile')}>Thông tin của tôi</button>
-                                        <button onClick={() => navigate('/update-profile')}>Cập nhật thông tin</button>
-                                        <button onClick={() => navigate('/topup-history')}>Lịch sử nạp tiền</button>
-                                        <button onClick={() => navigate('/test-history')}>Lịch sử xét nghiệm</button>
-                                        <button onClick={() => navigate('/topup')}>Nạp tiền</button>
-                                        <button onClick={handleLogout}>Đăng xuất</button>
+                                        {role === 'ADMIN' ? (
+                                            <>
+                                                <button onClick={() => navigate('/admin/dashboard')}>Bảng điều khiển</button>
+                                                <button onClick={handleLogout}>Đăng xuất</button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button onClick={() => navigate('/profile')}>Thông tin của tôi</button>
+                                                <button onClick={() => navigate('/update-profile')}>Cập nhật thông tin</button>
+                                                <button onClick={() => navigate('/topup-history')}>Lịch sử nạp tiền</button>
+                                                <button onClick={() => navigate('/test-history')}>Lịch sử xét nghiệm</button>
+                                                <button onClick={() => navigate('/topup')}>Nạp tiền</button>
+                                                <button onClick={handleLogout}>Đăng xuất</button>
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -85,15 +116,17 @@ const Header = () => {
                 </nav>
             </div>
 
-            <nav className="main-nav">
-                <div className="main-nav-container">
-                    <Link to="/" className="nav-btn">Trang Chủ</Link>
-                    <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
-                    <Link to="/pricing" className="nav-btn">Bảng giá</Link>
-                    <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
-                    <Link to="/blog" className="nav-btn">Blog chia sẻ</Link>
-                </div>
-            </nav>
+            {role !== 'ADMIN' && (
+                <nav className="main-nav">
+                    <div className="main-nav-container">
+                        <Link to="/" className="nav-btn">Trang Chủ</Link>
+                        <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
+                        <Link to="/pricing" className="nav-btn">Bảng giá</Link>
+                        <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
+                        <Link to="/blog" className="nav-btn">Blog chia sẻ</Link>
+                    </div>
+                </nav>
+            )}
         </header>
     );
 };

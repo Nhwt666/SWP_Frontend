@@ -73,7 +73,7 @@ const GuidePage = () => {
                 {/* Chèn ảnh ở đây */}
                 <div style={{ textAlign: 'center' }}>
                     <img
-                        src={process.env.PUBLIC_URL + "/mong tay.jpg"}
+                        src={process.env.PUBLIC_URL + "/mongtay.jpg"}
                         alt="Lấy mẫu móng tay"
                         style={{ maxWidth: '100%', height: 'auto' }}
                     />
