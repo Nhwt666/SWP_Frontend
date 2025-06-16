@@ -84,6 +84,16 @@ const Header = () => {
                     )}
                 </nav>
             </div>
+
+            <nav className="main-nav">
+                <div className="main-nav-container">
+                    <Link to="/" className="nav-btn">Trang Chủ</Link>
+                    <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
+                    <Link to="/pricing" className="nav-btn">Bảng giá</Link>
+                    <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
+                    <Link to="/blog" className="nav-btn">Blog chia sẻ</Link>
+                </div>
+            </nav>
         </header>
     );
 };
