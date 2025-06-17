@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom'; // Dùng để điều hướng sau khi thành công
 import Header from '../components/Header';
 import '../styles/StaffPage.css';
+import { toast } from 'react-toastify'; // Thêm thông báo toast
 
 const mockTickets = [
     {
@@ -35,11 +37,12 @@ const mockTickets = [
     },
 ];
 
-const StaffPage = () => {
+const TicketPage = () => {
     const [tickets, setTickets] = useState(mockTickets);
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [note, setNote] = useState('');
     const [result, setResult] = useState('');
+    const history = useHistory(); // Dùng để điều hướng sau khi xử lý thành công
 
     const selectedTicket = tickets.find((t) => t.id === selectedTicketId);
 
@@ -47,43 +50,75 @@ const StaffPage = () => {
         setSelectedTicketId(id);
         setNote('');
         setResult('');
-        // Nếu cần, có thể reset trạng thái tạm thời ở đây
     };
 
     const updateTicketStatus = (id, updates) => {
-        setTickets((prev) =>
-            prev.map((t) => (t.id === id ? { ...t, ...updates } : t))
+        setTickets((prevTickets) =>
+            prevTickets.map((t) => (t.id === id ? { ...t, ...updates } : t))
         );
     };
 
     const handleMarkProcessing = () => {
-        if (!selectedTicket) return;
+        if (!selectedTicket || selectedTicket.status === 'Đang xử lý') return;
         updateTicketStatus(selectedTicket.id, { status: 'Đang xử lý' });
     };
 
-    const handleSubmitResult = () => {
+    const handleSubmitResult = async () => {
         if (!selectedTicket) return;
         if (selectedTicket.type === 'Tại cơ sở' && !note.trim()) {
-            alert('Vui lòng nhập ghi chú xử lý mẫu!');
+            toast.error('Vui lòng nhập ghi chú xử lý mẫu!');
             return;
         }
         if (!result.trim()) {
-            alert('Vui lòng nhập kết quả xét nghiệm!');
+            toast.error('Vui lòng nhập kết quả xét nghiệm!');
             return;
         }
 
-        // Cập nhật trạng thái Done và lưu note, result
-        updateTicketStatus(selectedTicket.id, {
+        // Gửi dữ liệu tới backend (POST request)
+        const token = localStorage.getItem('jwtToken'); // Lấy token JWT từ localStorage
+        if (!token) {
+            toast.error('Vui lòng đăng nhập để tiếp tục!');
+            return;
+        }
+
+        const ticketData = {
+            type: selectedTicket.type,
             status: 'Done',
+            customer: selectedTicket.customer,
+            method: selectedTicket.type === 'Tại cơ sở' ? 'offline' : 'online',
+            reason: selectedTicket.reason,
             note,
             result,
-        });
+        };
 
-        // Gửi mail/sms giả lập
-        console.log(`Đã gửi kết quả đến email: ${selectedTicket.customer.email} - SĐT: ${selectedTicket.customer.phone}`);
-        alert('Kết quả đã được gửi và ticket đánh dấu Done!');
+        try {
+            const response = await fetch('http://localhost:4323/tickets', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Gửi token trong header
+                },
+                body: JSON.stringify(ticketData),
+            });
 
-        // Reset lựa chọn
+            if (response.ok) {
+                // Cập nhật trạng thái ticket và thông báo thành công
+                updateTicketStatus(selectedTicket.id, {
+                    status: 'Done',
+                    note,
+                    result,
+                });
+                toast.success('Kết quả đã được gửi và ticket đánh dấu Done!');
+                history.push('/tickets'); // Điều hướng về trang danh sách tickets
+            } else {
+                // Nếu có lỗi khi gửi dữ liệu
+                toast.error('Lỗi khi tạo ticket. Vui lòng thử lại!');
+            }
+        } catch (error) {
+            toast.error('Lỗi khi kết nối đến server. Vui lòng thử lại!');
+        }
+
+        // Reset lựa chọn và form
         setSelectedTicketId(null);
         setNote('');
         setResult('');
@@ -164,4 +199,4 @@ const StaffPage = () => {
     );
 };
 
-export default StaffPage;
+export default TicketPage;

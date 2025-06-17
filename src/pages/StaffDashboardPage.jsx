@@ -9,7 +9,8 @@ const StaffDashboardPage = () => {
                 <nav>
                     <ul>
                         <li>Trang chính</li>
-                        <li>Quản lý vé</li>
+                        <li>Tìm Kiếm</li>
+                        <li>Quản lý Yêu Cầu</li>
                         <li>Hồ sơ cá nhân</li>
                         <li>Đăng xuất</li>
                     </ul>
