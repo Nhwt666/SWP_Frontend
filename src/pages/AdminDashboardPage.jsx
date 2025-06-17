@@ -23,10 +23,7 @@ const AdminDashboardPage = () => {
                         tongXetNghiem: data.totalTickets || 0,
                         nguoiDungDangKy: data.totalUsers || 0,
                         dangChoXetDuyet: data.feedbackCount || 0,
-                        baiGuiGanDay: [
-                            { id: '#001', khachHang: 'Nguyễn Văn A', ngay: '2025-05-25', trangThai: 'Hoàn thành' },
-                            { id: '#002', khachHang: 'Trần Thị B', ngay: '2025-05-24', trangThai: 'Đang xử lý' }
-                        ]
+                        baiGuiGanDay: data.recentTickets || []
                     });
                 } else if (res.status === 403) {
                     setError('❌ Bạn không có quyền truy cập trang này!');
@@ -51,10 +48,18 @@ const AdminDashboardPage = () => {
                         <li onClick={() => navigate('/admin/dashboard')} style={{ cursor: 'pointer' }}>
                             Bảng điều khiển
                         </li>
-                        <li>Xét nghiệm ADN</li>
-                        <li>Người dùng</li>
-                        <li>Báo cáo</li>
-                        <li>Cài đặt</li>
+                        <li onClick={() => navigate('/admin/tests')} style={{ cursor: 'pointer' }}>
+                            Xét nghiệm ADN
+                        </li>
+                        <li onClick={() => navigate('/admin/users')} style={{ cursor: 'pointer' }}>
+                            Người dùng
+                        </li>
+                        <li onClick={() => navigate('/admin/reports')} style={{ cursor: 'pointer' }}>
+                            Báo cáo
+                        </li>
+                        <li onClick={() => navigate('/admin/settings')} style={{ cursor: 'pointer' }}>
+                            Cài đặt
+                        </li>
                     </ul>
                 </nav>
             </aside>
@@ -74,17 +79,17 @@ const AdminDashboardPage = () => {
                             <div className="card">
                                 <h3>Tổng số xét nghiệm ADN</h3>
                                 <p>{dashboardData.tongXetNghiem.toLocaleString()}</p>
-                                <button>Xem chi tiết</button>
+                                <button onClick={() => navigate('/admin/tests')}>Xem chi tiết</button>
                             </div>
                             <div className="card">
                                 <h3>Số người dùng đăng ký</h3>
                                 <p>{dashboardData.nguoiDungDangKy.toLocaleString()}</p>
-                                <button>Xem chi tiết</button>
+                                <button onClick={() => navigate('/admin/users')}>Xem chi tiết</button>
                             </div>
                             <div className="card">
                                 <h3>Xét nghiệm chờ duyệt</h3>
                                 <p>{dashboardData.dangChoXetDuyet.toLocaleString()}</p>
-                                <button>Xem chi tiết</button>
+                                <button onClick={() => navigate('/admin/feedbacks')}>Xem chi tiết</button>
                             </div>
                         </div>
 
@@ -95,26 +100,30 @@ const AdminDashboardPage = () => {
 
                         <div className="recent-submissions">
                             <h3>Xét nghiệm ADN gần đây</h3>
-                            <table>
-                                <thead>
-                                <tr>
-                                    <th>Mã đơn</th>
-                                    <th>Khách hàng</th>
-                                    <th>Ngày</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {dashboardData.baiGuiGanDay.map((item) => (
-                                    <tr key={item.id}>
-                                        <td>{item.id}</td>
-                                        <td>{item.khachHang}</td>
-                                        <td>{item.ngay}</td>
-                                        <td>{item.trangThai}</td>
+                            {dashboardData.baiGuiGanDay.length === 0 ? (
+                                <p>Không có dữ liệu.</p>
+                            ) : (
+                                <table>
+                                    <thead>
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Ngày</th>
+                                        <th>Trạng thái</th>
                                     </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {dashboardData.baiGuiGanDay.map((item) => (
+                                        <tr key={item.id}>
+                                            <td>{item.id}</td>
+                                            <td>{item.khachHang}</td>
+                                            <td>{item.ngay}</td>
+                                            <td>{item.trangThai}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            )}
                         </div>
                     </>
                 )}

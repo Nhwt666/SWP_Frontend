@@ -14,7 +14,8 @@ import Layout from './components/Layout';
 import ProfilePage from './pages/ProfilePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import PricingPage from './pages/PricingPage';
-
+import AdminUsersPage from './pages/AdminUsersPage';
+import StaffDashboardPage from './pages/StaffDashboardPage';
 function App() {
     return (
         <Router>
@@ -31,6 +32,8 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                     <Route path="/pricing" element={<PricingPage />} />
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />

@@ -10,7 +10,7 @@ const LoginPage = () => {
     const [newPassword, setNewPassword] = useState('');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [step, setStep] = useState('login'); // login | email | otp | newpass
+    const [step, setStep] = useState('login');
 
     const navigate = useNavigate();
 
@@ -67,8 +67,11 @@ const LoginPage = () => {
 
         setMessage('🎉 Đăng nhập thành công!');
         setTimeout(() => {
-            if (user.role?.toUpperCase() === 'ADMIN') {
+            const role = user.role?.toUpperCase();
+            if (role === 'ADMIN') {
                 navigate('/admin/dashboard');
+            } else if (role === 'STAFF') {
+                navigate('/staff/dashboard');
             } else {
                 navigate('/');
             }
@@ -95,7 +98,7 @@ const LoginPage = () => {
             setMessage('❌ OTP không hợp lệ hoặc đã hết hạn.');
         } else {
             setMessage('✅ OTP hợp lệ. Nhập mật khẩu mới.');
-            sessionStorage.setItem('verifiedOtp', otp);  // lưu otp để gửi cùng đổi mật khẩu
+            sessionStorage.setItem('verifiedOtp', otp);
             setStep('newpass');
         }
     };
@@ -110,10 +113,7 @@ const LoginPage = () => {
         const res = await fetch('/auth/update-password', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                otp: verifiedOtp,
-                newPassword
-            })
+            body: JSON.stringify({ otp: verifiedOtp, newPassword })
         });
 
         if (!res.ok) {
@@ -177,21 +177,10 @@ const LoginPage = () => {
                         />
                     )}
 
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+                    <div className="button-group">
                         <button
                             type="submit"
                             disabled={isLoading}
-                            style={{
-                                width: '100%',
-                                maxWidth: '200px',
-                                backgroundColor: '#0047AB',
-                                color: '#fff',
-                                border: 'none',
-                                padding: '10px',
-                                borderRadius: '4px',
-                                fontWeight: 'bold',
-                                cursor: 'pointer'
-                            }}
                         >
                             {step === 'login' ? (isLoading ? 'Đang đăng nhập...' : 'Đăng nhập') :
                                 step === 'email' ? 'Xác Nhận' :
@@ -203,14 +192,7 @@ const LoginPage = () => {
                             <button
                                 type="button"
                                 onClick={() => setStep('email')}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#0047AB',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline',
-                                    fontSize: '14px'
-                                }}
+                                className="link-button"
                             >
                                 Quên mật khẩu?
                             </button>
@@ -224,14 +206,7 @@ const LoginPage = () => {
                                     setNewPassword('');
                                     sessionStorage.removeItem('verifiedOtp');
                                 }}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    color: 'gray',
-                                    cursor: 'pointer',
-                                    textDecoration: 'underline',
-                                    fontSize: '14px'
-                                }}
+                                className="link-button gray"
                             >
                                 ← Quay lại đăng nhập
                             </button>
@@ -239,7 +214,7 @@ const LoginPage = () => {
                     </div>
                 </form>
 
-                {message && <p className="message" style={{ marginTop: '12px', textAlign: 'center' }}>{message}</p>}
+                {message && <p className="message">{message}</p>}
             </div>
         </>
     );

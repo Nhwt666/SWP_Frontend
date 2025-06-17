@@ -1,0 +1,7 @@
+organization=kenfiz123
+projectKey=SWP_Frontend-main1
+serverUrl=https://sonarcloud.io
+serverVersion=8.0.0.64524
+dashboardUrl=https://sonarcloud.io/dashboard?id=SWP_Frontend-main1
+ceTaskId=AZd7nisIq8uIhpBkrOlU
+ceTaskUrl=https://sonarcloud.io/api/ce/task?id=AZd7nisIq8uIhpBkrOlU
