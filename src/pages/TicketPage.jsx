@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/TicketPage.css';
 
+const pricingData = {
+    'Xác minh quyền thừa kế': 1200000,
+    'Xác minh quan hệ huyết thống': 1500000,
+    'Giám định ADN cho con nuôi': 1000000,
+    'Xác minh danh tính': 1300000,
+    'Xác minh quyền lợi bảo hiểm': 1600000,
+    'Xác minh quyền thừa kế trong di chúc': 1700000,
+    'Khác': 900000,
+};
+
 const TicketPage = () => {
     const [category, setCategory] = useState('');
     const [service, setService] = useState('');
@@ -11,12 +21,11 @@ const TicketPage = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState(null);
-
-    // Dữ liệu người dùng để fill tự động
+    const [price, setPrice] = useState(0);
     const [userInfo, setUserInfo] = useState({
         address: '',
         phone: '',
-        email: ''
+        email: '',
     });
 
     const civilServices = [
@@ -31,23 +40,24 @@ const TicketPage = () => {
         'Xác minh quyền thừa kế trong di chúc',
     ];
 
-    // Fetch user info
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
                 const res = await fetch('/auth/me', {
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
                 });
                 if (res.ok) {
-                    const data = await res.json();
-                    setUserId(data.userId || null);
+                    const user = await res.json();
+                    setUserId(user.userId || user.id || null);
                     setUserInfo({
-                        address: data.address || '',
-                        phone: data.phone || '',
-                        email: data.email || ''
+                        address: user.address || '',
+                        phone: user.phone || '',
+                        email: user.email || '',
                     });
+                } else {
+                    console.error('Không thể lấy thông tin người dùng.');
                 }
             } catch (err) {
                 console.error('Lỗi lấy thông tin người dùng:', err);
@@ -56,7 +66,6 @@ const TicketPage = () => {
         fetchUserInfo();
     }, []);
 
-    // Auto-fill khi chọn "Tự gửi mẫu"
     useEffect(() => {
         if (method === 'Tự gửi mẫu') {
             setAddress(userInfo.address);
@@ -69,19 +78,35 @@ const TicketPage = () => {
         }
     }, [method, userInfo]);
 
+    useEffect(() => {
+        let calculated = 0;
+        if (category === 'Khác') {
+            calculated = pricingData['Khác'];
+        } else if (service && pricingData[service]) {
+            calculated = pricingData[service];
+        }
+        setPrice(calculated);
+    }, [category, service]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!userId) {
+            alert('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            return;
+        }
+
         setLoading(true);
 
         const typeMap = {
-            "Dân sự": "CIVIL",
-            "Hành chính": "ADMINISTRATIVE",
-            "Khác": "OTHER",
+            'Dân sự': 'CIVIL',
+            'Hành chính': 'ADMINISTRATIVE',
+            'Khác': 'OTHER',
         };
 
         const methodMap = {
-            "Tự gửi mẫu": "SELF_TEST",
-            "Tại cơ sở y tế": "AT_FACILITY",
+            'Tự gửi mẫu': 'SELF_TEST',
+            'Tại cơ sở y tế': 'AT_FACILITY',
         };
 
         const ticketData = {
@@ -91,7 +116,7 @@ const TicketPage = () => {
             address: method === 'Tự gửi mẫu' ? address : null,
             phone: method === 'Tự gửi mẫu' ? phone : null,
             email: method === 'Tự gửi mẫu' ? email : null,
-            customerId: userId
+            customerId: userId,
         };
 
         try {
@@ -99,26 +124,25 @@ const TicketPage = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
-                body: JSON.stringify(ticketData)
+                body: JSON.stringify(ticketData),
             });
 
             if (res.ok) {
                 const ticket = await res.json();
-                let history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
+                const history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
-
                 alert(`🎉 Ticket đã được tạo thành công! ID: ${ticket.id}`);
                 resetForm();
             } else {
-                const errData = await res.json();
-                alert(`❌ Tạo ticket thất bại: ${errData.message || 'Lỗi không xác định'}`);
+                const errText = await res.text();
+                alert(`❌ Tạo ticket thất bại: ${errText || 'Lỗi không xác định'}`);
             }
         } catch (err) {
             console.error('Lỗi:', err);
-            alert('❌ Không thể kết nối server');
+            alert('❌ Không thể kết nối đến máy chủ');
         } finally {
             setLoading(false);
         }
@@ -132,6 +156,7 @@ const TicketPage = () => {
         setAddress('');
         setPhone('');
         setEmail('');
+        setPrice(0);
     };
 
     return (
@@ -139,7 +164,15 @@ const TicketPage = () => {
             <h2>Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
             <form onSubmit={handleSubmit}>
                 <label>Chọn loại yêu cầu:</label>
-                <select value={category} onChange={(e) => { setCategory(e.target.value); setService(''); setCustomReason(''); }} required>
+                <select
+                    value={category}
+                    onChange={(e) => {
+                        setCategory(e.target.value);
+                        setService('');
+                        setCustomReason('');
+                    }}
+                    required
+                >
                     <option value="">-- Chọn --</option>
                     <option value="Dân sự">Dân sự</option>
                     <option value="Hành chính">Hành chính</option>
@@ -161,7 +194,13 @@ const TicketPage = () => {
                 {category === 'Khác' && (
                     <>
                         <label>Lý do cần xét nghiệm:</label>
-                        <textarea value={customReason} onChange={(e) => setCustomReason(e.target.value)} rows="4" placeholder="Nhập lý do cụ thể..." required />
+                        <textarea
+                            value={customReason}
+                            onChange={(e) => setCustomReason(e.target.value)}
+                            rows="4"
+                            placeholder="Nhập lý do cụ thể..."
+                            required
+                        />
                     </>
                 )}
 
@@ -182,6 +221,10 @@ const TicketPage = () => {
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                     </>
                 )}
+
+                <div style={{ marginTop: '20px', fontWeight: 'bold', color: '#004aad', fontSize: '18px' }}>
+                    💰 Tổng chi phí: {price.toLocaleString('vi-VN')} VND
+                </div>
 
                 <button type="submit" className="submit-btn" disabled={loading}>
                     {loading ? 'Đang tạo...' : 'Tạo Đơn'}
