@@ -97,58 +97,62 @@ const RegisterPage = () => {
     return (
         <>
             <Header />
-            <div className="register-container">
-                <h2>Đăng Ký</h2>
-
-                {!showOtpForm ? (
-                    <form className="register-form" onSubmit={handleRegister}>
-                        <input
-                            type="text"
-                            placeholder="Tên người dùng"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="password"
-                            placeholder="Mật khẩu"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                        <input
-                            type="text"
-                            placeholder="Số điện thoại"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                        />
-                        <button type="submit" disabled={isLoading}>
-                            {isLoading ? 'Đang gửi...' : 'Xác nhận'}
-                        </button>
-                    </form>
-                ) : (
-                    <form className="register-form" onSubmit={handleConfirm}>
-                        <input
-                            type="text"
-                            placeholder="Nhập mã OTP"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            required
-                        />
-                        <button type="submit" disabled={isLoading}>
-                            {isLoading ? 'Đang xác nhận...' : 'Xác nhận'}
-                        </button>
-                    </form>
-                )}
-
-                {message && <p className="message">{message}</p>}
+            <div className="register-bg">
+                <div className="register-container flex-col">
+                    <div className="register-avatar-section">
+                        {/* <img src="/logo192.png" alt="Logo" className="register-avatar" /> */}
+                    </div>
+                    <h2 className="register-title">Đăng Ký</h2>
+                    {!showOtpForm ? (
+                        <form className="register-form" onSubmit={handleRegister}>
+                            <input
+                                type="text"
+                                placeholder="Tên người dùng"
+                                value={fullName}
+                                onChange={(e) => setFullName(e.target.value)}
+                                required
+                            />
+                            <input
+                                type="email"
+                                placeholder="Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                            />
+                            <input
+                                type="password"
+                                placeholder="Mật khẩu"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                            />
+                            <input
+                                type="text"
+                                placeholder="Số điện thoại"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                            />
+                            <button type="submit" disabled={isLoading}>
+                                {isLoading ? 'Đang gửi...' : 'Xác nhận'}
+                            </button>
+                        </form>
+                    ) : (
+                        <form className="register-form" onSubmit={handleConfirm}>
+                            <input
+                                type="text"
+                                placeholder="Nhập mã OTP"
+                                value={otp}
+                                onChange={(e) => setOtp(e.target.value)}
+                                required
+                            />
+                            <button type="submit" disabled={isLoading}>
+                                {isLoading ? 'Đang xác nhận...' : 'Xác nhận'}
+                            </button>
+                        </form>
+                    )}
+                    {message && <div className="divider" />}
+                    {message && <div className="message">{message}</div>}
+                </div>
             </div>
         </>
     );

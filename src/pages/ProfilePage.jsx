@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(true);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -14,33 +15,61 @@ const ProfilePage = () => {
                 if (res.ok) {
                     const data = await res.json();
                     setUserInfo(data);
-                } else {
-                    console.error("Không thể lấy thông tin người dùng");
                 }
             } catch (err) {
-                console.error("Lỗi khi lấy thông tin người dùng:", err);
+                // handle error
             }
         };
-
         fetchUserInfo();
     }, []);
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        window.history.back();
+    };
 
     if (!userInfo) {
         return <p>Đang tải thông tin...</p>;
     }
 
     return (
-        <div className="profile-container">
-            <h2>Thông tin của tôi</h2>
-            <div className="profile-box">
-                <p><strong>Họ tên:</strong> {userInfo.fullName}</p>
-                <p><strong>Email:</strong> {userInfo.email}</p>
-                <p><strong>Số điện thoại:</strong> {userInfo.phone || 'Chưa cập nhật'}</p>
-                <p><strong>Địa chỉ:</strong> {userInfo.address || 'Chưa cập nhật'}</p>
-                <p><strong>Vai trò:</strong> {userInfo.role}</p>
-                <p><strong>Số dư ví:</strong> {Number(userInfo.walletBalance).toLocaleString()}đ</p>
-            </div>
-        </div>
+        <>
+            {isModalOpen && (
+                <div className="modal-overlay" onClick={closeModal}>
+                    <div className="modal-container profile-modal" onClick={e => e.stopPropagation()}>
+                        <div className="profile-form-card">
+                            <h2 className="profile-simple-title">Thông Tin Của Tôi</h2>
+                            <div className="profile-simple-form">
+                                <div className="profile-simple-group">
+                                    <label>Họ tên</label>
+                                    <input value={userInfo.fullName || ''} disabled readOnly />
+                                </div>
+                                <div className="profile-simple-group">
+                                    <label>Email</label>
+                                    <input value={userInfo.email || ''} disabled readOnly />
+                                </div>
+                                <div className="profile-simple-group">
+                                    <label>Số điện thoại</label>
+                                    <input value={userInfo.phone || ''} disabled readOnly />
+                                </div>
+                                <div className="profile-simple-group">
+                                    <label>Địa chỉ</label>
+                                    <input value={userInfo.address || ''} disabled readOnly />
+                                </div>
+                                <div className="profile-simple-group">
+                                    <label>Số dư ví</label>
+                                    <input
+                                        value={Number(userInfo.walletBalance || 0).toLocaleString('vi-VN') + ' VND'}
+                                        disabled
+                                        readOnly
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 };
 

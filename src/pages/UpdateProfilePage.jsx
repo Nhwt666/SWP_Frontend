@@ -67,7 +67,7 @@ const UpdateProfilePage = () => {
     return (
         <div className="profile-box">
             <div className="profile-header">
-                <h2>My profile</h2>
+                <h2>Cập Nhập Thông Tin</h2>
                 <button className="close-btn" onClick={() => navigate(-1)}>✕</button>
             </div>
 

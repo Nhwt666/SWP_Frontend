@@ -1,22 +1,93 @@
+.register-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e3f0ff 0%, #f8fbff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .register-container {
-  width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 32px 28px 24px 28px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 6px 32px rgba(0, 42, 120, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
   text-align: center;
+  position: relative;
+}
+
+.register-container h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  color: #004aad;
+  letter-spacing: 0.5px;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .register-form input {
-  width: 90%;
-  padding: 10px;
-  margin: 10px 0;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  display: block;
+  padding: 12px 14px;
+  border: 1.5px solid #e0e6ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.2s;
+  background: #f7fafd;
 }
 
-.register-form button {
-  background-color: #004aad;
-  color: white;
-  padding: 10px 20px;
+.register-form input:focus {
+  border: 1.5px solid #004aad;
+  outline: none;
+  background: #fff;
+}
+
+.register-form button[type="submit"] {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  display: block;
+  background: linear-gradient(90deg, #004aad 60%, #0076ff 100%);
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 0;
   border: none;
+  border-radius: 8px;
+  font-size: 1.08rem;
   cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(0,42,120,0.08);
+}
+
+.register-form button[type="submit"]:hover {
+  background: linear-gradient(90deg, #00337a 60%, #005bb5 100%);
+}
+
+.message {
+  margin-top: 14px;
+  font-size: 1rem;
+  padding: 10px 0;
+  color: #d32f2f;
+  background: #fff4f4;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .register-container {
+    padding: 18px 6px 16px 6px;
+    max-width: 98vw;
+  }
+  .register-container h2 {
+    font-size: 1.3rem;
+  }
 }

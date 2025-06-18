@@ -37,28 +37,32 @@ const TopUpPage = () => {
     };
 
     return (
-        <div className="topup-page">
-            <h2>💰 Nạp tiền vào ví</h2>
-
-            <input
-                type="number"
-                min="1000"
-                max="100000000"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="VD: 100000"
-            />
-
-            <div className="topup-actions">
-                <button onClick={handleTopUp}>Xác nhận</button>
-                <button onClick={() => navigate(-1)}>Huỷ</button>
+        <div className="topup-bg">
+            <div className="topup-modern-card">
+                <div className="topup-icon-banner">
+                    <span role="img" aria-label="wallet" className="topup-wallet-icon">💳</span>
+                </div>
+                <h2 className="topup-title">Nạp tiền vào ví</h2>
+                <div className="topup-subtitle">Vui lòng nhập số tiền bạn muốn nạp (tối thiểu 1.000đ, tối đa 100.000.000đ)</div>
+                <input
+                    className="topup-input-modern"
+                    type="number"
+                    min="1000"
+                    max="100000000"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="VD: 100000"
+                />
+                {errorMessage && (
+                    <div className="topup-alert-modern" role="alert">
+                        {errorMessage}
+                    </div>
+                )}
+                <div className="topup-actions-modern">
+                    <button className="btn-primary" onClick={handleTopUp}>Xác nhận</button>
+                    <button className="btn-outline" onClick={() => navigate(-1)}>Huỷ</button>
+                </div>
             </div>
-
-            {errorMessage && (
-                <p role="alert" style={{ color: 'red', marginTop: '10px' }}>
-                    {errorMessage}
-                </p>
-            )}
         </div>
     );
 };
