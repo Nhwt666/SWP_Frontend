@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../styles/TicketPage.css';
+import { UserContext } from '../UserContext';
 
 const pricingData = {
     'Xác minh quyền thừa kế': 1200000,
@@ -27,6 +28,8 @@ const TicketPage = () => {
         phone: '',
         email: '',
     });
+    const { wallet, updateFullName, updateWallet } = useContext(UserContext);
+    const [notify, setNotify] = useState({ type: '', message: '' });
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -88,14 +91,34 @@ const TicketPage = () => {
         setPrice(calculated);
     }, [category, service]);
 
+    useEffect(() => {
+        if (notify.message) {
+            const timer = setTimeout(() => setNotify({ type: '', message: '' }), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [notify]);
+
+    // Hàm giả lập thanh toán, trả về true nếu thành công
+    const payFunction = async (amount) => {
+        // Ở đây bạn có thể tích hợp thực tế với PayPal/MoMo/ví
+        // Ví dụ: gọi API /api/paypal/pay hoặc /api/momo/pay, chờ xác nhận thành công
+        // Ở đây mình giả lập luôn thành công
+        return window.confirm(`Xác nhận thanh toán ${amount.toLocaleString('vi-VN')} VND?`);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!userId) {
-            alert('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            setNotify({ type: 'error', message: 'Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.' });
+            setLoading(false);
             return;
         }
-
+        if (wallet < price) {
+            setNotify({ type: 'error', message: '❌ Số dư ví không đủ để thanh toán!' });
+            setLoading(false);
+            return;
+        }
         setLoading(true);
 
         const typeMap = {
@@ -117,10 +140,19 @@ const TicketPage = () => {
             phone: method === 'Tự gửi mẫu' ? phone : null,
             email: method === 'Tự gửi mẫu' ? email : null,
             customerId: userId,
-        };
+            amount: price, // <-- Đổi từ cost thành amount
+          };
 
         try {
-            const res = await fetch('/tickets', {
+            // 1. Gọi API thanh toán trước
+            const paymentSuccess = await payFunction(price);
+            if (!paymentSuccess) {
+                setNotify({ type: 'error', message: '❌ Thanh toán thất bại hoặc bị huỷ. Không tạo ticket.' });
+                setLoading(false);
+                return;
+            }
+            // 2. Chỉ khi thanh toán thành công mới lưu ticket
+            const res = await fetch('/tickets/after-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -134,15 +166,26 @@ const TicketPage = () => {
                 const history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
-                alert(`🎉 Ticket đã được tạo thành công! ID: ${ticket.id}`);
+                // Cập nhật lại số dư ví realtime
+                try {
+                    const resUser = await fetch('/auth/me', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (resUser.ok) {
+                        const user = await resUser.json();
+                        updateFullName(user.fullName);
+                        updateWallet(user.walletBalance);
+                    }
+                } catch {}
+                setNotify({ type: 'success', message: `🎉 Ticket đã được tạo thành công!` });
                 resetForm();
             } else {
                 const errText = await res.text();
-                alert(`❌ Tạo ticket thất bại: ${errText || 'Lỗi không xác định'}`);
+                setNotify({ type: 'error', message: `❌ Tạo ticket thất bại: ${errText || 'Lỗi không xác định'}` });
             }
         } catch (err) {
             console.error('Lỗi:', err);
-            alert('❌ Không thể kết nối đến máy chủ');
+            setNotify({ type: 'error', message: '❌ Không thể kết nối đến máy chủ' });
         } finally {
             setLoading(false);
         }
@@ -162,6 +205,24 @@ const TicketPage = () => {
     return (
         <div className="ticket-page">
             <h2>Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
+            {notify.message && (
+                <div
+                    style={{
+                        margin: '16px 0',
+                        padding: '12px 20px',
+                        borderRadius: 8,
+                        color: notify.type === 'success' ? '#155724' : '#721c24',
+                        background: notify.type === 'success' ? '#d4edda' : '#f8d7da',
+                        border: `1px solid ${notify.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
+                        fontWeight: 500,
+                        fontSize: 16,
+                        textAlign: 'center',
+                        transition: 'all 0.3s'
+                    }}
+                >
+                    {notify.message}
+                </div>
+            )}
             <form onSubmit={handleSubmit}>
                 <label>Chọn loại yêu cầu:</label>
                 <select

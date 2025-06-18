@@ -5,12 +5,7 @@ import '../styles/Header.css';
 
 const Header = () => {
     const navigate = useNavigate();
-    const { fullName } = useContext(UserContext);
-    const [wallet, setWallet] = useState(() => {
-        const raw = localStorage.getItem('wallet');
-        const value = Number(raw);
-        return isNaN(value) ? 0 : value;
-    });
+    const { fullName, wallet, updateFullName, updateWallet } = useContext(UserContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const [role, setRole] = useState(localStorage.getItem('role') || '');
 
@@ -20,32 +15,13 @@ const Header = () => {
 
     const handleLogout = () => {
         localStorage.clear();
+        updateFullName('');
+        updateWallet(0);
         navigate('/');
     };
 
-    const refreshWalletAndRole = async () => {
-        try {
-            const res = await fetch('/auth/me', {
-                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-            });
-            if (res.ok) {
-                const user = await res.json();
-                const balance = Number(user.walletBalance);
-                const safeBalance = isNaN(balance) ? 0 : balance;
-                localStorage.setItem('wallet', safeBalance);
-                localStorage.setItem('role', user.role);
-                setWallet(safeBalance);
-                setRole(user.role);
-            }
-        } catch (err) {
-            console.error('❌ Lỗi cập nhật thông tin:', err);
-        }
-    };
-
     useEffect(() => {
-        if (isLoggedIn && localStorage.getItem('token')) {
-            refreshWalletAndRole();
-        }
+        setRole(localStorage.getItem('role') || '');
     }, [isLoggedIn]);
 
     useEffect(() => {

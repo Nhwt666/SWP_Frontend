@@ -16,14 +16,13 @@ const TopUpHistoryPage = () => {
                 if (!meRes.ok) throw new Error("Không thể lấy thông tin user");
                 const user = await meRes.json();
 
-                // Giả sử BE trả userId (nếu chưa có thì cần BE bổ sung userId vào /auth/me)
                 const userId = user.userId;
                 if (!userId) {
                     setMessage("Không tìm thấy userId trong thông tin người dùng");
                     return;
                 }
 
-                // Gọi API topup history
+                // Gọi API topup history (BE đã trả về cả PayPal và MoMo)
                 const historyRes = await fetch(`/api/paypal/topup-history?userId=${userId}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -54,7 +53,8 @@ const TopUpHistoryPage = () => {
                     <tr>
                         <th style={{ border: '1px solid #ccc', padding: '8px' }}>Ngày</th>
                         <th style={{ border: '1px solid #ccc', padding: '8px' }}>Số tiền</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Thông tin PayPal</th>
+                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phương thức</th>
+                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Thông tin giao dịch</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -64,11 +64,24 @@ const TopUpHistoryPage = () => {
                                 {new Date(item.createdAt).toLocaleString('vi-VN')}
                             </td>
                             <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                                {Number(item.amount).toLocaleString('vi-VN')} đ
+                                {item.paymentMethod === 'PAYPAL'
+                                    ? `${item.amount} $`
+                                    : `${Number(item.amount).toLocaleString('vi-VN')} đ`}
                             </td>
                             <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                                PayID: {item.paymentId} <br />
-                                PayerID: {item.payerId}
+                                {item.paymentMethod === 'MOMO' ? 'MoMo' : item.paymentMethod === 'PAYPAL' ? 'PayPal' : (item.payment_method === 'MOMO' ? 'MoMo' : item.payment_method === 'PAYPAL' ? 'PayPal' : '')}
+                            </td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>
+                                {item.paymentId ? (
+                                    <>
+                                        PayID: {item.paymentId} <br />
+                                        PayerID: {item.payerId}
+                                    </>
+                                ) : (
+                                    <>
+                                        OrderID: {item.orderId}
+                                    </>
+                                )}
                             </td>
                         </tr>
                     ))}
