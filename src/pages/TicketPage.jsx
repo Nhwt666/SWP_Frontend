@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import '../styles/TicketPage.css';
 import { UserContext } from '../UserContext';
+import Notification from '../components/Notification';
 
 const pricingData = {
     'Xác minh quyền thừa kế': 1200000,
@@ -30,6 +31,7 @@ const TicketPage = () => {
     });
     const { wallet, updateFullName, updateWallet } = useContext(UserContext);
     const [notify, setNotify] = useState({ type: '', message: '' });
+    const [confirmModal, setConfirmModal] = useState({ open: false, amount: 0, resolve: null });
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -98,12 +100,14 @@ const TicketPage = () => {
         }
     }, [notify]);
 
-    // Hàm giả lập thanh toán, trả về true nếu thành công
+    const showConfirm = (amount) => {
+        return new Promise((resolve) => {
+            setConfirmModal({ open: true, amount, resolve });
+        });
+    };
+
     const payFunction = async (amount) => {
-        // Ở đây bạn có thể tích hợp thực tế với PayPal/MoMo/ví
-        // Ví dụ: gọi API /api/paypal/pay hoặc /api/momo/pay, chờ xác nhận thành công
-        // Ở đây mình giả lập luôn thành công
-        return window.confirm(`Xác nhận thanh toán ${amount.toLocaleString('vi-VN')} VND?`);
+        return await showConfirm(amount);
     };
 
     const handleSubmit = async (e) => {
@@ -205,22 +209,38 @@ const TicketPage = () => {
     return (
         <div className="ticket-page">
             <h2>Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
-            {notify.message && (
-                <div
-                    style={{
-                        margin: '16px 0',
-                        padding: '12px 20px',
-                        borderRadius: 8,
-                        color: notify.type === 'success' ? '#155724' : '#721c24',
-                        background: notify.type === 'success' ? '#d4edda' : '#f8d7da',
-                        border: `1px solid ${notify.type === 'success' ? '#c3e6cb' : '#f5c6cb'}`,
-                        fontWeight: 500,
-                        fontSize: 16,
-                        textAlign: 'center',
-                        transition: 'all 0.3s'
-                    }}
-                >
-                    {notify.message}
+            <Notification
+                type={notify.type}
+                message={notify.message}
+                onClose={() => setNotify({ type: '', message: '' })}
+            />
+            {confirmModal.open && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: 10, padding: 32, minWidth: 320, maxWidth: '90vw', boxShadow: '0 2px 16px rgba(0,0,0,0.2)', textAlign: 'center'
+                    }}>
+                        <div style={{ fontSize: 32, marginBottom: 12 }}>💸</div>
+                        <div style={{ fontSize: 18, marginBottom: 24 }}>
+                            Xác nhận thanh toán <b>{confirmModal.amount.toLocaleString('vi-VN')}</b> VND?
+                        </div>
+                        <button
+                            style={{ background: '#34c759', color: '#fff', border: 'none', borderRadius: 6, padding: '8px 24px', fontSize: 16, marginRight: 12, cursor: 'pointer' }}
+                            onClick={() => {
+                                confirmModal.resolve(true);
+                                setConfirmModal({ ...confirmModal, open: false });
+                            }}
+                        >Xác nhận</button>
+                        <button
+                            style={{ background: '#eee', color: '#333', border: 'none', borderRadius: 6, padding: '8px 24px', fontSize: 16, cursor: 'pointer' }}
+                            onClick={() => {
+                                confirmModal.resolve(false);
+                                setConfirmModal({ ...confirmModal, open: false });
+                            }}
+                        >Huỷ</button>
+                    </div>
                 </div>
             )}
             <form onSubmit={handleSubmit}>
