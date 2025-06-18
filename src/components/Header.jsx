@@ -1,10 +1,11 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { UserContext } from '../UserContext';
 import '../styles/Header.css';
 
 const Header = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { fullName } = useContext(UserContext);
     const [wallet, setWallet] = useState(() => {
         const raw = localStorage.getItem('wallet');
@@ -58,13 +59,32 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    // Smooth scroll to blog section if on homepage
+    const handleBlogClick = (e) => {
+        if (location.pathname === '/') {
+            e.preventDefault();
+            const el = document.getElementById('blog-section');
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth' });
+            }
+        } else {
+            navigate('/#blog-section');
+        }
+    };
+
     return (
         <header className="header">
             <div className="header-container">
                 <div className="logo-title">
-                    <Link to={role === 'ADMIN' ? '/admin/dashboard' : '/'}>
-                        <img src="/logo.png" alt="Logo" className="logo" />
-                    </Link>
+                    {role === 'ADMIN' ? (
+                        <Link to="/admin/dashboard">
+                            <img src="/logo.png" alt="Logo" className="logo" />
+                        </Link>
+                    ) : (
+                        <a href="/" onClick={e => { e.preventDefault(); window.location.replace('/'); }}>
+                            <img src="/logo.png" alt="Logo" className="logo" />
+                        </a>
+                    )}
                     <h1>Trung Tâm Xét nghiệm ADN</h1>
                 </div>
 
@@ -119,11 +139,11 @@ const Header = () => {
             {role !== 'ADMIN' && (
                 <nav className="main-nav">
                     <div className="main-nav-container">
-                        <Link to="/" className="nav-btn">Trang Chủ</Link>
+                        <a href="/" className="nav-btn" onClick={e => { e.preventDefault(); window.location.replace('/'); }}>Trang Chủ</a>
                         <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
                         <Link to="/pricing" className="nav-btn">Bảng giá</Link>
                         <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
-                        <Link to="/blog" className="nav-btn">Blog chia sẻ</Link>
+                        <a href="#blog-section" className="nav-btn" onClick={handleBlogClick}>Blog chia sẻ</a>
                     </div>
                 </nav>
             )}

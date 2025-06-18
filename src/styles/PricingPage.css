@@ -1,35 +1,135 @@
+/* ========== Modern DNA Hospital Pricing Page Styles ========== */
 .pricing-page {
-    padding: 20px;
-    max-width: 1000px;
-    margin: auto;
+  min-height: 100vh;
+  background: linear-gradient(120deg, #f0f4f8 0%, #e8f0fe 100%);
+  padding: 48px 0 64px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-.pricing-page h2 {
-    margin-top: 20px;
-    color: #004aad;
+.pricing-container {
+  width: 100%;
+  max-width: 950px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(30,58,138,0.10);
+  padding: 40px 36px 32px 36px;
+  margin: 0 auto;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 15px;
+.pricing-title {
+  text-align: center;
+  color: #1e3a8a;
+  margin-bottom: 36px;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 1px;
 }
 
-table th, table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: center;
+.pricing-section {
+  margin-bottom: 38px;
 }
 
-table th {
-    background-color: #004aad;
-    color: white;
+.pricing-section-title {
+  color: #2563eb;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  margin-top: 0;
+  letter-spacing: 0.5px;
 }
 
-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+.pricing-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 10px;
 }
 
-p {
-    margin: 5px 0;
+.pricing-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #f8fafc;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.06);
+  margin-bottom: 0;
+}
+
+.pricing-table th, .pricing-table td {
+  padding: 14px 10px;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.pricing-table th {
+  background: linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%);
+  color: #fff;
+  font-weight: 700;
+  border: none;
+}
+
+.pricing-table tr:nth-child(even) td {
+  background: #e7f0ff;
+}
+
+.pricing-table tr:nth-child(odd) td {
+  background: #f8fafc;
+}
+
+.pricing-table td {
+  border: none;
+  color: #1e293b;
+}
+
+.pricing-table tr:hover td {
+  background: #dbeafe;
+  transition: background 0.18s;
+}
+
+.pricing-note-list {
+  margin: 10px 0 0 0;
+  padding-left: 22px;
+  color: #374151;
+  font-size: 1rem;
+}
+.pricing-note-list li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.pricing-note {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-left: 4px solid #2563eb;
+  border-radius: 8px;
+  padding: 12px 18px;
+  margin: 10px 0 0 0;
+  font-size: 1rem;
+}
+
+.pricing-summary {
+  margin-top: 32px;
+  background: #e7f0ff;
+  border-radius: 12px;
+  padding: 22px 24px;
+  color: #1e293b;
+  font-size: 1.08rem;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.06) inset;
+}
+
+@media (max-width: 700px) {
+  .pricing-container {
+    padding: 18px 6vw 18px 6vw;
+  }
+  .pricing-title {
+    font-size: 1.3rem;
+  }
+  .pricing-section-title {
+    font-size: 1.05rem;
+  }
+  .pricing-table th, .pricing-table td {
+    font-size: 0.95rem;
+    padding: 10px 4px;
+  }
 }

@@ -16,6 +16,8 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import PricingPage from './pages/PricingPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import StaffDashboardPage from './pages/StaffDashboardPage';
+import BlogPostPage from './pages/BlogPostPage';
+
 function App() {
     return (
         <Router>
@@ -34,6 +36,7 @@ function App() {
                     <Route path="/pricing" element={<PricingPage />} />
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
+                    <Route path="/blog/:slug" element={<BlogPostPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />

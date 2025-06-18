@@ -11,6 +11,17 @@ const pricingData = {
     'Khác': 900000,
 };
 
+const thirdSamplePricing = {
+    'Xác minh quyền thừa kế': 1000000,
+    'Xác minh quan hệ huyết thống': 1250000,
+    'Giám định ADN cho con nuôi': 1000000,
+    'Xác minh danh tính': 1300000,
+    'Xác minh quyền lợi bảo hiểm': 1600000,
+    'Xác minh quyền thừa kế trong di chúc': 1700000,
+    'Khác': 900000,
+    // You can adjust/add more if needed
+};
+
 const TicketPage = () => {
     const [category, setCategory] = useState('');
     const [service, setService] = useState('');
@@ -27,6 +38,7 @@ const TicketPage = () => {
         phone: '',
         email: '',
     });
+    const [addThirdSample, setAddThirdSample] = useState(false);
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -85,8 +97,11 @@ const TicketPage = () => {
         } else if (service && pricingData[service]) {
             calculated = pricingData[service];
         }
+        if (addThirdSample && service && thirdSamplePricing[service]) {
+            calculated += thirdSamplePricing[service];
+        }
         setPrice(calculated);
-    }, [category, service]);
+    }, [category, service, addThirdSample]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -157,79 +172,140 @@ const TicketPage = () => {
         setPhone('');
         setEmail('');
         setPrice(0);
+        setAddThirdSample(false);
     };
 
     return (
         <div className="ticket-page">
-            <h2>Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
-            <form onSubmit={handleSubmit}>
-                <label>Chọn loại yêu cầu:</label>
-                <select
-                    value={category}
-                    onChange={(e) => {
-                        setCategory(e.target.value);
-                        setService('');
-                        setCustomReason('');
-                    }}
-                    required
-                >
-                    <option value="">-- Chọn --</option>
-                    <option value="Dân sự">Dân sự</option>
-                    <option value="Hành chính">Hành chính</option>
-                    <option value="Khác">Yêu cầu khác</option>
-                </select>
-
-                {(category === 'Dân sự' || category === 'Hành chính') && (
-                    <>
-                        <label>Chọn dịch vụ:</label>
-                        <select value={service} onChange={(e) => setService(e.target.value)} required>
-                            <option value="">-- Chọn dịch vụ --</option>
-                            {(category === 'Dân sự' ? civilServices : adminServices).map((srv, idx) => (
-                                <option key={idx} value={srv}>{srv}</option>
-                            ))}
-                        </select>
-                    </>
-                )}
-
-                {category === 'Khác' && (
-                    <>
-                        <label>Lý do cần xét nghiệm:</label>
-                        <textarea
-                            value={customReason}
-                            onChange={(e) => setCustomReason(e.target.value)}
-                            rows="4"
-                            placeholder="Nhập lý do cụ thể..."
+            <div className="ticket-form-container">
+                <h2 className="ticket-title">Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
+                <form onSubmit={handleSubmit} className="ticket-form" autoComplete="off">
+                    <div className="form-group">
+                        <label htmlFor="category">Chọn loại yêu cầu:</label>
+                        <select
+                            id="category"
+                            value={category}
+                            onChange={(e) => {
+                                setCategory(e.target.value);
+                                setService('');
+                                setCustomReason('');
+                            }}
                             required
+                        >
+                            <option value="">-- Chọn --</option>
+                            <option value="Dân sự">Dân sự</option>
+                            <option value="Hành chính">Hành chính</option>
+                            <option value="Khác">Yêu cầu khác</option>
+                        </select>
+                    </div>
+
+                    {(category === 'Dân sự' || category === 'Hành chính') && (
+                        <div className="form-group">
+                            <label htmlFor="service">Chọn dịch vụ:</label>
+                            <select
+                                id="service"
+                                value={service}
+                                onChange={(e) => setService(e.target.value)}
+                                required
+                            >
+                                <option value="">-- Chọn dịch vụ --</option>
+                                {(category === 'Dân sự' ? civilServices : adminServices).map((srv, idx) => (
+                                    <option key={idx} value={srv}>{srv}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
+                    {category === 'Khác' && (
+                        <div className="form-group">
+                            <label htmlFor="customReason">Lý do cần xét nghiệm:</label>
+                            <textarea
+                                id="customReason"
+                                value={customReason}
+                                onChange={(e) => setCustomReason(e.target.value)}
+                                rows="4"
+                                placeholder="Nhập lý do..."
+                                required
+                            />
+                        </div>
+                    )}
+
+                    <div className="form-group">
+                        <label htmlFor="method">Chọn phương thức lấy mẫu:</label>
+                        <select
+                            id="method"
+                            value={method}
+                            onChange={(e) => setMethod(e.target.value)}
+                            required
+                        >
+                            <option value="">-- Chọn phương thức --</option>
+                            <option value="Tự gửi mẫu">Tự gửi mẫu</option>
+                            <option value="Tại cơ sở y tế">Tại cơ sở y tế</option>
+                        </select>
+                    </div>
+
+                    {method === 'Tự gửi mẫu' && (
+                        <div className="method-details">
+                            <div className="form-group">
+                                <label htmlFor="address"><strong>Địa chỉ nhận mẫu:</strong></label>
+                                <input
+                                    id="address"
+                                    type="text"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    placeholder="Nhập địa chỉ nhận mẫu"
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="phone"><strong>Số điện thoại:</strong></label>
+                                <input
+                                    id="phone"
+                                    type="tel"
+                                    value={phone}
+                                    onChange={(e) => setPhone(e.target.value)}
+                                    placeholder="Nhập số điện thoại"
+                                    required
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="email"><strong>Email:</strong></label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="Nhập email"
+                                    required
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Add Third Sample Checkbox - Redesigned */}
+                    <div className="add-third-sample-box" tabIndex={0}>
+                        <input
+                            type="checkbox"
+                            id="addThirdSample"
+                            className="add-third-sample-checkbox"
+                            checked={addThirdSample}
+                            onChange={e => setAddThirdSample(e.target.checked)}
                         />
-                    </>
-                )}
+                        <label htmlFor="addThirdSample" className="add-third-sample-label">
+                            <span className="add-third-sample-icon" role="img" aria-label="sample">🧬</span>
+                            Thêm mẫu thứ 3
+                        </label>
+                    </div>
 
-                <label>Phương thức xét nghiệm:</label>
-                <select value={method} onChange={(e) => setMethod(e.target.value)} required>
-                    <option value="">-- Chọn phương thức --</option>
-                    <option value="Tự gửi mẫu">Tự gửi mẫu</option>
-                    <option value="Tại cơ sở y tế">Tại cơ sở y tế</option>
-                </select>
+                    <div className="price-display">
+                        Service Price: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
+                    </div>
 
-                {method === 'Tự gửi mẫu' && (
-                    <>
-                        <label>Địa chỉ nhận mẫu:</label>
-                        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
-                        <label>Số điện thoại liên hệ:</label>
-                        <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required />
-                        <label>Email liên hệ:</label>
-                        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </>
-                )}
-
-                <div style={{ marginTop: '20px', fontWeight: 'bold', color: '#004aad', fontSize: '18px' }}>
-                    💰 Tổng chi phí: {price.toLocaleString('vi-VN')} VND
-                </div>
-
-                <button type="submit" className="submit-btn" disabled={loading}>
-                    {loading ? 'Đang tạo...' : 'Tạo Đơn'}
-                </button>
-            </form>
+                    <button className="submit-btn" type="submit" disabled={loading}>
+                        {loading ? 'Đang xử lý...' : 'Tạo yêu cầu'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };
