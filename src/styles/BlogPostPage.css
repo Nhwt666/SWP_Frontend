@@ -1,0 +1,139 @@
+/* ========== Modern DNA Hospital Blog Post Styles ========== */
+.blogpost-bg {
+  min-height: 100vh;
+  background: linear-gradient(120deg, #f0f4f8 0%, #e8f0fe 100%);
+  padding: 48px 0 64px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.blogpost-container {
+  width: 100%;
+  max-width: 760px;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(30,58,138,0.10);
+  padding: 40px 36px 32px 36px;
+  margin: 0 auto;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.blogpost-featured-img-wrap {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.blogpost-featured-img {
+  max-width: 100%;
+  width: 100%;
+  max-height: 340px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(30,58,138,0.10);
+  background: #f8fafc;
+}
+
+.blogpost-title {
+  font-size: 2.1rem;
+  font-weight: 800;
+  color: #1e3a8a;
+  margin: 18px 0 10px 0;
+  text-align: left;
+  letter-spacing: 1px;
+}
+
+.blogpost-meta {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.blogpost-author {
+  font-weight: 600;
+}
+
+.blogpost-date {
+  color: #2563eb;
+}
+
+.blogpost-content {
+  color: #1e293b;
+  font-size: 1.13rem;
+  line-height: 1.8;
+}
+
+.blogpost-h3 {
+  color: #2563eb;
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin: 28px 0 10px 0;
+}
+
+.blogpost-quote {
+  background: #e7f0ff;
+  border-left: 5px solid #2563eb;
+  border-radius: 8px;
+  padding: 16px 22px;
+  margin: 18px 0;
+  color: #1e40af;
+  font-size: 1.08rem;
+  font-style: italic;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.06) inset;
+}
+
+.blogpost-notfound {
+  max-width: 500px;
+  margin: 80px auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(30,58,138,0.10);
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.blogpost-back-btn {
+  margin-top: 18px;
+  padding: 12px 28px;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.08);
+}
+.blogpost-back-btn:hover, .blogpost-back-btn:focus {
+  background: #1e40af;
+  box-shadow: 0 4px 16px rgba(30,58,138,0.13);
+}
+
+.blogpost-highlight {
+  background: #fffbe6;
+  border-left: 5px solid #f59e42;
+  border-radius: 8px;
+  padding: 14px 20px;
+  margin: 18px 0;
+  color: #b45309;
+  font-size: 1.05rem;
+  font-style: italic;
+  box-shadow: 0 2px 8px rgba(245, 158, 66, 0.08) inset;
+}
+
+@media (max-width: 700px) {
+  .blogpost-container {
+    padding: 18px 6vw 18px 6vw;
+  }
+  .blogpost-title {
+    font-size: 1.2rem;
+  }
+  .blogpost-h3 {
+    font-size: 1rem;
+  }
+} 
