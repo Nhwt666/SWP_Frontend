@@ -34,23 +34,30 @@ const HomePage = () => {
                     </div>
 
                     <h2 className="section-title">Về Chúng Tôi</h2>
-                    <p className="about-description">
-                        Chúng tôi là đơn vị tiên phong trong lĩnh vực xét nghiệm ADN tại Việt Nam,
-                        với đội ngũ chuyên gia nhiều năm kinh nghiệm và hệ thống thiết bị hiện đại đạt chuẩn quốc tế.<br /><br />
-                        Trong suốt quá trình hoạt động, chúng tôi đã thực hiện hàng chục nghìn ca xét nghiệm chính xác và bảo mật,
-                        hỗ trợ hiệu quả cho các nhu cầu như xác định huyết thống, pháp lý, di truyền và y tế.<br /><br />
-                        Uy tín của chúng tôi được khẳng định qua sự tin tưởng từ khách hàng cá nhân, tổ chức và các cơ quan pháp luật.<br /><br />
-                        Với sứ mệnh <strong>"Chính xác – Bảo mật – Nhanh chóng"</strong>,
-                        chúng tôi cam kết mang đến dịch vụ xét nghiệm ADN đáng tin cậy nhất.
-                    </p>
+
+                    <div className="about-section">
+                        <div className="about-left">
+                            <img src="/nurse.png" alt="Nurse" />
+                        </div>
+
+                        <div className="about-right">
+                            <div className="about-box">
+                                Chúng tôi là đơn vị tiên phong trong lĩnh vực xét nghiệm ADN tại Việt Nam, với đội ngũ chuyên gia giàu kinh nghiệm.
+                            </div>
+                            <div className="about-box">
+                                Hệ thống thiết bị hiện đại đạt chuẩn quốc tế, phục vụ các nhu cầu xét nghiệm huyết thống, pháp lý, y tế và di truyền.
+                            </div>
+                            <div className="about-box">
+                                Uy tín được khẳng định qua hàng chục nghìn ca xét nghiệm chính xác và bảo mật, hỗ trợ cho cá nhân và cơ quan pháp luật.
+                            </div>
+                            <div className="about-box">
+                                Sứ mệnh của chúng tôi là <strong>“Chính xác – Bảo mật – Nhanh chóng”</strong>, mang đến dịch vụ ADN đáng tin cậy nhất.
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </section>
-
-            <footer>
-                <div className="container">
-                    <p>&copy; 2025 Bệnh viện Xét nghiệm ADN. Mọi quyền được bảo lưu.</p>
-                </div>
-            </footer>
         </>
     );
 };
