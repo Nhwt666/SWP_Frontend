@@ -41,6 +41,12 @@ const TicketPage = () => {
     });
     const [addThirdSample, setAddThirdSample] = useState(false);
     const { wallet, updateFullName, updateWallet } = useContext(UserContext);
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [confirmAmount, setConfirmAmount] = useState(0);
+    const [confirmResolve, setConfirmResolve] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -107,12 +113,19 @@ const TicketPage = () => {
 
     const showConfirm = (amount) => {
         return new Promise((resolve) => {
-            if (window.confirm(`Xác nhận thanh toán ${amount.toLocaleString('vi-VN')} VNĐ?`)) {
-                resolve(true);
-            } else {
-                resolve(false);
-            }
+            setConfirmAmount(amount);
+            setShowConfirmModal(true);
+            setConfirmResolve(() => resolve);
         });
+    };
+
+    const handleConfirm = () => {
+        setShowConfirmModal(false);
+        if (confirmResolve) confirmResolve(true);
+    };
+    const handleCancel = () => {
+        setShowConfirmModal(false);
+        if (confirmResolve) confirmResolve(false);
     };
 
     const payFunction = async (amount) => {
@@ -123,13 +136,15 @@ const TicketPage = () => {
         e.preventDefault();
 
         if (!userId) {
-            alert('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            setErrorMsg('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            setShowErrorModal(true);
             setLoading(false);
             return;
         }
 
         if (wallet < price) {
-            alert('❌ Số dư ví không đủ để thanh toán!');
+            setErrorMsg('❌ Số dư ví không đủ để thanh toán!');
+            setShowErrorModal(true);
             setLoading(false);
             return;
         }
@@ -190,7 +205,7 @@ const TicketPage = () => {
                         updateWallet(user.walletBalance);
                     }
                 } catch {}
-                alert('🎉 Ticket đã được tạo thành công!');
+                setShowSuccessModal(true);
                 resetForm();
             } else {
                 const errText = await res.text();
@@ -347,6 +362,115 @@ const TicketPage = () => {
                     </button>
                 </form>
             </div>
+            {showConfirmModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
+                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
+                    }}>
+                        <div style={{ marginBottom: 18 }}>
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
+                                <rect x="4" y="12" width="40" height="24" rx="8" fill="#e0f2fe"/>
+                                <rect x="4" y="12" width="40" height="24" rx="8" stroke="#22c55e" strokeWidth="2"/>
+                                <circle cx="24" cy="24" r="6" fill="#fff" stroke="#22c55e" strokeWidth="2"/>
+                                <text x="24" y="28" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#22c55e">₫</text>
+                            </svg>
+                        </div>
+                        <div style={{ fontSize: 18, marginBottom: 18 }}>
+                            Xác nhận thanh toán <b style={{ fontSize: 22 }}>{confirmAmount.toLocaleString('vi-VN')}</b> VNĐ?
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
+                            <button
+                                onClick={handleConfirm}
+                                style={{
+                                    background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
+                                    padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
+                                onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
+                            >Xác nhận</button>
+                            <button
+                                onClick={handleCancel}
+                                style={{
+                                    background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8,
+                                    padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(30,58,138,0.06)', transition: 'background 0.2s',
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#e5e7eb'}
+                                onMouseOut={e => e.currentTarget.style.background = '#f3f4f6'}
+                            >Huỷ</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+            {showSuccessModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2100
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
+                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
+                    }}>
+                        <div style={{ marginBottom: 18 }}>
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
+                                <circle cx="24" cy="24" r="22" fill="#e0f2fe"/>
+                                <path d="M16 24l6 6 10-12" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                        </div>
+                        <div style={{ fontSize: 18, marginBottom: 18, color: '#22c55e', fontWeight: 700 }}>
+                            🎉 Ticket đã được tạo thành công!
+                        </div>
+                        <button
+                            onClick={() => { setShowSuccessModal(false); setLoading(false); }}
+                            style={{
+                                background: 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)', color: '#fff', border: 'none', borderRadius: 12,
+                                padding: '12px 36px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                boxShadow: '0 4px 16px rgba(30,58,138,0.13)', letterSpacing: 0.5, marginTop: 8,
+                                transition: 'background 0.22s, transform 0.18s, box-shadow 0.18s',
+                            }}
+                            onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1e40af 60%, #2563eb 100%)'}
+                            onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)'}
+                        >Đóng</button>
+                    </div>
+                </div>
+            )}
+            {showErrorModal && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2200
+                }}>
+                    <div style={{
+                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
+                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
+                    }}>
+                        <div style={{ marginBottom: 18 }}>
+                            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
+                                <circle cx="24" cy="24" r="22" fill="#fee2e2"/>
+                                <path d="M16 16l16 16M32 16l-16 16" stroke="#ef4444" strokeWidth="3" strokeLinecap="round"/>
+                            </svg>
+                        </div>
+                        <div style={{ fontSize: 18, marginBottom: 18, color: '#ef4444', fontWeight: 700 }}>
+                            {errorMsg}
+                        </div>
+                        <button
+                            onClick={() => { setShowErrorModal(false); setLoading(false); }}
+                            style={{
+                                background: 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)', color: '#fff', border: 'none', borderRadius: 12,
+                                padding: '12px 36px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                boxShadow: '0 4px 16px rgba(30,58,138,0.13)', letterSpacing: 0.5, marginTop: 8,
+                                transition: 'background 0.22s, transform 0.18s, box-shadow 0.18s',
+                            }}
+                            onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1e40af 60%, #2563eb 100%)'}
+                            onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)'}
+                        >OK</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
