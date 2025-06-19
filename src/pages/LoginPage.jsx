@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import '../styles/LoginPage.css';
+import { UserContext } from '../UserContext';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ const LoginPage = () => {
     const [step, setStep] = useState('login');
 
     const navigate = useNavigate();
+    const { updateFullName, updateWallet } = useContext(UserContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -64,6 +66,8 @@ const LoginPage = () => {
         localStorage.setItem('fullName', user.fullName);
         localStorage.setItem('wallet', user.walletBalance);
         localStorage.setItem('role', user.role);
+        updateFullName(user.fullName);
+        updateWallet(user.walletBalance);
 
         setMessage('🎉 Đăng nhập thành công!');
         setTimeout(() => {
