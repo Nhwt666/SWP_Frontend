@@ -60,12 +60,12 @@ const TopUpPage = () => {
                 }
             } else if (paymentMethod === 'momo') {
                 res = await fetch(`/api/momo/pay?amount=${value}`, {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                if (res.ok) {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            if (res.ok) {
                     const data = await res.json();
                     if (data && data.payUrl && data.orderId) {
                         localStorage.setItem('momoOrderId', data.orderId);
@@ -74,9 +74,9 @@ const TopUpPage = () => {
                     } else {
                         setErrorMessage('❌ Không nhận được thông tin thanh toán MoMo.');
                     }
-                } else {
-                    const errText = await res.text();
-                    setErrorMessage(`❌ Lỗi: ${errText}`);
+            } else {
+                const errText = await res.text();
+                setErrorMessage(`❌ Lỗi: ${errText}`);
                 }
             }
         } catch (err) {
@@ -119,12 +119,12 @@ const TopUpPage = () => {
                 <h2><span role="img" aria-label="moneybag">💰</span> Nạp tiền vào ví</h2>
                 <div className="topup-input-row">
                     <button type="button" onClick={handleDecrease}>-</button>
-                    <input
-                        type="number"
+                <input
+                    type="number"
                         min={paymentMethod === 'paypal' ? 10 : 100000}
                         step={paymentMethod === 'paypal' ? 10 : 100000}
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
                         placeholder={paymentMethod === 'paypal' ? 'VD: 10$' : 'VD: 100,000đ'}
                     />
                     <button type="button" onClick={handleIncrease}>+</button>

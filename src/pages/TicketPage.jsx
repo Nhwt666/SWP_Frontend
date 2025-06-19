@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import '../styles/TicketPage.css';
+import { UserContext } from '../UserContext';
 
 const pricingData = {
     'Xác minh quyền thừa kế': 1200000,
@@ -39,6 +40,7 @@ const TicketPage = () => {
         email: '',
     });
     const [addThirdSample, setAddThirdSample] = useState(false);
+    const { wallet, updateFullName, updateWallet } = useContext(UserContext);
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -103,11 +105,32 @@ const TicketPage = () => {
         setPrice(calculated);
     }, [category, service, addThirdSample]);
 
+    const showConfirm = (amount) => {
+        return new Promise((resolve) => {
+            if (window.confirm(`Xác nhận thanh toán ${amount.toLocaleString('vi-VN')} VNĐ?`)) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+    };
+
+    const payFunction = async (amount) => {
+        return await showConfirm(amount);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!userId) {
             alert('Không tìm thấy thông tin người dùng. Vui lòng đăng nhập lại.');
+            setLoading(false);
+            return;
+        }
+
+        if (wallet < price) {
+            alert('❌ Số dư ví không đủ để thanh toán!');
+            setLoading(false);
             return;
         }
 
@@ -132,10 +155,18 @@ const TicketPage = () => {
             phone: method === 'Tự gửi mẫu' ? phone : null,
             email: method === 'Tự gửi mẫu' ? email : null,
             customerId: userId,
+            amount: price,
         };
 
         try {
-            const res = await fetch('/tickets', {
+            const paymentSuccess = await payFunction(price);
+            if (!paymentSuccess) {
+                alert('❌ Thanh toán thất bại hoặc bị huỷ. Không tạo ticket.');
+                setLoading(false);
+                return;
+            }
+
+            const res = await fetch('/tickets/after-payment', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -149,7 +180,17 @@ const TicketPage = () => {
                 const history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
-                alert(`🎉 Ticket đã được tạo thành công! ID: ${ticket.id}`);
+                try {
+                    const resUser = await fetch('/auth/me', {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    });
+                    if (resUser.ok) {
+                        const user = await resUser.json();
+                        updateFullName(user.fullName);
+                        updateWallet(user.walletBalance);
+                    }
+                } catch {}
+                alert('🎉 Ticket đã được tạo thành công!');
                 resetForm();
             } else {
                 const errText = await res.text();

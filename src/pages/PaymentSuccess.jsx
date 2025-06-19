@@ -54,12 +54,12 @@ const PaymentSuccess = () => {
         try {
             const res = await fetch(`/api/momo/confirm?orderId=${orderId}`, {
                 method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
             const msg = await res.text();
-            if (res.ok) {
+                if (res.ok) {
                 // Cập nhật lại context số dư và tên
                 try {
                     const resUser = await fetch('/auth/me', {
@@ -133,8 +133,8 @@ const PaymentSuccess = () => {
                             minWidth: 300
                         }}>
                             ✅ Nạp tiền thành công! Đang chuyển hướng...
-                        </div>
-                    ) : (
+                </div>
+            ) : (
                         <div style={{ marginTop: 24, color: '#1976d2', fontWeight: 500 }}>
                             <p>🔄 Sau khi thanh toán trên app MoMo, vui lòng bấm nút bên dưới để xác nhận.</p>
                             <p>Bạn có thể đóng tab QR MoMo sau khi đã thanh toán xong.</p>

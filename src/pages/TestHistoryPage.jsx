@@ -2,34 +2,30 @@ import React, { useEffect, useState } from 'react';
 
 const TestHistoryPage = () => {
     const [history, setHistory] = useState([]);
+    const [message, setMessage] = useState('');
 
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const res = await fetch('/api/test/history', {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
+                // Gọi đúng endpoint BE: /tickets/history (dựa vào token)
+                const historyRes = await fetch('/tickets/history', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    setHistory(data);
-                } else {
-                    console.error('Không thể tải lịch sử xét nghiệm');
-                }
+                if (!historyRes.ok) throw new Error('Không thể tải lịch sử xét nghiệm');
+                const data = await historyRes.json();
+                setHistory(data);
             } catch (err) {
-                console.error('Lỗi khi tải lịch sử xét nghiệm:', err);
+                setMessage(err.message || 'Lỗi khi tải lịch sử xét nghiệm');
             }
         };
-
         fetchHistory();
     }, []);
 
     return (
         <div className="test-history-page" style={{ padding: '20px' }}>
             <h2>Lịch sử xét nghiệm</h2>
-            {history.length === 0 ? (
+            {message && <p style={{ color: 'red' }}>{message}</p>}
+            {history.length === 0 && !message ? (
                 <p>Không có dữ liệu xét nghiệm.</p>
             ) : (
                 <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -44,10 +40,10 @@ const TestHistoryPage = () => {
                     <tbody>
                     {history.map((item, index) => (
                         <tr key={index}>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{new Date(item.date).toLocaleString()}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.type}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.result}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.status}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : ''}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.reason || ''}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.result ? item.result : 'Chưa có'}</td>
+                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.status || ''}</td>
                         </tr>
                     ))}
                     </tbody>
@@ -57,4 +53,4 @@ const TestHistoryPage = () => {
     );
 };
 
-export default TestHistoryPage;
+export default TestHistoryPage; 
