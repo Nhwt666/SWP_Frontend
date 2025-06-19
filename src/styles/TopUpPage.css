@@ -142,3 +142,219 @@
         width: 100%;
     }
 }
+
+/* --- Thêm style hiện đại cho UI mới --- */
+.topup-page {
+    max-width: 700px;
+    margin: 48px auto 0 auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 6px 32px rgba(0, 42, 120, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+    padding: 36px 32px 32px 32px;
+    min-height: 420px;
+}
+
+.topup-page h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #004aad;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.payment-methods-cards {
+    display: flex;
+    gap: 24px;
+    justify-content: center;
+    margin: 24px 0 32px 0;
+}
+
+.payment-card {
+    cursor: pointer;
+    border: 1.5px solid #ccc;
+    border-radius: 12px;
+    padding: 24px 32px;
+    min-width: 120px;
+    text-align: center;
+    background: #fff;
+    box-shadow: 0 1px 4px #ccc2;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.08rem;
+    font-weight: 500;
+}
+.payment-card.selected {
+    border: 2.5px solid #1976d2;
+    background: #e3f0ff;
+    box-shadow: 0 2px 8px #1976d233;
+}
+
+.topup-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.topup-actions button {
+    background: linear-gradient(90deg, #004aad 60%, #0076ff 100%);
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 28px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,42,120,0.08);
+}
+.topup-actions button:last-child {
+    background: #fff;
+    color: #444;
+    border: 1.5px solid #cfd8e3;
+    box-shadow: none;
+}
+.topup-actions button:last-child:hover {
+    background: #f7fafd;
+    border: 1.5px solid #004aad;
+}
+
+/* Nút tăng/giảm số tiền */
+.topup-page button[type="button"] {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid #ccc;
+    background: #fff;
+    color: #1976d2;
+    font-weight: bold;
+    margin: 0 4px;
+    transition: border 0.2s, background 0.2s;
+}
+.topup-page button[type="button"]:hover {
+    border: 1.5px solid #1976d2;
+    background: #e3f0ff;
+}
+
+.topup-page input[type="number"] {
+    flex: 1;
+    font-size: 18px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #4caf50;
+    background: #f7fafd;
+    outline: none;
+    margin: 0 8px;
+    transition: border 0.2s;
+}
+.topup-page input[type="number"]:focus {
+    border: 1.5px solid #1976d2;
+    background: #fff;
+}
+
+@media (max-width: 700px) {
+    .topup-page {
+        padding: 16px 4vw 16px 4vw;
+        min-width: 0;
+    }
+    .payment-methods-cards {
+        flex-direction: column;
+        gap: 16px;
+    }
+    .topup-actions {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+}
+
+/* --- Thêm style căn giữa card và các thành phần trong card --- */
+.topup-center-outer {
+    min-height: 70vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+}
+
+.topup-center-card {
+    background: #fff;
+    border-radius: 24px;
+    box-shadow: 0 6px 32px rgba(0, 42, 120, 0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+    padding: 40px 36px 32px 36px;
+    min-width: 350px;
+    max-width: 420px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.topup-center-card h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #004aad;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.topup-input-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 28px;
+    gap: 8px;
+}
+.topup-input-row input[type="number"] {
+    flex: 1;
+    font-size: 18px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1.5px solid #4caf50;
+    background: #f7fafd;
+    outline: none;
+    transition: border 0.2s;
+    min-width: 0;
+}
+.topup-input-row input[type="number"]:focus {
+    border: 1.5px solid #1976d2;
+    background: #fff;
+}
+.topup-input-row button[type="button"] {
+    font-size: 22px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid #ccc;
+    background: #fff;
+    color: #1976d2;
+    font-weight: bold;
+    transition: border 0.2s, background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.topup-input-row button[type="button"]:hover {
+    border: 1.5px solid #1976d2;
+    background: #e3f0ff;
+}
+
+@media (max-width: 700px) {
+    .topup-center-card {
+        padding: 16px 4vw 16px 4vw;
+        min-width: 0;
+        max-width: 98vw;
+    }
+    .topup-input-row {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+}

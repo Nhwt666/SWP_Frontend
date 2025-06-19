@@ -6,12 +6,7 @@ import '../styles/Header.css';
 const Header = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    const { fullName } = useContext(UserContext);
-    const [wallet, setWallet] = useState(() => {
-        const raw = localStorage.getItem('wallet');
-        const value = Number(raw);
-        return isNaN(value) ? 0 : value;
-    });
+    const { fullName, wallet } = useContext(UserContext);
     const [showDropdown, setShowDropdown] = useState(false);
     const [role, setRole] = useState(localStorage.getItem('role') || '');
 
@@ -31,11 +26,9 @@ const Header = () => {
             });
             if (res.ok) {
                 const user = await res.json();
-                const balance = Number(user.walletBalance);
-                const safeBalance = isNaN(balance) ? 0 : balance;
+                const safeBalance = isNaN(Number(user.walletBalance)) ? 0 : Number(user.walletBalance);
                 localStorage.setItem('wallet', safeBalance);
                 localStorage.setItem('role', user.role);
-                setWallet(safeBalance);
                 setRole(user.role);
             }
         } catch (err) {
