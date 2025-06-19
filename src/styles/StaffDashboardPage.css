@@ -123,3 +123,65 @@
     background: #28a745;
     color: #fff;
 }
+
+/* ===== Member Footer Styles ===== */
+.member-footer {
+    background: #1e3a8a;
+    color: #fff;
+    padding: 28px 0 18px 0;
+    margin-top: 40px;
+    border-radius: 0 0 18px 18px;
+    box-shadow: 0 -2px 12px rgba(30,58,138,0.08);
+    width: 100%;
+}
+.member-footer-content {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 32px;
+    flex-wrap: wrap;
+    padding: 0 24px;
+}
+.member-footer-info {
+    flex: 1 1 260px;
+    font-size: 1.08rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 500;
+}
+.member-footer-info strong {
+    color: #ffd600;
+    font-weight: 700;
+}
+.member-footer-map {
+    flex: 0 0 260px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+.member-footer-map iframe {
+    border-radius: 10px;
+    border: none;
+    box-shadow: 0 2px 8px rgba(30,58,138,0.10);
+}
+@media (max-width: 700px) {
+    .member-footer-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 18px;
+        padding: 0 8px;
+    }
+    .member-footer-map {
+        justify-content: flex-start;
+        margin-top: 12px;
+    }
+    .member-footer-map iframe {
+        width: 100% !important;
+        min-width: 0;
+        max-width: 100vw;
+        height: 180px;
+    }
+}

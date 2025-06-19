@@ -129,7 +129,7 @@ const Header = () => {
                 </nav>
             </div>
 
-            {role !== 'ADMIN' && (
+            {role !== 'ADMIN' && role !== 'STAFF' && (
                 <nav className="main-nav">
                     <div className="main-nav-container">
                         <a href="/" className="nav-btn" onClick={e => { e.preventDefault(); window.location.replace('/'); }}>Trang Chủ</a>

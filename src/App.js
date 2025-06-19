@@ -17,6 +17,7 @@ import PricingPage from './pages/PricingPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import BlogPostPage from './pages/BlogPostPage';
+import StaffPage from './pages/StaffPage';
 
 function App() {
     return (
@@ -37,6 +38,7 @@ function App() {
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
                     <Route path="/blog/:slug" element={<BlogPostPage />} />
+                    <Route path="/staff/requests" element={<StaffPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />

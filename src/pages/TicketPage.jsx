@@ -12,17 +12,6 @@ const pricingData = {
     'Khác': 900000,
 };
 
-const thirdSamplePricing = {
-    'Xác minh quyền thừa kế': 1000000,
-    'Xác minh quan hệ huyết thống': 1250000,
-    'Giám định ADN cho con nuôi': 1000000,
-    'Xác minh danh tính': 1300000,
-    'Xác minh quyền lợi bảo hiểm': 1600000,
-    'Xác minh quyền thừa kế trong di chúc': 1700000,
-    'Khác': 900000,
-    // You can adjust/add more if needed
-};
-
 const TicketPage = () => {
     const [category, setCategory] = useState('');
     const [service, setService] = useState('');
@@ -39,7 +28,6 @@ const TicketPage = () => {
         phone: '',
         email: '',
     });
-    const [addThirdSample, setAddThirdSample] = useState(false);
     const { wallet, updateFullName, updateWallet } = useContext(UserContext);
 
     const civilServices = [
@@ -99,11 +87,8 @@ const TicketPage = () => {
         } else if (service && pricingData[service]) {
             calculated = pricingData[service];
         }
-        if (addThirdSample && service && thirdSamplePricing[service]) {
-            calculated += thirdSamplePricing[service];
-        }
         setPrice(calculated);
-    }, [category, service, addThirdSample]);
+    }, [category, service]);
 
     const showConfirm = (amount) => {
         return new Promise((resolve) => {
@@ -213,7 +198,6 @@ const TicketPage = () => {
         setPhone('');
         setEmail('');
         setPrice(0);
-        setAddThirdSample(false);
     };
 
     return (
@@ -323,23 +307,8 @@ const TicketPage = () => {
                         </div>
                     )}
 
-                    {/* Add Third Sample Checkbox - Redesigned */}
-                    <div className="add-third-sample-box" tabIndex={0}>
-                        <input
-                            type="checkbox"
-                            id="addThirdSample"
-                            className="add-third-sample-checkbox"
-                            checked={addThirdSample}
-                            onChange={e => setAddThirdSample(e.target.checked)}
-                        />
-                        <label htmlFor="addThirdSample" className="add-third-sample-label">
-                            <span className="add-third-sample-icon" role="img" aria-label="sample">🧬</span>
-                            Thêm mẫu thứ 3
-                        </label>
-                    </div>
-
                     <div className="price-display">
-                        Service Price: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
+                        Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
                     </div>
 
                     <button className="submit-btn" type="submit" disabled={loading}>
