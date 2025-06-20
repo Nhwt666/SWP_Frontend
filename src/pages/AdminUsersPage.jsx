@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const AdminUsersPage = () => {
     const [users, setUsers] = useState([]);
-    const [newUser, setNewUser] = useState({ name: '', email: '', password: '' });
+    const [newUser, setNewUser] = useState({ name: '' });
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
@@ -23,6 +23,13 @@ const AdminUsersPage = () => {
 
     const handleCreateUser = async (e) => {
         e.preventDefault();
+        // Sinh email từ tên nhân viên, loại bỏ dấu, khoảng trắng, chuyển thường
+        const nameSlug = newUser.name
+            .normalize('NFD').replace(/\p{Diacritic}/gu, '')
+            .replace(/[^a-zA-Z0-9 ]/g, '')
+            .replace(/\s+/g, '').toLowerCase();
+        const email = nameSlug + '@adn.com';
+        const password = '1234567';
         try {
             const res = await fetch('/admin/users/create', {
                 method: 'POST',
@@ -30,12 +37,12 @@ const AdminUsersPage = () => {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify(newUser)
+                body: JSON.stringify({ name: newUser.name, email, password })
             });
 
             if (res.ok) {
                 setMessage('✅ Tạo tài khoản thành công!');
-                setNewUser({ name: '', email: '', password: '' });
+                setNewUser({ name: '' });
                 fetchUsers();
             } else {
                 setMessage('❌ Tạo tài khoản thất bại!');
@@ -72,24 +79,22 @@ const AdminUsersPage = () => {
                 <form onSubmit={handleCreateUser} className="create-user-form">
                     <input
                         type="text"
-                        placeholder="Tên nhân viên"
+                        placeholder="Họ và tên nhân viên"
                         value={newUser.name}
                         onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
                         required
                     />
                     <input
-                        type="email"
-                        placeholder="Email"
-                        value={newUser.email}
-                        onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                        required
+                        type="text"
+                        placeholder="Email sẽ tự sinh từ tên"
+                        value={newUser.name ? newUser.name.normalize('NFD').replace(/\p{Diacritic}/gu, '').replace(/[^a-zA-Z0-9 ]/g, '').replace(/\s+/g, '').toLowerCase() + '@adn.com' : ''}
+                        disabled
                     />
                     <input
-                        type="password"
-                        placeholder="Mật khẩu"
-                        value={newUser.password}
-                        onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                        required
+                        type="text"
+                        placeholder="Mật khẩu mặc định: 1234567"
+                        value="1234567"
+                        disabled
                     />
                     <button type="submit">Tạo tài khoản</button>
                 </form>
@@ -106,7 +111,7 @@ const AdminUsersPage = () => {
                     <tbody>
                     {users.map((u) => (
                         <tr key={u.id}>
-                            <td>{u.name}</td>
+                            <td>{u.fullName || u.name}</td>
                             <td>{u.email}</td>
                             <td>{new Date(u.createdAt).toLocaleDateString()}</td>
                         </tr>
