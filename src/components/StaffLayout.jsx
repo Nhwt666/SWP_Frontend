@@ -12,7 +12,6 @@ const StaffLayout = ({ children }) => {
                     <nav>
                         <ul>
                             <li style={{ fontWeight: 600, cursor: 'pointer' }} onClick={() => navigate('/staff/dashboard')}>Trang chính</li>
-                            <li>Tìm Kiếm</li>
                             <li onClick={() => navigate('/staff/requests')} style={{ cursor: 'pointer', fontWeight: 600 }}>Quản lý Yêu Cầu</li>
                             <li>Hồ sơ cá nhân</li>
                             <li>Đăng xuất</li>

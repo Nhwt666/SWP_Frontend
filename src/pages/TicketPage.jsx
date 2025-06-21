@@ -156,6 +156,7 @@ const TicketPage = () => {
             email: method === 'Tự gửi mẫu' ? email : null,
             customerId: userId,
             amount: price,
+            status: 'PENDING',
         };
 
         try {

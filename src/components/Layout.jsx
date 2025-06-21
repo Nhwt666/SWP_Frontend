@@ -6,7 +6,7 @@ const Layout = () => {
     return (
         <>
             <Header />
-            <main style={{ padding: '20px', minHeight: 'calc(100vh - 120px)' }}>
+            <main className="main-layout-modern">
                 <Outlet />
             </main>
             <footer className="member-footer">

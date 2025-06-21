@@ -1,11 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+
+body {
+    background: linear-gradient(135deg, #e3f0ff 0%, #f7faff 100%);
+    min-height: 100vh;
+}
+
 .staff-page {
+    background: rgba(255,255,255,0.98);
+    box-shadow: 0 8px 32px 0 rgba(25, 118, 210, 0.10);
+    border-radius: 28px;
+    padding: 36px 32px 32px 32px;
     max-width: 900px;
-    margin: 40px auto;
-    padding: 30px;
-    font-family: Arial, sans-serif;
-    background: #fefefe;
-    border-radius: 12px;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    margin: 48px auto 32px auto;
+    font-family: 'Be Vietnam Pro', 'Inter', 'Arial', 'Helvetica Neue', 'Segoe UI', sans-serif;
 }
 
 .staff-page h2 {
@@ -102,4 +109,439 @@ textarea {
     color: green;
     font-weight: bold;
     margin-top: 20px;
+}
+
+.modern-card {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px 0 rgba(0,0,0,0.08);
+    padding: 32px 28px 28px 28px;
+    margin: 0 auto 32px auto;
+    max-width: 520px;
+    min-width: 320px;
+    transition: box-shadow 0.2s;
+}
+
+.ticket-detail-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 18px;
+    color: #1a237e;
+    letter-spacing: 0.5px;
+    text-align: center;
+    font-family: 'Be Vietnam Pro', 'Inter', 'Arial', 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+.ticket-status-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 18px;
+}
+
+.ticket-status-badge {
+    padding: 6px 18px;
+    border-radius: 16px;
+    font-size: 1.13rem;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.08);
+    letter-spacing: 0.5px;
+}
+
+.status-pending {
+    background: #ff9800;
+}
+
+.status-in_progress {
+    background: #1976d2;
+}
+
+.status-completed {
+    background: #43a047;
+}
+
+.ticket-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 22px;
+    margin-bottom: 18px;
+    font-size: 1.09rem;
+}
+
+.ticket-info-grid div {
+    background: #f7f9fc;
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #222;
+    font-weight: 500;
+}
+
+.btn-processing.modern-btn,
+.btn-complete.modern-btn {
+    background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.13rem;
+    font-weight: 800;
+    padding: 12px 38px;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.10);
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-processing.modern-btn:disabled,
+.btn-complete.modern-btn:disabled {
+    background: #b0bec5;
+    color: #eee;
+    cursor: not-allowed;
+}
+
+.btn-processing.modern-btn:hover,
+.btn-complete.modern-btn:hover {
+    background: linear-gradient(90deg, #1251a3 60%, #1976d2 100%);
+    transform: scale(1.03);
+}
+
+.modern-select {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: 1.5px solid #b0bec5;
+    font-size: 1.09rem;
+    margin-left: 8px;
+    outline: none;
+    background: #f7f9fc;
+    min-width: 180px;
+    transition: border 0.2s;
+}
+
+.modern-select:focus {
+    border: 1.5px solid #1976d2;
+}
+
+.modern-done-msg {
+    background: #e8f5e9;
+    color: #388e3c;
+    border-radius: 10px;
+    padding: 16px 0;
+    text-align: center;
+    font-size: 1.13rem;
+    font-weight: 700;
+    margin-top: 24px;
+}
+
+@media (max-width: 700px) {
+    .staff-page {
+        padding: 10px 2px 10px 2px;
+        max-width: 99vw;
+        border-radius: 0;
+    }
+    .ticket-list-modern {
+        padding: 10px 2px 10px 2px;
+        max-width: 99vw;
+        border-radius: 0;
+    }
+    .modern-search-input {
+        min-width: 120px;
+        margin-left: 8px;
+        font-size: 0.98rem;
+        padding-left: 38px;
+    }
+    .modern-tabs-row {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    .modern-tab-btn {
+        padding: 8px 12px 8px 24px;
+        font-size: 0.98rem;
+        border-radius: 10px;
+    }
+    .ticket-item-modern {
+        padding: 10px 6px;
+        font-size: 0.98rem;
+        gap: 7px;
+        border-radius: 10px;
+    }
+    .ticket-id-modern {
+        min-width: 36px;
+        font-size: 0.98rem;
+    }
+    .ticket-detail.modern-card {
+        border-radius: 0 0 10px 10px;
+        padding: 12px 4px 12px 4px;
+    }
+    .ticket-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px 0;
+    }
+    .ticket-detail-title {
+        font-size: 1.15rem;
+    }
+}
+
+.staff-title-modern {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: #0d1a4a;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+    text-align: center;
+    font-family: 'Be Vietnam Pro', 'Inter', 'Arial', 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+.modern-tabs-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    position: relative;
+    justify-content: center;
+}
+
+.modern-tab-btn {
+    padding: 12px 36px 12px 32px;
+    border-radius: 16px;
+    border: none;
+    background: #e3eafc;
+    color: #1a237e;
+    font-weight: 700;
+    font-size: 1.13rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.06);
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s, transform 0.18s;
+    margin-right: 2px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.modern-tab-btn.active {
+    background: linear-gradient(90deg, #1976d2 60%, #64b5f6 100%);
+    color: #fff;
+    box-shadow: 0 4px 16px 0 rgba(25, 118, 210, 0.13);
+    transform: scale(1.04);
+}
+
+.modern-tab-btn.active::after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: 0;
+    height: 4px;
+    border-radius: 2px;
+    background: #fff;
+    animation: tabUnderline 0.32s cubic-bezier(.4,1.4,.6,1) forwards;
+}
+
+@keyframes tabUnderline {
+    from { width: 0; opacity: 0; }
+    to { width: 64%; opacity: 1; }
+}
+
+.modern-search-input {
+    margin-left: 24px;
+    padding: 12px 20px 12px 44px;
+    border-radius: 12px;
+    border: 1.5px solid #b0bec5;
+    min-width: 260px;
+    font-size: 1.13rem;
+    outline: none;
+    background: #f7f9fc url('data:image/svg+xml;utf8,<svg fill="%23999" height="20" viewBox="0 0 24 24" width="20" xmlns="http://www.w3.org/2000/svg"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99c.41.41 1.09.41 1.5 0s.41-1.09 0-1.5l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>') no-repeat 14px center;
+    transition: border 0.18s, box-shadow 0.18s;
+    box-shadow: 0 1px 4px 0 rgba(25, 118, 210, 0.04);
+}
+
+.modern-search-input:focus {
+    border: 1.5px solid #1976d2;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.10);
+}
+
+.ticket-list-modern {
+    background: #f4f7fb;
+    border-radius: 22px;
+    box-shadow: 0 4px 18px 0 rgba(25, 118, 210, 0.09);
+    padding: 28px 18px 18px 18px;
+    margin: 0 auto 32px auto;
+    max-width: 650px;
+}
+
+.ticket-list-title-modern {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #1976d2;
+    margin-bottom: 18px;
+    text-align: center;
+    font-family: 'Be Vietnam Pro', 'Inter', 'Arial', 'Helvetica Neue', 'Segoe UI', sans-serif;
+}
+
+.ticket-ul-modern {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ticket-item-modern {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    padding: 18px 22px;
+    font-size: 1.13rem;
+    font-weight: 600;
+    color: #222;
+    cursor: pointer;
+    box-shadow: 0 2px 8px 0 rgba(25, 118, 210, 0.08);
+    border: 2px solid transparent;
+    transition: box-shadow 0.18s, border 0.18s, background 0.18s, transform 0.18s;
+    position: relative;
+}
+
+.ticket-item-modern.selected {
+    border: 2px solid #1976d2;
+    background: #e3eafc;
+    color: #1976d2;
+    transform: scale(1.02);
+}
+
+.ticket-item-modern:hover {
+    box-shadow: 0 6px 20px 0 rgba(25, 118, 210, 0.13);
+    background: #f0f7ff;
+    transform: scale(1.01);
+}
+
+.ticket-item-modern:active {
+    transform: scale(0.97);
+    box-shadow: 0 1px 4px 0 rgba(25, 118, 210, 0.10);
+}
+
+.ticket-id-modern {
+    font-weight: 800;
+    color: #1976d2;
+    min-width: 60px;
+    font-size: 1.13rem;
+}
+
+.ticket-type-modern {
+    background: #e3eafc;
+    color: #1976d2;
+    border-radius: 8px;
+    padding: 2px 12px;
+    font-size: 1.01rem;
+    font-weight: 700;
+}
+
+.ticket-status-badge-list {
+    padding: 2px 14px;
+    border-radius: 10px;
+    font-size: 1.01rem;
+    font-weight: 700;
+    color: #fff;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+.ticket-status-badge-list.status-pending {
+    background: #ff9800;
+}
+
+.ticket-status-badge-list.status-in_progress {
+    background: #1976d2;
+}
+
+.ticket-status-badge-list.status-completed {
+    background: #43a047;
+}
+
+.ticket-customer-modern {
+    margin-left: auto;
+    font-weight: 600;
+    color: #333;
+    font-size: 1.05rem;
+}
+
+.ticket-empty-modern {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 28px 0 18px 0;
+    font-size: 1.13rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.ticket-empty-modern::before {
+    content: '\1F50D'; /* icon kính lúp */
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+/* Card chi tiết slide-down */
+.ticket-detail.modern-card {
+    animation: slideDownAnim 0.45s cubic-bezier(.4,1.4,.6,1);
+    overflow: hidden;
+}
+
+@keyframes slideDownAnim {
+    from { opacity: 0; transform: translateY(-32px) scaleY(0.95); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Loading spinner */
+.staff-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 32px 0;
+}
+
+.staff-spinner .spinner {
+    width: 38px;
+    height: 38px;
+    border: 4px solid #e3eafc;
+    border-top: 4px solid #1976d2;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Fade-in cho card chi tiết */
+.fade-in {
+    animation: fadeInAnim 0.5s ease;
+}
+
+@keyframes fadeInAnim {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* Custom scrollbar */
+.staff-page, .ticket-list-modern, .ticket-detail.modern-card {
+    scrollbar-width: thin;
+    scrollbar-color: #b0bec5 #f4f7fb;
+}
+
+.staff-page::-webkit-scrollbar, .ticket-list-modern::-webkit-scrollbar, .ticket-detail.modern-card::-webkit-scrollbar {
+    width: 8px;
+    background: #f4f7fb;
+}
+
+.staff-page::-webkit-scrollbar-thumb, .ticket-list-modern::-webkit-scrollbar-thumb, .ticket-detail.modern-card::-webkit-scrollbar-thumb {
+    background: #b0bec5;
+    border-radius: 8px;
 }

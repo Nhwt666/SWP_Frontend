@@ -89,7 +89,7 @@ const Header = () => {
                                     Xin chào, {fullName || 'Người dùng'} {role === 'ADMIN' && '(Quản trị)'}
                                 </div>
                                 {role !== 'ADMIN' && (
-                                    <div className="user-wallet">Ví: {wallet.toLocaleString()}đ</div>
+                                    <div className="user-wallet">Ví: {(typeof wallet === 'number' && !isNaN(wallet) ? wallet : 0).toLocaleString()}đ</div>
                                 )}
                             </div>
                             <div className="avatar-container">

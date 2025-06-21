@@ -99,18 +99,16 @@ const RegisterPage = () => {
             <Header />
             <div className="register-bg">
                 <div className="register-container flex-col">
-                    <div className="register-avatar-section">
-                        {/* <img src="/logo192.png" alt="Logo" className="register-avatar" /> */}
-                    </div>
-                    <h2 className="register-title">Đăng Ký</h2>
+                    <h2 className="register-title" style={{ fontFamily: 'Be Vietnam Pro, Inter, Arial, sans-serif', fontWeight: 900 }}>Đăng Ký</h2>
                     {!showOtpForm ? (
-                        <form className="register-form" onSubmit={handleRegister}>
+                        <form className="register-form" onSubmit={handleRegister} autoComplete="off">
                             <input
                                 type="text"
                                 placeholder="Tên người dùng"
                                 value={fullName}
                                 onChange={(e) => setFullName(e.target.value)}
                                 required
+                                style={{ fontFamily: 'inherit' }}
                             />
                             <input
                                 type="email"
@@ -118,6 +116,7 @@ const RegisterPage = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                style={{ fontFamily: 'inherit' }}
                             />
                             <input
                                 type="password"
@@ -125,33 +124,58 @@ const RegisterPage = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                style={{ fontFamily: 'inherit' }}
                             />
                             <input
                                 type="text"
                                 placeholder="Số điện thoại"
                                 value={phone}
                                 onChange={(e) => setPhone(e.target.value)}
+                                style={{ fontFamily: 'inherit' }}
                             />
-                            <button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Đang gửi...' : 'Xác nhận'}
+                            <button type="submit" disabled={isLoading} style={{ fontFamily: 'inherit', position: 'relative' }}>
+                                {isLoading ? (
+                                    <span className="spinner" style={{ display: 'inline-block', verticalAlign: 'middle', width: 22, height: 22 }}>
+                                        <svg width="22" height="22" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#6c47d8">
+                                            <g fill="none" fillRule="evenodd" strokeWidth="4">
+                                                <circle cx="22" cy="22" r="18" strokeOpacity=".2" />
+                                                <path d="M40 22c0-9.94-8.06-18-18-18">
+                                                    <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="0.9s" repeatCount="indefinite" />
+                                                </path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                ) : 'Xác nhận'}
                             </button>
                         </form>
                     ) : (
-                        <form className="register-form" onSubmit={handleConfirm}>
+                        <form className="register-form" onSubmit={handleConfirm} autoComplete="off">
                             <input
                                 type="text"
                                 placeholder="Nhập mã OTP"
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 required
+                                style={{ fontFamily: 'inherit' }}
                             />
-                            <button type="submit" disabled={isLoading}>
-                                {isLoading ? 'Đang xác nhận...' : 'Xác nhận'}
+                            <button type="submit" disabled={isLoading} style={{ fontFamily: 'inherit', position: 'relative' }}>
+                                {isLoading ? (
+                                    <span className="spinner" style={{ display: 'inline-block', verticalAlign: 'middle', width: 22, height: 22 }}>
+                                        <svg width="22" height="22" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" stroke="#6c47d8">
+                                            <g fill="none" fillRule="evenodd" strokeWidth="4">
+                                                <circle cx="22" cy="22" r="18" strokeOpacity=".2" />
+                                                <path d="M40 22c0-9.94-8.06-18-18-18">
+                                                    <animateTransform attributeName="transform" type="rotate" from="0 22 22" to="360 22 22" dur="0.9s" repeatCount="indefinite" />
+                                                </path>
+                                            </g>
+                                        </svg>
+                                    </span>
+                                ) : 'Xác nhận'}
                             </button>
                         </form>
                     )}
-                    {message && <div className="divider" />}
-                    {message && <div className="message">{message}</div>}
+                    {message && <div className="divider" style={{ margin: '18px auto 0', width: 48, height: 3, borderRadius: 2, background: 'linear-gradient(90deg,#6c47d8 60%,#17a2b8 100%)', opacity: 0.18 }} />}
+                    {message && <div className="message" style={{ fontFamily: 'inherit', marginTop: 10, animation: 'fadeInLogin 0.5s' }}>{message}</div>}
                 </div>
             </div>
         </>
