@@ -46,6 +46,19 @@ const TestHistoryPage = () => {
         setSelectedTicket(null);
     };
 
+    const getDisplayResult = (resultStr) => {
+        if (!resultStr || resultStr === 'Chưa có') return 'Chưa có';
+        try {
+            const parsed = JSON.parse(resultStr);
+            if (parsed && typeof parsed === 'object' && parsed.result) {
+                return parsed.result;
+            }
+            return parsed;
+        } catch (e) {
+            return resultStr;
+        }
+    };
+
     return (
         <div className="test-history-page" style={{ padding: '20px' }}>
             <h2>Lịch sử xét nghiệm</h2>
@@ -106,7 +119,9 @@ const TestHistoryPage = () => {
                                 <tr><td><b>Ngày tạo:</b></td><td>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : ''}</td></tr>
                                 <tr><td><b>Loại xét nghiệm:</b></td><td>{selectedTicket.reason || ''}</td></tr>
                                 <tr><td><b>Phương thức:</b></td><td>{methodMap[selectedTicket.method] || selectedTicket.method || ''}</td></tr>
-                                <tr><td><b>Kết quả:</b></td><td>{selectedTicket.result ? selectedTicket.result : 'Chưa có'}</td></tr>
+                                <tr><td><b>Tên Mẫu 1:</b></td><td>{selectedTicket.sample1Name || ''}</td></tr>
+                                <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
+                                <tr><td><b>Kết quả:</b></td><td>{getDisplayResult(selectedTicket.resultString)}</td></tr>
                                 <tr><td><b>Trạng thái:</b></td><td>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
                                 <tr><td><b>Staff ID:</b></td><td>{selectedTicket.staffId || 'Chưa có'}</td></tr>
                                 {selectedTicket.method === 'SELF_TEST' && (

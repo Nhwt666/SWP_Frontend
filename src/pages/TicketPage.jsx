@@ -20,6 +20,9 @@ const TicketPage = () => {
     const [address, setAddress] = useState('');
     const [phone, setPhone] = useState('');
     const [email, setEmail] = useState('');
+    const [sample1Name, setSample1Name] = useState('');
+    const [sample2Name, setSample2Name] = useState('');
+    const [appointmentDate, setAppointmentDate] = useState('');
     const [loading, setLoading] = useState(false);
     const [userId, setUserId] = useState(null);
     const [price, setPrice] = useState(0);
@@ -154,6 +157,9 @@ const TicketPage = () => {
             address: method === 'Tự gửi mẫu' ? address : null,
             phone: method === 'Tự gửi mẫu' ? phone : null,
             email: method === 'Tự gửi mẫu' ? email : null,
+            appointmentDate: method === 'Tại cơ sở y tế' ? appointmentDate : null,
+            sample1Name: sample1Name,
+            sample2Name: sample2Name,
             customerId: userId,
             amount: price,
             status: 'PENDING',
@@ -213,6 +219,9 @@ const TicketPage = () => {
         setAddress('');
         setPhone('');
         setEmail('');
+        setSample1Name('');
+        setSample2Name('');
+        setAppointmentDate('');
         setPrice(0);
     };
 
@@ -322,6 +331,44 @@ const TicketPage = () => {
                             </div>
                         </div>
                     )}
+
+                    {method === 'Tại cơ sở y tế' && (
+                        <div className="form-group">
+                            <label htmlFor="appointmentDate"><strong>Chọn ngày hẹn:</strong></label>
+                            <input
+                                id="appointmentDate"
+                                type="date"
+                                value={appointmentDate}
+                                onChange={(e) => setAppointmentDate(e.target.value)}
+                                required
+                                className="date-picker"
+                            />
+                        </div>
+                    )}
+
+                    <div className="form-group">
+                        <label htmlFor="sample1Name"><strong>Tên Mẫu 1:</strong></label>
+                        <input
+                            id="sample1Name"
+                            type="text"
+                            value={sample1Name}
+                            onChange={(e) => setSample1Name(e.target.value)}
+                            placeholder="Nhập tên người cung cấp mẫu 1"
+                            required
+                        />
+                    </div>
+
+                    <div className="form-group">
+                        <label htmlFor="sample2Name"><strong>Tên Mẫu 2:</strong></label>
+                        <input
+                            id="sample2Name"
+                            type="text"
+                            value={sample2Name}
+                            onChange={(e) => setSample2Name(e.target.value)}
+                            placeholder="Nhập tên người cung cấp mẫu 2"
+                            required
+                        />
+                    </div>
 
                     <div className="price-display">
                         Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}

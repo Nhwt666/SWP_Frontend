@@ -5,10 +5,10 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: linear-gradient(90deg, #6c47d8 0%, #1e3a8a 100%);
+  background: linear-gradient(90deg, #00d4ff 0%, #0099ff 100%);
   color: white;
   padding: 0;
-  box-shadow: 0 6px 32px rgba(108,71,216,0.10), 0 1.5px 6px rgba(0,0,0,0.04);
+  box-shadow: 0 6px 32px rgba(0,212,255,0.25), 0 1.5px 6px rgba(0,0,0,0.04);
   border-radius: 0 0 22px 22px;
   font-family: 'Be Vietnam Pro', 'Inter', Arial, sans-serif;
   transition: background 0.3s;
@@ -36,14 +36,14 @@
   border-radius: 16px;
   object-fit: cover;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(108,71,216,0.10);
+  box-shadow: 0 2px 8px rgba(0,212,255,0.20);
   background: #fff;
-  border: 2.5px solid #e3e0ff;
+  border: 2.5px solid #e0f7ff;
   transition: box-shadow 0.2s, border 0.2s;
 }
 .logo:hover {
-  box-shadow: 0 4px 16px rgba(108,71,216,0.18);
-  border: 2.5px solid #6c47d8;
+  box-shadow: 0 4px 16px rgba(0,212,255,0.30);
+  border: 2.5px solid #00d4ff;
 }
 
 .logo-title h1 {
@@ -68,16 +68,16 @@
   border-radius: 18px;
   font-size: 1.08rem;
   font-family: inherit;
-  background: linear-gradient(90deg, #6c47d8 60%, #17a2b8 100%);
-  box-shadow: 0 2px 8px rgba(108,71,216,0.08);
+  background: linear-gradient(90deg, #00d4ff 60%, #0099ff 100%);
+  box-shadow: 0 2px 8px rgba(0,212,255,0.20);
   transition: background 0.3s, color 0.3s, box-shadow 0.2s, transform 0.18s;
 }
 .auth-links a:hover,
 .auth-links a:focus {
-  background: linear-gradient(90deg, #17a2b8 60%, #6c47d8 100%);
+  background: linear-gradient(90deg, #0099ff 60%, #00d4ff 100%);
   color: #fff;
   outline: none;
-  box-shadow: 0 4px 16px 0 rgba(108,71,216,0.16);
+  box-shadow: 0 4px 16px 0 rgba(0,212,255,0.30);
   transform: scale(1.04);
 }
 
@@ -111,23 +111,23 @@
 .avatar {
   width: 44px;
   height: 44px;
-  background: linear-gradient(135deg, #e3f0ff 0%, #e0e7ff 100%);
+  background: linear-gradient(135deg, #e0f7ff 0%, #e6f3ff 100%);
   border-radius: 50%;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 900;
-  color: #6c47d8;
+  color: #00d4ff;
   font-size: 1.25rem;
-  box-shadow: 0 2px 8px rgba(108,71,216,0.10);
+  box-shadow: 0 2px 8px rgba(0,212,255,0.20);
   border: 2px solid #fff;
   transition: background 0.3s, color 0.2s, box-shadow 0.2s;
 }
 .avatar:hover {
-  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
-  color: #17a2b8;
-  box-shadow: 0 4px 16px 0 rgba(108,71,216,0.16);
+  background: linear-gradient(135deg, #e6f3ff 0%, #e0f7ff 100%);
+  color: #0099ff;
+  box-shadow: 0 4px 16px 0 rgba(0,212,255,0.30);
 }
 
 .dropdown-menu {
@@ -157,13 +157,13 @@
 }
 .dropdown-menu button:hover {
   background: #f3f4f6;
-  color: #6c47d8;
+  color: #00d4ff;
 }
 
 /* ===== Nút Nạp tiền và Đăng xuất ===== */
 .topup-btn,
 .logout-btn {
-  background: linear-gradient(90deg, #6c47d8 60%, #17a2b8 100%);
+  background: linear-gradient(90deg, #00d4ff 60%, #0099ff 100%);
   border: none;
   color: #fff;
   padding: 8px 18px;
@@ -172,13 +172,13 @@
   cursor: pointer;
   font-family: inherit;
   transition: background 0.3s, color 0.3s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(108,71,216,0.08);
+  box-shadow: 0 2px 8px rgba(0,212,255,0.20);
 }
 .topup-btn:hover,
 .logout-btn:hover {
-  background: linear-gradient(90deg, #17a2b8 60%, #6c47d8 100%);
+  background: linear-gradient(90deg, #0099ff 60%, #00d4ff 100%);
   color: #fff;
-  box-shadow: 0 4px 16px 0 rgba(108,71,216,0.16);
+  box-shadow: 0 4px 16px 0 rgba(0,212,255,0.30);
 }
 
 /* ===== Menu Điều Hướng Chính ===== */

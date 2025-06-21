@@ -135,6 +135,33 @@ const StaffPage = () => {
         }
     };
 
+    const handleCompleteTicket = async (id, result) => {
+        if (!result) {
+            toast.error('Vui lòng chọn kết quả xử lý.');
+            return;
+        }
+        setStatusLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/tickets/${id}/complete`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(result),
+            });
+            if (!res.ok) throw new Error('Không thể hoàn thành ticket.');
+            const updated = await res.json();
+            setTickets((prev) => prev.map(t => (t.id === id ? updated : t)));
+            toast.success('Đã hoàn thành và lưu kết quả!');
+            setResultOption('');
+        } catch (err) {
+            toast.error(err.message || 'Lỗi khi hoàn thành ticket.');
+        } finally {
+            setStatusLoading(false);
+        }
+    };
+
     const handleUpdateType = async (id, newType) => {
         setStatusLoading(true);
         try {
@@ -163,6 +190,24 @@ const StaffPage = () => {
         const nameMatch = name.toLowerCase().includes(search.trim().toLowerCase());
         return idMatch || nameMatch;
     });
+
+    const methodMap = {
+        SELF_TEST: 'Tự gửi mẫu',
+        AT_FACILITY: 'Tại cơ sở y tế'
+    };
+
+    const getDisplayResult = (resultStr) => {
+        if (!resultStr) return 'Chưa có thông tin kết quả.';
+        try {
+            const parsed = JSON.parse(resultStr);
+            if (parsed && typeof parsed === 'object' && parsed.result) {
+                return parsed.result;
+            }
+            return parsed;
+        } catch (e) {
+            return resultStr;
+        }
+    };
 
     return (
         <StaffLayout>
@@ -231,9 +276,16 @@ const StaffPage = () => {
                                                     <div><strong>Khách hàng:</strong> <span>{ticket.customer?.fullName || ticket.customer?.name || ''}</span></div>
                                                     <div><strong>Email:</strong> <span>{ticket.customer?.email || ''}</span></div>
                                                     <div><strong>SĐT:</strong> <span>{ticket.customer?.phone || ''}</span></div>
-                                                    <div><strong>Địa chỉ:</strong> <span>{ticket.address || ''}</span></div>
-                                                    <div><strong>Phương thức:</strong> <span>{ticket.method || ''}</span></div>
+                                                    <div><strong>Phương thức:</strong> <span>{methodMap[ticket.method] || ticket.method}</span></div>
                                                     <div><strong>Lý do:</strong> <span>{ticket.reason || ''}</span></div>
+                                                    {ticket.appointmentDate &&
+                                                        <div><strong>Ngày hẹn:</strong> <span>{new Date(ticket.appointmentDate).toLocaleDateString('vi-VN')}</span></div>
+                                                    }
+                                                    {ticket.address &&
+                                                        <div><strong>Địa chỉ gửi mẫu:</strong> <span>{ticket.address}</span></div>
+                                                    }
+                                                    <div><strong>Tên Mẫu 1:</strong> <span>{ticket.sample1Name || ''}</span></div>
+                                                    <div><strong>Tên Mẫu 2:</strong> <span>{ticket.sample2Name || ''}</span></div>
                                                 </div>
                                                 {ticket.status === 'PENDING' && ticket.staff == null && (
                                                     <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
@@ -255,21 +307,19 @@ const StaffPage = () => {
                                                             className="modern-select"
                                                         >
                                                             <option value="">-- Chọn kết quả --</option>
-                                                            <option value="match">Thông tin trùng khớp</option>
-                                                            <option value="not_match">Thông tin không trùng khớp</option>
+                                                            <option value="Thông tin trùng khớp">Thông tin trùng khớp</option>
+                                                            <option value="Thông tin không trùng khớp">Thông tin không trùng khớp</option>
                                                         </select>
                                                         {resultOption && (
                                                             <>
                                                                 <p style={{ marginTop: 12, fontStyle: 'italic', color: '#1976d2', fontSize: 15 }}>
-                                                                    {resultOption === 'match'
-                                                                        ? 'Kết luận: Thông tin xác minh trùng khớp với hồ sơ.'
-                                                                        : 'Kết luận: Thông tin xác minh không trùng khớp với hồ sơ.'}
+                                                                    Kết luận: {resultOption}.
                                                                 </p>
                                                                 <button
                                                                     className="btn-complete modern-btn"
                                                                     style={{ marginTop: 16 }}
-                                                                    onClick={e => { e.stopPropagation(); handleUpdateStatusVN(ticket.id, 'COMPLETED'); }}
-                                                                    disabled={statusLoading}
+                                                                    onClick={e => { e.stopPropagation(); handleCompleteTicket(ticket.id, resultOption); }}
+                                                                    disabled={statusLoading || !resultOption}
                                                                 >
                                                                     Xác nhận Hoàn thành
                                                                 </button>
@@ -278,7 +328,10 @@ const StaffPage = () => {
                                                     </div>
                                                 )}
                                                 {ticket.status === 'COMPLETED' && (
-                                                    <div className="done-msg modern-done-msg">Yêu cầu đã hoàn thành.</div>
+                                                    <div className="result-display-box">
+                                                        <h4>Kết quả xử lý</h4>
+                                                        <p>{getDisplayResult(ticket.resultString)}</p>
+                                                    </div>
                                                 )}
                                             </div>
                                         </li>

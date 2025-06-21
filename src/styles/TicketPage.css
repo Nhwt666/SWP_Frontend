@@ -51,7 +51,8 @@
 .ticket-form textarea,
 .ticket-form input[type="text"],
 .ticket-form input[type="tel"],
-.ticket-form input[type="email"] {
+.ticket-form input[type="email"],
+.ticket-form input[type="date"] {
     width: 100%;
     padding: 13px 16px;
     font-size: 1rem;
@@ -69,7 +70,8 @@
 .ticket-form textarea:focus,
 .ticket-form input[type="text"]:focus,
 .ticket-form input[type="tel"]:focus,
-.ticket-form input[type="email"]:focus {
+.ticket-form input[type="email"]:focus,
+.ticket-form input[type="date"]:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 2px #c7d7fa;
     background: #fff;
@@ -181,4 +183,8 @@
     font-size: 1.3rem;
     color: #2563eb;
     margin-right: 6px;
+}
+
+.ticket-form .date-picker {
+    cursor: pointer;
 }
