@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import '../styles/ProfilePage.css';
+import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaWallet } from 'react-icons/fa';
 
 const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(true);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -15,61 +17,69 @@ const ProfilePage = () => {
                 if (res.ok) {
                     const data = await res.json();
                     setUserInfo(data);
+                } else {
+                    console.error("Failed to fetch user info");
                 }
             } catch (err) {
-                // handle error
+                console.error("Error fetching user info:", err);
             }
         };
         fetchUserInfo();
     }, []);
 
-    const closeModal = () => {
-        setIsModalOpen(false);
-        window.history.back();
-    };
-
     if (!userInfo) {
-        return <p>Đang tải thông tin...</p>;
+        return <p className="loading-text">Đang tải thông tin...</p>;
     }
 
     return (
-        <>
-            {isModalOpen && (
-                <div className="modal-overlay" onClick={closeModal}>
-                    <div className="modal-container profile-modal" onClick={e => e.stopPropagation()}>
-                        <div className="profile-form-card">
-                            <h2 className="profile-simple-title">Thông Tin Của Tôi</h2>
-                            <div className="profile-simple-form">
-                                <div className="profile-simple-group">
-                                    <label>Họ tên</label>
-                                    <input value={userInfo.fullName || ''} disabled readOnly />
-                                </div>
-                                <div className="profile-simple-group">
-                                    <label>Email</label>
-                                    <input value={userInfo.email || ''} disabled readOnly />
-                                </div>
-                                <div className="profile-simple-group">
-                                    <label>Số điện thoại</label>
-                                    <input value={userInfo.phone || ''} disabled readOnly />
-                                </div>
-                                <div className="profile-simple-group">
-                                    <label>Địa chỉ</label>
-                                    <input value={userInfo.address || ''} disabled readOnly />
-                                </div>
-                                <div className="profile-simple-group">
-                                    <label>Số dư ví</label>
-                                    <input
-                                        value={Number(userInfo.walletBalance || 0).toLocaleString('vi-VN') + ' VND'}
-                                        disabled
-                                        readOnly
-                                    />
-                                </div>
+        <div className="profile-page-container">
+            <div className="profile-card">
+                <div className="profile-card-header">
+                    <div className="avatar-container">
+                        <FaUserCircle className="avatar-icon" />
+                    </div>
+                    <div className="user-info-header">
+                        <h2 className="user-name">{userInfo.fullName || 'Tên người dùng'}</h2>
+                        <p className="user-email-header">{userInfo.email}</p>
+                    </div>
+                </div>
+
+                <div className="profile-card-body">
+                    <h3 className="section-title">Thông tin chi tiết</h3>
+                    <div className="info-grid">
+                        <div className="info-item">
+                            <FaPhone className="info-icon" />
+                            <div className="info-text">
+                                <label>Số điện thoại</label>
+                                <span>{userInfo.phone || 'Chưa cập nhật'}</span>
+                            </div>
+                        </div>
+                        <div className="info-item">
+                            <FaMapMarkerAlt className="info-icon" />
+                            <div className="info-text">
+                                <label>Địa chỉ</label>
+                                <span>{userInfo.address || 'Chưa cập nhật'}</span>
+                            </div>
+                        </div>
+                        <div className="info-item">
+                            <FaWallet className="info-icon" />
+                            <div className="info-text">
+                                <label>Số dư ví</label>
+                                <span className="wallet-balance">
+                                    {Number(userInfo.walletBalance || 0).toLocaleString('vi-VN')} VND
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
-            )}
-        </>
+
+                <div className="profile-card-footer">
+                    <Link to="/update-profile" className="btn-update-profile">
+                        Chỉnh sửa thông tin
+                    </Link>
+                </div>
+            </div>
+        </div>
     );
 };
 

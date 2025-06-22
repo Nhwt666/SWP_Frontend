@@ -33,7 +33,7 @@ const tabOptions = [
 
 const StaffPage = () => {
     const [tickets, setTickets] = useState([]);
-    const [selectedTicketId, setSelectedTicketId] = useState(null);
+    const [selectedTicket, setSelectedTicket] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [statusLoading, setStatusLoading] = useState(false);
@@ -42,6 +42,7 @@ const StaffPage = () => {
     const [resultOption, setResultOption] = useState('');
 
     const [activeTab, setActiveTab] = useState('unassigned');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const fetchTickets = useCallback(async (tabKey) => {
         setLoading(true);
@@ -65,8 +66,21 @@ const StaffPage = () => {
     }, []);
 
     useEffect(() => {
-        fetchTickets(activeTab);
-    }, [activeTab, fetchTickets]);
+        if (!isModalOpen) {
+            fetchTickets(activeTab);
+        }
+    }, [activeTab, fetchTickets, isModalOpen]);
+
+    const handleOpenModal = (ticket) => {
+        setSelectedTicket(ticket);
+        setIsModalOpen(true);
+        setResultOption('');
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedTicket(null);
+    };
 
     const handleAssignSelf = async (id) => {
         setStatusLoading(true);
@@ -85,6 +99,7 @@ const StaffPage = () => {
             setTickets((prev) => prev.map(t => t.id === id ? updated : t));
             toast.success('Đã nhận xử lý yêu cầu và chuyển sang Đang xử lý!');
             fetchTickets(activeTab);
+            handleCloseModal();
         } catch (err) {
             toast.error(err.message || 'Lỗi khi nhận yêu cầu');
         } finally {
@@ -103,6 +118,80 @@ const StaffPage = () => {
         } catch (e) {
             return resultStr.replace(/^(✅|❌)\s*Kết quả:\s*\n?/, '');
         }
+    };
+
+    const ResultDisplay = ({ resultString }) => {
+        if (!resultString) {
+            return (
+                <div className="result-display-box">
+                    <div className="result-header">
+                        <h4>Kết quả xét nghiệm</h4>
+                    </div>
+                    <div className="result-content">
+                        <p className="no-result">Chưa có thông tin kết quả.</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const result = getDisplayResult(resultString);
+        const lines = result.split('\n');
+        
+        // Phân tích kết quả để xác định loại
+        const isPositive = result.includes('Có quan hệ huyết thống') || result.includes('trùng khớp');
+        const isNegative = result.includes('Không có quan hệ huyết thống') || result.includes('không trùng khớp');
+        
+        // Trích xuất thông tin
+        const conclusion = lines[0] || '';
+        const probability = lines.find(line => line.includes('Tỉ lệ xác suất:')) || '';
+        const purpose = lines.find(line => line.includes('Lý do xét nghiệm:')) || '';
+
+        return (
+            <div className="result-display-box">
+                <div className="result-header">
+                    <h4>Kết quả xét nghiệm</h4>
+                    <div className={`result-status ${isPositive ? 'positive' : isNegative ? 'negative' : 'neutral'}`}>
+                        {isPositive ? '✅ Trùng khớp' : isNegative ? '❌ Không trùng khớp' : '📋 Kết quả'}
+                    </div>
+                </div>
+                
+                <div className="result-content">
+                    <div className="result-card conclusion">
+                        <div className="result-card-header">
+                            <span className="result-icon">🎯</span>
+                            <span className="result-label">Kết luận</span>
+                        </div>
+                        <div className="result-value">
+                            {conclusion.replace(/^[✔️✖️]\s*/, '')}
+                        </div>
+                    </div>
+                    
+                    {probability && (
+                        <div className="result-card probability">
+                            <div className="result-card-header">
+                                <span className="result-icon">📊</span>
+                                <span className="result-label">Tỉ lệ xác suất</span>
+                            </div>
+                            <div className="result-value">
+                                {probability.replace('Tỉ lệ xác suất:', '').trim()}
+                            </div>
+                        </div>
+                    )}
+                    
+                    {purpose && (
+                        <div className="result-card purpose">
+                            <div className="result-card-header">
+                                <span className="result-icon">📋</span>
+                                <span className="result-label">Mục đích xét nghiệm</span>
+                            </div>
+                            <div className="result-value">
+                                {purpose.replace('Lý do xét nghiệm:', '').trim()}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
     };
 
     const generateDetailedResult = (ticket, resultOption) => {
@@ -171,6 +260,7 @@ const StaffPage = () => {
             toast.success('Đã hoàn thành và lưu kết quả!');
             setResultOption('');
             fetchTickets(activeTab);
+            handleCloseModal();
         } catch (err) {
             toast.error(err.message || 'Lỗi khi hoàn thành ticket.');
         } finally {
@@ -496,119 +586,143 @@ const StaffPage = () => {
                     <p style={{ color: 'red' }}>{error}</p>
                 ) : (
                     <div className="ticket-list-modern fade-in">
-                        <h3 className="ticket-list-title-modern">Danh sách Ticket được giao</h3>
-                        <ul className="ticket-ul-modern">
-                            {filteredTickets.length === 0 && <li className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</li>}
-                            {filteredTickets.map((ticket) => (
-                                <React.Fragment key={ticket.id}>
-                                    <li
-                                        className={`ticket-item-modern${selectedTicketId === ticket.id ? ' selected' : ''}`}
-                                        onClick={() => setSelectedTicketId(selectedTicketId === ticket.id ? null : ticket.id)}
-                                    >
-                                        <span className="ticket-id-modern">#{ticket.id}</span>
-                                        <span className="ticket-type-modern">{ticket.type}</span>
-                                        <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>{(() => {
-                                            switch(ticket.status) {
-                                                case 'PENDING': return 'Chờ xử lý';
-                                                case 'IN_PROGRESS': return 'Đang xử lý';
-                                                case 'COMPLETED': return 'Đã hoàn thành';
-                                                default: return ticket.status;
-                                            }
-                                        })()}</span>
-                                        <span className="ticket-customer-modern">{ticket.customer?.fullName || ticket.customer?.name || ''}</span>
-                                    </li>
-                                    {selectedTicketId === ticket.id && (
-                                        <li>
-                                            <div className="ticket-detail modern-card fade-in" style={{marginTop: 8, marginBottom: 8}}>
-                                                <h3 className="ticket-detail-title">Chi tiết Ticket #{ticket.id}</h3>
-                                                <div className="ticket-status-row">
-                                                    <span className={`ticket-status-badge status-${ticket.status.toLowerCase()}`}>{(() => {
+                        <table className="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Khách hàng</th>
+                                    <th>Loại yêu cầu</th>
+                                    <th>Trạng thái</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredTickets.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="5" className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</td>
+                                    </tr>
+                                ) : (
+                                    filteredTickets.map((ticket) => (
+                                        <tr key={ticket.id}>
+                                            <td>#{ticket.id}</td>
+                                            <td>{ticket.customer?.fullName || ticket.customer?.name || 'N/A'}</td>
+                                            <td>{ticket.type}</td>
+                                            <td>
+                                                <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
+                                                    {(() => {
                                                         switch(ticket.status) {
                                                             case 'PENDING': return 'Chờ xử lý';
                                                             case 'IN_PROGRESS': return 'Đang xử lý';
                                                             case 'COMPLETED': return 'Đã hoàn thành';
                                                             default: return ticket.status;
                                                         }
-                                                    })()}</span>
-                                                </div>
-                                                <div className="ticket-info-grid">
-                                                    <div><strong>Khách hàng:</strong> <span>{ticket.customer?.fullName || ticket.customer?.name || ''}</span></div>
-                                                    <div><strong>Email:</strong> <span>{ticket.customer?.email || ''}</span></div>
-                                                    <div><strong>SĐT:</strong> <span>{ticket.customer?.phone || ''}</span></div>
-                                                    <div><strong>Phương thức:</strong> <span>{methodMap[ticket.method] || ticket.method}</span></div>
-                                                    <div><strong>Lý do:</strong> <span>{ticket.reason || ''}</span></div>
-                                                    <div><strong>Thời gian tạo:</strong> <span>{ticket.createdAt ? new Date(ticket.createdAt).toLocaleString('vi-VN') : 'Không có thông tin'}</span></div>
-                                                    {ticket.appointmentDate &&
-                                                        <div><strong>Ngày hẹn:</strong> <span>{new Date(ticket.appointmentDate).toLocaleDateString('vi-VN')}</span></div>
-                                                    }
-                                                    {ticket.address &&
-                                                        <div><strong>Địa chỉ gửi mẫu:</strong> <span>{ticket.address}</span></div>
-                                                    }
-                                                    <div><strong>Tên Mẫu 1:</strong> <span>{ticket.sample1Name || ''}</span></div>
-                                                    <div><strong>Tên Mẫu 2:</strong> <span>{ticket.sample2Name || ''}</span></div>
-                                                </div>
-                                                {ticket.status === 'PENDING' && ticket.staff == null && (
-                                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
-                                                        <button
-                                                            className="btn-processing modern-btn"
-                                                            onClick={e => { e.stopPropagation(); handleAssignSelf(ticket.id); }}
-                                                            disabled={statusLoading}
-                                                        >
-                                                            Nhận xử lý
-                                                        </button>
-                                                    </div>
-                                                )}
-                                                {ticket.status === 'IN_PROGRESS' && (
-                                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
-                                                        <label style={{ marginRight: 10, fontWeight: 600, fontSize: 16 }}>Kết quả xử lý:</label>
-                                                        <select
-                                                            value={resultOption}
-                                                            onChange={e => setResultOption(e.target.value)}
-                                                            className="modern-select"
-                                                        >
-                                                            <option value="">-- Chọn kết quả --</option>
-                                                            <option value="Thông tin trùng khớp">Thông tin trùng khớp</option>
-                                                            <option value="Thông tin không trùng khớp">Thông tin không trùng khớp</option>
-                                                        </select>
-                                                        {resultOption && (
-                                                            <>
-                                                                <p style={{ marginTop: 12, fontStyle: 'italic', color: '#1976d2', fontSize: 15 }}>
-                                                                    Kết luận: {resultOption}.
-                                                                </p>
-                                                                <button
-                                                                    className="btn-complete modern-btn"
-                                                                    style={{ marginTop: 16 }}
-                                                                    onClick={e => { e.stopPropagation(); handleCompleteTicket(ticket.id, resultOption); }}
-                                                                    disabled={statusLoading || !resultOption}
-                                                                >
-                                                                    Xác nhận Hoàn thành
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {ticket.status === 'COMPLETED' && (
-                                                    <div className="result-display-box">
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                                            <h4>Kết quả xử lý</h4>
-                                                            <button
-                                                                onClick={() => generatePDFReport(ticket)}
-                                                                className="pdf-download-btn"
-                                                            >
-                                                                📄 Tải PDF
-                                                            </button>
-                                                        </div>
-                                                        <div className="detailed-result" style={{ whiteSpace: 'pre-wrap' }}>
-                                                            {getDisplayResult(ticket.resultString)}
-                                                        </div>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </li>
-                                    )}
-                                </React.Fragment>
-                            ))}
-                        </ul>
+                                                    })()}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <button className="btn-details" onClick={() => handleOpenModal(ticket)}>
+                                                    {activeTab === 'completed' ? 'Xem chi tiết' : 'Xử lý'}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                
+                {isModalOpen && selectedTicket && (
+                    <div className="modal-overlay" onClick={handleCloseModal}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <button className="modal-close-btn" onClick={handleCloseModal}>&times;</button>
+                            <div className="ticket-detail modern-card">
+                                <h3 className="ticket-detail-title">Chi tiết Ticket #{selectedTicket.id}</h3>
+                                <div className="ticket-status-row">
+                                    <span className={`ticket-status-badge status-${selectedTicket.status.toLowerCase()}`}>
+                                        {(() => {
+                                            switch(selectedTicket.status) {
+                                                case 'PENDING': return 'Chờ xử lý';
+                                                case 'IN_PROGRESS': return 'Đang xử lý';
+                                                case 'COMPLETED': return 'Đã hoàn thành';
+                                                default: return selectedTicket.status;
+                                            }
+                                        })()}
+                                    </span>
+                                </div>
+                                <div className="ticket-info-grid">
+                                    <div><strong>Khách hàng:</strong> <span>{selectedTicket.customer?.fullName || selectedTicket.customer?.name || ''}</span></div>
+                                    <div><strong>Email:</strong> <span>{selectedTicket.customer?.email || ''}</span></div>
+                                    <div><strong>SĐT:</strong> <span>{selectedTicket.customer?.phone || ''}</span></div>
+                                    <div><strong>Phương thức:</strong> <span>{methodMap[selectedTicket.method] || selectedTicket.method}</span></div>
+                                    <div><strong>Lý do:</strong> <span>{selectedTicket.reason || ''}</span></div>
+                                    <div><strong>Thời gian tạo:</strong> <span>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : 'Không có thông tin'}</span></div>
+                                    {selectedTicket.appointmentDate &&
+                                        <div><strong>Ngày hẹn:</strong> <span>{new Date(selectedTicket.appointmentDate).toLocaleDateString('vi-VN')}</span></div>
+                                    }
+                                    {selectedTicket.address &&
+                                        <div><strong>Địa chỉ gửi mẫu:</strong> <span>{selectedTicket.address}</span></div>
+                                    }
+                                    <div><strong>Tên Mẫu 1:</strong> <span>{selectedTicket.sample1Name || ''}</span></div>
+                                    <div><strong>Tên Mẫu 2:</strong> <span>{selectedTicket.sample2Name || ''}</span></div>
+                                </div>
+
+                                {selectedTicket.status === 'PENDING' && selectedTicket.staff == null && (
+                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                        <button
+                                            className="btn-processing modern-btn"
+                                            onClick={() => handleAssignSelf(selectedTicket.id)}
+                                            disabled={statusLoading}
+                                        >
+                                            Nhận xử lý
+                                        </button>
+                                    </div>
+                                )}
+                                {selectedTicket.status === 'IN_PROGRESS' && (
+                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                        <label style={{ marginRight: 10, fontWeight: 600, fontSize: 16 }}>Kết quả xử lý:</label>
+                                        <select
+                                            value={resultOption}
+                                            onChange={e => setResultOption(e.target.value)}
+                                            className="modern-select"
+                                        >
+                                            <option value="">-- Chọn kết quả --</option>
+                                            <option value="Thông tin trùng khớp">Thông tin trùng khớp</option>
+                                            <option value="Thông tin không trùng khớp">Thông tin không trùng khớp</option>
+                                        </select>
+                                        {resultOption && (
+                                            <>
+                                                <p style={{ marginTop: 12, fontStyle: 'italic', color: '#1976d2', fontSize: 15 }}>
+                                                    Kết luận: {resultOption}.
+                                                </p>
+                                                <button
+                                                    className="btn-complete modern-btn"
+                                                    style={{ marginTop: 16 }}
+                                                    onClick={() => handleCompleteTicket(selectedTicket.id, resultOption)}
+                                                    disabled={statusLoading || !resultOption}
+                                                >
+                                                    Xác nhận Hoàn thành
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+                                {selectedTicket.status === 'COMPLETED' && (
+                                    <div className="result-display-box">
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                            <h4>Kết quả xử lý</h4>
+                                            <button
+                                                onClick={() => generatePDFReport(selectedTicket)}
+                                                className="pdf-download-btn"
+                                            >
+                                                📄 Tải PDF
+                                            </button>
+                                        </div>
+                                        <ResultDisplay resultString={selectedTicket.resultString} />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
             </div>
