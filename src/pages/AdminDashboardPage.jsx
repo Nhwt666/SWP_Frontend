@@ -4,8 +4,10 @@ import '../styles/AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
     const [stats, setStats] = useState(null);
+    const [depositStats, setDepositStats] = useState(null);
     const [memberCount, setMemberCount] = useState(0);
     const [error, setError] = useState('');
+    const [depositError, setDepositError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,7 +26,8 @@ const AdminDashboardPage = () => {
                     setStats({
                         tongXetNghiem: data.totalTickets || 0,
                         dangChoXetDuyet: data.feedbackCount || 0,
-                        baiGuiGanDay: data.recentTickets || []
+                        baiGuiGanDay: data.recentTickets || [],
+                        totalTicketSpending: data.totalTicketSpending || 0
                     });
                 } else {
                     throw new Error('Could not fetch stats');
@@ -56,7 +59,37 @@ const AdminDashboardPage = () => {
             }
         };
 
+        const fetchDepositStats = async () => {
+            try {
+                // Fetch deposit stats
+                const depositStatsRes = await fetch('/admin/deposits/stats', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (depositStatsRes.ok) {
+                    const data = await depositStatsRes.json();
+                    setDepositStats(data);
+                } else {
+                    console.error('Lỗi khi tải thống kê tiền nạp. Trạng thái:', depositStatsRes.status);
+                    try {
+                        const errorData = await depositStatsRes.json();
+                        console.error('Nội dung lỗi từ máy chủ:', errorData);
+                    } catch (e) {
+                        console.error('Không thể phân tích nội dung lỗi dưới dạng JSON.');
+                    }
+                    setDepositError('❌ Không thể tải thống kê tiền nạp');
+                }
+            } catch (err) {
+                console.error('Lỗi kết nối đến máy chủ thống kê tiền nạp:', err);
+                setDepositError('❌ Lỗi kết nối đến máy chủ thống kê tiền nạp');
+            }
+        };
+
         fetchDashboardData();
+        fetchDepositStats();
     }, []);
 
     return (
@@ -68,7 +101,7 @@ const AdminDashboardPage = () => {
                         <li onClick={() => navigate('/admin/dashboard')} style={{ cursor: 'pointer' }}>
                             Bảng điều khiển
                         </li>
-                        <li onClick={() => navigate('/admin/tests')} style={{ cursor: 'pointer' }}>
+                        <li onClick={() => navigate('/admin/tickets')} style={{ cursor: 'pointer' }}>
                             Xét nghiệm ADN
                         </li>
                         <li onClick={() => navigate('/admin/users')} style={{ cursor: 'pointer' }}>
@@ -111,7 +144,21 @@ const AdminDashboardPage = () => {
                                 <p>{stats.dangChoXetDuyet.toLocaleString()}</p>
                                 <button onClick={() => navigate('/admin/feedbacks')}>Xem chi tiết</button>
                             </div>
+                            {depositStats &&
+                                <div className="card">
+                                    <h3>Tổng tiền đã nạp</h3>
+                                    <p>{Number(depositStats.totalDeposits).toLocaleString('vi-VN')}đ</p>
+                                </div>
+                            }
+                            {stats && stats.totalTicketSpending !== undefined && (
+                                <div className="card">
+                                    <h3>Tổng tiền xét nghiệm</h3>
+                                    <p>{Number(stats.totalTicketSpending).toLocaleString('vi-VN')}đ</p>
+                                </div>
+                            )}
                         </div>
+
+                        {depositError && <p className="error-message" style={{textAlign: 'center', width: '100%'}}>{depositError}</p>}
 
                         <div className="charts">
                             <div className="chart-box">📊 Biểu đồ xét nghiệm theo tháng (đang phát triển)</div>

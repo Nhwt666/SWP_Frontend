@@ -64,9 +64,7 @@ const TopUpHistoryPage = () => {
                                 {new Date(item.createdAt).toLocaleString('vi-VN')}
                             </td>
                             <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                                {item.paymentMethod === 'PAYPAL'
-                                    ? `${item.amount} $`
-                                    : `${Number(item.amount).toLocaleString('vi-VN')} đ`}
+                                {`${Number(item.amount).toLocaleString('vi-VN')} đ`}
                             </td>
                             <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                                 {item.paymentMethod === 'MOMO' ? 'MoMo' : item.paymentMethod === 'PAYPAL' ? 'PayPal' : (item.payment_method === 'MOMO' ? 'MoMo' : item.payment_method === 'PAYPAL' ? 'PayPal' : '')}

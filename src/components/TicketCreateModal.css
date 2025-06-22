@@ -1,0 +1,16 @@
+/* Reusing styles from TicketEditModal.css */
+@import './TicketEditModal.css';
+
+/* Override the modal width for a more focused, single-column layout */
+.create-modal {
+    max-width: 650px;
+}
+
+/* The grid layout is removed to match the single-column user-facing UI */
+.create-modal .form-grid {
+   /* No grid styles */
+}
+
+.create-modal .form-group.full-width {
+    /* No specific grid styles needed */
+} 

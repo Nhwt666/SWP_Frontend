@@ -18,6 +18,7 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import BlogPostPage from './pages/BlogPostPage';
 import StaffPage from './pages/StaffPage';
+import AdminTicketsPage from "./pages/AdminTicketsPage";
 
 function App() {
     return (
@@ -39,6 +40,7 @@ function App() {
                     <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
                     <Route path="/blog/:slug" element={<BlogPostPage />} />
                     <Route path="/staff/requests" element={<StaffPage />} />
+                    <Route path="/admin/tickets" element={<AdminTicketsPage />} />
                 </Route>
 
                 <Route path="/login" element={<LoginPage />} />
