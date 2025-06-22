@@ -3,36 +3,56 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/AdminDashboardPage.css';
 
 const AdminDashboardPage = () => {
-    const [dashboardData, setDashboardData] = useState(null);
+    const [stats, setStats] = useState(null);
+    const [memberCount, setMemberCount] = useState(0);
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await fetch('/admin/stats', {
+                // Fetch general stats
+                const statsRes = await fetch('/admin/stats', {
                     headers: {
                         'Content-Type': 'application/json',
                         Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
                 });
 
-                if (res.ok) {
-                    const data = await res.json();
-                    setDashboardData({
+                if (statsRes.ok) {
+                    const data = await statsRes.json();
+                    setStats({
                         tongXetNghiem: data.totalTickets || 0,
-                        nguoiDungDangKy: data.totalUsers || 0,
                         dangChoXetDuyet: data.feedbackCount || 0,
                         baiGuiGanDay: data.recentTickets || []
                     });
-                } else if (res.status === 403) {
+                } else {
+                    throw new Error('Could not fetch stats');
+                }
+
+                // Fetch all users to count members
+                const usersRes = await fetch('/admin/users', {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (usersRes.ok) {
+                    const users = await usersRes.json();
+                    const members = users.filter(user => user.role === 'MEMBER');
+                    setMemberCount(members.length);
+                } else {
+                    throw new Error('Could not fetch users');
+                }
+
+            } catch (err) {
+                console.error('Lỗi:', err);
+                if (err.response && err.response.status === 403) {
                     setError('❌ Bạn không có quyền truy cập trang này!');
                 } else {
                     setError('❌ Lỗi khi lấy dữ liệu từ máy chủ');
                 }
-            } catch (err) {
-                console.error('Lỗi:', err);
-                setError('❌ Không thể kết nối đến máy chủ');
             }
         };
 
@@ -71,24 +91,24 @@ const AdminDashboardPage = () => {
                 </header>
 
                 {error && <p className="error-message">{error}</p>}
-                {!error && !dashboardData && <p>⏳ Đang tải dữ liệu...</p>}
+                {!error && !stats && <p>⏳ Đang tải dữ liệu...</p>}
 
-                {dashboardData && (
+                {stats && (
                     <>
                         <div className="stats-cards">
                             <div className="card">
                                 <h3>Tổng số xét nghiệm ADN</h3>
-                                <p>{dashboardData.tongXetNghiem.toLocaleString()}</p>
+                                <p>{stats.tongXetNghiem.toLocaleString()}</p>
                                 <button onClick={() => navigate('/admin/tests')}>Xem chi tiết</button>
                             </div>
                             <div className="card">
                                 <h3>Số người dùng đăng ký</h3>
-                                <p>{dashboardData.nguoiDungDangKy.toLocaleString()}</p>
+                                <p>{memberCount.toLocaleString()}</p>
                                 <button onClick={() => navigate('/admin/users')}>Xem chi tiết</button>
                             </div>
                             <div className="card">
                                 <h3>Xét nghiệm chờ duyệt</h3>
-                                <p>{dashboardData.dangChoXetDuyet.toLocaleString()}</p>
+                                <p>{stats.dangChoXetDuyet.toLocaleString()}</p>
                                 <button onClick={() => navigate('/admin/feedbacks')}>Xem chi tiết</button>
                             </div>
                         </div>
@@ -100,7 +120,7 @@ const AdminDashboardPage = () => {
 
                         <div className="recent-submissions">
                             <h3>Xét nghiệm ADN gần đây</h3>
-                            {dashboardData.baiGuiGanDay.length === 0 ? (
+                            {stats.baiGuiGanDay.length === 0 ? (
                                 <p>Không có dữ liệu.</p>
                             ) : (
                                 <table>
@@ -113,7 +133,7 @@ const AdminDashboardPage = () => {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {dashboardData.baiGuiGanDay.map((item) => (
+                                    {stats.baiGuiGanDay.map((item) => (
                                         <tr key={item.id}>
                                             <td>{item.id}</td>
                                             <td>{item.khachHang}</td>

@@ -38,6 +38,7 @@ const TestHistoryPage = () => {
     const [message, setMessage] = useState('');
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [staffList, setStaffList] = useState([]);
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -53,7 +54,21 @@ const TestHistoryPage = () => {
                 setMessage(err.message || 'Lỗi khi tải lịch sử xét nghiệm');
             }
         };
+        const fetchStaff = async () => {
+            try {
+                const res = await fetch('/admin/users/role/STAFF', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setStaffList(data);
+                }
+            } catch (error) {
+                console.error("Failed to fetch staff list", error);
+            }
+        };
         fetchHistory();
+        fetchStaff();
     }, []);
 
     const handleRowClick = (item) => {
@@ -64,6 +79,12 @@ const TestHistoryPage = () => {
     const closeModal = () => {
         setShowModal(false);
         setSelectedTicket(null);
+    };
+
+    const getStaffName = (staffId) => {
+        if (!staffId || !staffList.length) return 'Chưa có';
+        const staffMember = staffList.find(staff => staff.id === staffId);
+        return staffMember ? staffMember.fullName : 'Không xác định';
     };
 
     const getDisplayResult = (resultStr) => {
@@ -434,7 +455,7 @@ const TestHistoryPage = () => {
                                 <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
                                 <tr><td><b>Kết quả:</b></td><td>{getResultInfo(selectedTicket.resultString).conclusion}</td></tr>
                                 <tr><td><b>Trạng thái:</b></td><td>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
-                                <tr><td><b>Staff ID:</b></td><td>{selectedTicket.staffId || 'Chưa có'}</td></tr>
+                                {selectedTicket.staffId && <tr><td><b>Nhân viên xử lý:</b></td><td>{getStaffName(selectedTicket.staffId)}</td></tr>}
                                 {selectedTicket.method === 'SELF_TEST' && (
                                     <>
                                         <tr><td><b>Địa chỉ:</b></td><td>{selectedTicket.address || ''}</td></tr>
