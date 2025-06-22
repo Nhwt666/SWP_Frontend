@@ -212,26 +212,26 @@ const StaffPage = () => {
                 resultLower.includes('99.999%')
             );
             const conclusionText = isMatch ? 'TRÙNG KHỚP' : 'KHÔNG TRÙNG KHỚP';
-            const conclusionColor = isMatch ? '#28a745' : '#dc3545';
+            const conclusionColor = isMatch ? '#2e7d32' : '#d32f2f';
+
+            const typeDisplayMap = {
+                'CIVIL': 'Dân sự',
+                'ADMINISTRATIVE': 'Hành chính',
+                'OTHER': 'Khác'
+            };
+            const displayType = typeDisplayMap[type] || type;
 
             const docDefinition = {
                 pageSize: 'A4',
-                pageMargins: [50, 80, 50, 80],
+                pageMargins: [40, 60, 40, 60],
+                header: {
+                    stack: [
+                        { text: 'TRUNG TÂM XÉT NGHIỆM ADN', style: 'mainHeader' },
+                        { text: 'PHIẾU TRẢ KẾT QUẢ XÉT NGHIỆM ADN', style: 'subHeader' }
+                    ],
+                    margin: [0, 20, 0, 0]
+                },
                 content: [
-                    {
-                        columns: [
-                            { width: 80, text: '🧬', style: 'logoText', alignment: 'center' },
-                            {
-                                width: '*',
-                                text: [
-                                    { text: 'TRUNG TÂM XÉT NGHIỆM ADN', style: 'mainHeader', alignment: 'center' },
-                                    { text: 'PHIẾU TRẢ KẾT QUẢ XÉT NGHIỆM ADN', style: 'subHeader', alignment: 'center', margin: [0, 5, 0, 0] }
-                                ],
-                                margin: [20, 0, 0, 0]
-                            }
-                        ],
-                        margin: [0, 0, 0, 30]
-                    },
                     {
                         text: [
                             'Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM\n',
@@ -240,125 +240,223 @@ const StaffPage = () => {
                         ],
                         style: 'centerInfo',
                         alignment: 'center',
-                        margin: [0, 0, 0, 25]
+                        margin: [0, 0, 0, 30]
                     },
                     {
-                        columns: [
-                            {
-                                width: '*',
-                                text: [
-                                    { text: 'THÔNG TIN PHIẾU', style: 'sectionHeader' },
+                        table: {
+                            widths: ['*', '*'],
+                            body: [
+                                [
                                     {
                                         text: [
-                                            `Mã phiếu: ${ticket.id}\n`,
-                                            `Mã khách hàng: ${customerCode}\n`,
-                                            `Ngày gửi mẫu: ${ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('vi-VN') : 'N/A'}\n`,
-                                            `Ngày trả kết quả: ${new Date().toLocaleDateString('vi-VN')}`
-                                        ],
-                                        style: 'infoText'
+                                            { text: 'THÔNG TIN PHIẾU\n', style: 'sectionHeader' },
+                                            { text: `Mã phiếu: ${ticket.id}\n`, style: 'infoText' },
+                                            { text: `Mã khách hàng: ${customerCode}\n`, style: 'infoText' },
+                                            { text: `Ngày gửi mẫu: ${ticket.createdAt ? new Date(ticket.createdAt).toLocaleDateString('vi-VN') : 'N/A'}\n`, style: 'infoText' },
+                                            { text: `Ngày trả kết quả: ${new Date().toLocaleDateString('vi-VN')}`, style: 'infoText' }
+                                        ]
+                                    },
+                                    {
+                                        text: [
+                                            { text: 'THÔNG TIN KHÁCH HÀNG\n', style: 'sectionHeader' },
+                                            { text: `Họ và tên: ${customerName || 'N/A'}\n`, style: 'infoText' },
+                                            { text: `Số điện thoại: ${phone || 'N/A'}\n`, style: 'infoText' },
+                                            { text: `Email: ${email || 'N/A'}`, style: 'infoText' }
+                                        ]
                                     }
                                 ]
-                            },
-                            {
-                                width: '*',
-                                text: [
-                                    { text: 'THÔNG TIN KHÁCH HÀNG', style: 'sectionHeader' },
-                                    {
-                                        text: [
-                                            `Họ và tên: ${customerName || 'N/A'}\n`,
-                                            `Số điện thoại: ${phone || 'N/A'}\n`,
-                                            `Email: ${email || 'N/A'}`
-                                        ],
-                                        style: 'infoText'
-                                    }
-                                ],
-                                margin: [20, 0, 0, 0]
-                            }
-                        ],
+                            ]
+                        },
+                        layout: 'noBorders',
                         margin: [0, 0, 0, 25]
                     },
                     { text: 'THÔNG TIN XÉT NGHIỆM', style: 'sectionHeader', margin: [0, 0, 0, 10] },
                     {
-                        text: [
-                            `Loại xét nghiệm: ${type || 'N/A'}\n`,
-                            `Lý do xét nghiệm: ${reason}\n`,
-                            `Phương thức nhận mẫu: ${method}\n`,
-                            `Tên mẫu 1: ${sample1Name}\n`,
-                            `Tên mẫu 2: ${sample2Name}`
-                        ],
-                        style: 'infoText',
-                        margin: [0, 0, 0, 15]
-                    },
-                    {
-                        text: [
-                            method === 'Tại cơ sở y tế' ? `Ngày hẹn: ${appointmentDate}\n` : '',
-                            method === 'Tự gửi mẫu' ? `Địa chỉ gửi mẫu: ${address}\n` : ''
-                        ].filter(Boolean).join(''),
-                        style: 'infoText',
+                        table: {
+                            widths: ['*'],
+                            body: [
+                                [
+                                    {
+                                        text: [
+                                            { text: `Loại xét nghiệm: ${displayType || 'N/A'}\n`, style: 'infoText' },
+                                            { text: `Lý do xét nghiệm: ${reason}\n`, style: 'infoText' },
+                                            { text: `Phương thức nhận mẫu: ${method}\n`, style: 'infoText' },
+                                            { text: `Tên mẫu 1: ${sample1Name}\n`, style: 'infoText' },
+                                            { text: `Tên mẫu 2: ${sample2Name}\n`, style: 'infoText' },
+                                            ...(method === 'Tại cơ sở y tế' ? [{ text: `Ngày hẹn: ${appointmentDate}\n`, style: 'infoText' }] : []),
+                                            ...(method === 'Tự gửi mẫu' ? [{ text: `Địa chỉ gửi mẫu: ${address}`, style: 'infoText' }] : [])
+                                        ].filter(Boolean)
+                                    }
+                                ]
+                            ]
+                        },
+                        layout: 'noBorders',
                         margin: [0, 0, 0, 25]
                     },
+                    { text: 'KẾT QUẢ XÉT NGHIỆM', style: 'sectionHeader', margin: [0, 0, 0, 15] },
                     {
-                        text: 'KẾT QUẢ XÉT NGHIỆM',
-                        style: 'sectionHeader',
-                        margin: [0, 0, 0, 15]
+                        table: {
+                            widths: ['*'],
+                            body: [
+                                [
+                                    {
+                                        text: [
+                                            { text: 'Kết quả: ', style: 'resultLabel' },
+                                            { text: conclusionText, color: conclusionColor, style: 'resultValue' },
+                                            { text: '\n' + result.replace(/\\n/g, '\n'), style: 'resultDetails' }
+                                        ],
+                                        style: 'resultCell'
+                                    }
+                                ]
+                            ]
+                        },
+                        layout: {
+                            hLineWidth: function() { return 0; },
+                            vLineWidth: function() { return 0; },
+                            fillColor: function() { return '#f8f9fa'; }
+                        },
+                        margin: [0, 0, 0, 30]
                     },
+                    { text: 'CHỮ KÝ XÁC NHẬN', style: 'sectionHeader', margin: [0, 0, 0, 15] },
                     {
-                        style: 'resultText',
-                        margin: [0, 0, 0, 30],
-                        text: [
-                            { text: 'Kết quả: ', bold: true },
-                            { text: conclusionText, color: conclusionColor, bold: true },
-                            { text: `\n${result}` }
-                        ]
-                    },
-                    {
-                        text: 'CHỮ KÝ XÁC NHẬN',
-                        style: 'sectionHeader',
-                        margin: [0, 0, 0, 15]
-                    },
-                    {
-                        columns: [
-                            {
-                                width: '*',
-                                text: ['Người thực hiện xét nghiệm:\n','_________________\n','(Ký và ghi rõ họ tên)'],
-                                style: 'signatureText',
-                                alignment: 'center'
-                            },
-                            {
-                                width: '*',
-                                text: ['Người duyệt kết quả:\n','_________________\n','(Ký và ghi rõ họ tên)'],
-                                style: 'signatureText',
-                                alignment: 'center'
-                            },
-                            { width: 100, text: 'ĐÓNG DẤU\nTRUNG TÂM', style: 'stampText', alignment: 'center', background: '#f8f9fa' }
-                        ],
+                        table: {
+                            widths: ['*', '*', 120],
+                            body: [
+                                [
+                                    {
+                                        text: [
+                                            { text: 'Người thực hiện xét nghiệm:\n', style: 'signatureLabel' },
+                                            { text: '\n\n_________________\n', style: 'signatureLine' },
+                                            { text: '(Ký và ghi rõ họ tên)', style: 'signatureNote' }
+                                        ],
+                                        alignment: 'center'
+                                    },
+                                    {
+                                        text: [
+                                            { text: 'Người duyệt kết quả:\n', style: 'signatureLabel' },
+                                            { text: '\n\n_________________\n', style: 'signatureLine' },
+                                            { text: '(Ký và ghi rõ họ tên)', style: 'signatureNote' }
+                                        ],
+                                        alignment: 'center'
+                                    },
+                                    {
+                                        text: [
+                                            { text: 'ĐÓNG DẤU', style: 'stampText' },
+                                            { text: 'TRUNG TÂM', style: 'stampText' }
+                                        ],
+                                        alignment: 'center',
+                                        style: 'stampCell'
+                                    }
+                                ]
+                            ]
+                        },
+                        layout: 'noBorders',
                         margin: [0, 0, 0, 30]
                     },
                     { text: 'GHI CHÚ QUAN TRỌNG', style: 'sectionHeader', margin: [0, 0, 0, 10] },
                     {
-                        text: [
-                            '• Văn bản này chỉ có hiệu lực khi có dấu xác nhận của trung tâm\n',
-                            '• Kết quả xét nghiệm có hiệu lực trong vòng 30 ngày kể từ ngày trả kết quả\n',
-                            '• Mọi thắc mắc vui lòng liên hệ trung tâm qua số điện thoại hoặc email trên\n',
-                            '• Trung tâm không chịu trách nhiệm về việc sử dụng kết quả cho mục đích khác'
-                        ],
-                        style: 'noteText',
+                        table: {
+                            widths: ['*'],
+                            body: [
+                                [
+                                    {
+                                        text: [
+                                            { text: '• Văn bản này chỉ có hiệu lực khi có dấu xác nhận của trung tâm\n', style: 'noteText' },
+                                            { text: '• Kết quả xét nghiệm có hiệu lực trong vòng 30 ngày kể từ ngày trả kết quả\n', style: 'noteText' },
+                                            { text: '• Mọi thắc mắc vui lòng liên hệ trung tâm qua số điện thoại hoặc email trên\n', style: 'noteText' },
+                                            { text: '• Trung tâm không chịu trách nhiệm về việc sử dụng kết quả cho mục đích khác', style: 'noteText' }
+                                        ]
+                                    }
+                                ]
+                            ]
+                        },
+                        layout: 'noBorders',
                         margin: [0, 0, 0, 20]
                     }
                 ],
                 styles: {
-                    mainHeader: { fontSize: 20, bold: true, color: '#1a237e', alignment: 'center' },
-                    subHeader: { fontSize: 16, bold: true, color: '#333333', alignment: 'center' },
-                    logoText: { fontSize: 40, alignment: 'center' },
-                    centerInfo: { fontSize: 10, color: '#666666', lineHeight: 1.4 },
-                    sectionHeader: { fontSize: 14, bold: true, color: '#424242', margin: [0, 0, 0, 8] },
-                    infoText: { fontSize: 11, lineHeight: 1.5, color: '#333333' },
-                    resultText: { fontSize: 11, lineHeight: 1.6, background: '#f5f5f5', padding: 15, color: '#333333' },
-                    conclusionIcon: { fontSize: 24, bold: true },
-                    conclusionText: { fontSize: 16, bold: true },
-                    signatureText: { fontSize: 11, lineHeight: 1.5, color: '#333333' },
-                    stampText: { fontSize: 10, bold: true, color: '#666666', padding: 10 },
-                    noteText: { fontSize: 10, lineHeight: 1.4, color: '#666666' }
+                    mainHeader: { 
+                        fontSize: 18, 
+                        bold: true, 
+                        color: '#1a237e', 
+                        alignment: 'center',
+                        margin: [0, 0, 0, 5]
+                    },
+                    subHeader: { 
+                        fontSize: 14, 
+                        bold: true, 
+                        color: '#333333', 
+                        alignment: 'center',
+                        margin: [0, 0, 0, 0]
+                    },
+                    centerInfo: { 
+                        fontSize: 9, 
+                        color: '#666666', 
+                        lineHeight: 1.3 
+                    },
+                    sectionHeader: { 
+                        fontSize: 12, 
+                        bold: true, 
+                        color: '#1a237e', 
+                        margin: [0, 0, 0, 8],
+                        decoration: 'underline',
+                        decorationStyle: 'solid',
+                        decorationColor: '#1a237e'
+                    },
+                    infoText: { 
+                        fontSize: 10, 
+                        lineHeight: 1.4, 
+                        color: '#333333',
+                        margin: [0, 2, 0, 2]
+                    },
+                    resultLabel: { 
+                        fontSize: 11, 
+                        bold: true, 
+                        color: '#333333' 
+                    },
+                    resultValue: { 
+                        fontSize: 12, 
+                        bold: true 
+                    },
+                    resultDetails: { 
+                        fontSize: 10, 
+                        lineHeight: 1.5, 
+                        color: '#333333',
+                        margin: [0, 5, 0, 0]
+                    },
+                    resultCell: { 
+                        padding: [15, 10, 15, 10]
+                    },
+                    signatureLabel: { 
+                        fontSize: 10, 
+                        bold: true, 
+                        color: '#333333' 
+                    },
+                    signatureLine: { 
+                        fontSize: 12, 
+                        color: '#333333' 
+                    },
+                    signatureNote: { 
+                        fontSize: 8, 
+                        color: '#666666',
+                        italics: true
+                    },
+                    stampText: { 
+                        fontSize: 9, 
+                        bold: true, 
+                        color: '#666666',
+                        margin: [0, 2, 0, 2]
+                    },
+                    stampCell: { 
+                        padding: [10, 5, 10, 5],
+                        fillColor: '#f8f9fa'
+                    },
+                    noteText: { 
+                        fontSize: 9, 
+                        lineHeight: 1.3, 
+                        color: '#666666',
+                        margin: [0, 2, 0, 2]
+                    }
                 },
                 defaultStyle: { font: 'Roboto' }
             };
