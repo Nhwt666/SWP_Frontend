@@ -34,47 +34,71 @@
 
 .modal-content h2 {
     margin-top: 0;
-    margin-bottom: 2rem;
-    color: #212529;
-    font-weight: 700;
-    text-align: center;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
-.form-group {
+.edit-ticket-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
     margin-bottom: 1.5rem;
 }
 
-.form-group label {
-    display: block;
-    margin-bottom: 0.6rem;
+.edit-ticket-form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.edit-ticket-form .full-width {
+    grid-column: 1 / -1;
+}
+
+.edit-ticket-form label,
+.edit-ticket-form .info-only label {
+    margin-bottom: 0.5rem;
     font-weight: 600;
     color: #495057;
     font-size: 0.9rem;
 }
 
-.form-group select,
-.form-group textarea {
+.edit-ticket-form .info-only span {
+    padding: 0.6rem 0.8rem;
+    background-color: #e9ecef;
+    border-radius: 6px;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.edit-ticket-form input[type="text"],
+.edit-ticket-form input[type="email"],
+.edit-ticket-form input[type="tel"],
+.edit-ticket-form input[type="datetime-local"],
+.edit-ticket-form input[type="number"],
+.edit-ticket-form select,
+.edit-ticket-form textarea {
     width: 100%;
-    padding: 0.9rem 1rem;
+    padding: 0.6rem 0.8rem;
     border: 1px solid #ced4da;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
     font-family: inherit;
-    background-color: #f8f9fa;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.form-group select:focus,
-.form-group textarea:focus {
+.edit-ticket-form input:focus,
+.edit-ticket-form select:focus,
+.edit-ticket-form textarea:focus {
     outline: none;
-    border-color: #8963f7;
-    box-shadow: 0 0 0 3px rgba(108, 71, 216, 0.15);
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
 }
 
-.form-group textarea {
+.edit-ticket-form textarea {
     resize: vertical;
-    min-height: 120px;
-    line-height: 1.6;
+    min-height: 60px;
 }
 
 .form-actions {
@@ -113,8 +137,40 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
+.ticket-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #6c757d;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.info-value {
+    font-weight: 500;
+    color: #212529;
+}
+
 .error-message {
-    color: #721c24;
+    color: #dc3545;
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
     padding: 0.75rem 1.25rem;

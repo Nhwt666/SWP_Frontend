@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../styles/AdminTicketsPage.css';
 import TicketEditModal from '../components/TicketEditModal';
 import TicketCreateModal from '../components/TicketCreateModal';
@@ -8,11 +8,27 @@ const AdminTicketsPage = () => {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [filters, setFilters] = useState({ status: '', type: '', date: '' });
+    const location = useLocation();
+    const [filters, setFilters] = useState({ 
+        status: location.state?.filterStatus || '', 
+        type: '', 
+        date: '' 
+    });
     const navigate = useNavigate();
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingTicket, setEditingTicket] = useState(null);
+    const preselectedStaffId = location.state?.staffId;
+    const staffName = location.state?.staffName;
+    const preselectedCustomerId = location.state?.customerId;
+    const customerName = location.state?.customerName;
+    const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
+    const [pendingTickets, setPendingTickets] = useState([]);
+    const [assigning, setAssigning] = useState(false);
+    const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
+    const [staffList, setStaffList] = useState([]);
+    const [selectedTicketId, setSelectedTicketId] = useState(null);
+    const [assigningStaffId, setAssigningStaffId] = useState(null);
 
     const fetchTickets = async () => {
         try {
@@ -69,10 +85,19 @@ const AdminTicketsPage = () => {
 
     const resetFilters = () => {
         setFilters({ status: '', type: '', date: '' });
+        if (preselectedStaffId) {
+            navigate('/admin/tickets', { replace: true, state: {} });
+        }
     };
 
     const filteredTickets = useMemo(() => {
         return tickets.filter(ticket => {
+            if (preselectedStaffId && ticket.staff?.id !== preselectedStaffId) {
+                return false;
+            }
+            if (preselectedCustomerId && ticket.customer?.id !== preselectedCustomerId) {
+                return false;
+            }
             const { status, type, date } = filters;
             if (status && ticket.status !== status) return false;
             if (type && ticket.type !== type) return false;
@@ -82,35 +107,72 @@ const AdminTicketsPage = () => {
             }
             return true;
         });
-    }, [tickets, filters]);
+    }, [tickets, filters, preselectedStaffId, preselectedCustomerId]);
 
     const handleSaveTicket = async (id, updatedData) => {
+        const token = localStorage.getItem('token');
+        const originalTicket = tickets.find(t => t.id === id);
+
         try {
-            const token = localStorage.getItem('token');
-            const dataToSend = Object.fromEntries(
-                Object.entries(updatedData).filter(([_, v]) => v !== '' && v !== null)
-            );
+            // 1. Handle staff assignment/unassignment
+            const newStaffId = updatedData.staffId;
+            const oldStaffId = originalTicket.staff?.id;
 
-            const response = await fetch(`/admin/tickets/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(dataToSend)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Không thể cập nhật ticket');
+            if (String(newStaffId || '') !== String(oldStaffId || '')) {
+                if (newStaffId) { // Assign or re-assign
+                    const assignRes = await fetch(`/admin/tickets/${id}/assign/${newStaffId}`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (!assignRes.ok) {
+                        const errorData = await assignRes.json();
+                        throw new Error(errorData.message || 'Không thể gán nhân viên');
+                    }
+                } else { // Unassign
+                    const unassignRes = await fetch(`/admin/tickets/${id}/unassign`, {
+                        method: 'PUT',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                     if (!unassignRes.ok) {
+                        const errorData = await unassignRes.json();
+                        throw new Error(errorData.message || 'Không thể bỏ gán nhân viên');
+                    }
+                }
             }
 
+            // 2. Handle other data updates
+            const { staffId, ...otherData } = updatedData;
+            
+            // Prepare data for submission
+            const dataToUpdate = { ...otherData };
+            if (dataToUpdate.appointmentDate === '') dataToUpdate.appointmentDate = null;
+            if (dataToUpdate.amount === '' || dataToUpdate.amount === null) {
+                dataToUpdate.amount = null;
+            } else {
+                dataToUpdate.amount = parseFloat(dataToUpdate.amount);
+            }
+            
+            const updateRes = await fetch(`/admin/tickets/${id}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json', 
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify(dataToUpdate)
+            });
+
+            if (!updateRes.ok) {
+                const errorData = await updateRes.json();
+                throw new Error(errorData.message || 'Không thể cập nhật thông tin ticket');
+            }
+            
             alert('Cập nhật ticket thành công!');
             handleCloseModal();
             fetchTickets();
+
         } catch (err) {
             console.error('Error updating ticket:', err);
-            alert(`Lỗi khi cập nhật ticket: ${err.message}`);
+            alert(`Lỗi khi cập nhật: ${err.message}`);
         }
     };
 
@@ -133,7 +195,7 @@ const AdminTicketsPage = () => {
             
             alert('Tạo ticket mới thành công!');
             handleCloseModal();
-            fetchTickets(); // Refresh the list
+            fetchTickets();
         } catch (err) {
             console.error('Error creating ticket:', err);
             alert(`Lỗi khi tạo ticket: ${err.message}`);
@@ -164,7 +226,7 @@ const AdminTicketsPage = () => {
             }
         }
     };
-    
+
     const getStatusStyle = (status) => {
         switch (status) {
             case 'PENDING':
@@ -178,6 +240,73 @@ const AdminTicketsPage = () => {
         }
     };
 
+    // Fetch all pending tickets (not assigned to any staff)
+    const fetchPendingTickets = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/admin/tickets', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch tickets');
+            const data = await response.json();
+            setPendingTickets(data.filter(t => t.status === 'PENDING' && !t.staff));
+        } catch (err) {
+            setPendingTickets([]);
+        }
+    };
+
+    // Open modal and fetch pending tickets
+    const handleOpenPendingModal = () => {
+        fetchPendingTickets();
+        setIsPendingModalOpen(true);
+    };
+    const handleClosePendingModal = () => setIsPendingModalOpen(false);
+
+    // Fetch staff list
+    const fetchStaffList = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/admin/all-users?role=STAFF', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!response.ok) throw new Error('Failed to fetch staff list');
+            const staffData = await response.json();
+            setStaffList(staffData.map(s => s.user));
+        } catch (err) {
+            setStaffList([]);
+        }
+    };
+
+    // Open staff modal for a ticket
+    const handleOpenStaffModal = (ticketId) => {
+        setSelectedTicketId(ticketId);
+        fetchStaffList();
+        setIsStaffModalOpen(true);
+    };
+    const handleCloseStaffModal = () => {
+        setIsStaffModalOpen(false);
+        setSelectedTicketId(null);
+    };
+
+    // Assign staff to ticket
+    const handleAssignStaff = async (staffId) => {
+        if (!selectedTicketId) return;
+        setAssigningStaffId(staffId);
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`/admin/tickets/${selectedTicketId}/assign/${staffId}`, {
+                method: 'PUT',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error('Không thể gán ticket');
+            handleCloseStaffModal();
+            fetchTickets();
+        } catch (err) {
+            alert('Lỗi khi gán ticket: ' + err.message);
+        } finally {
+            setAssigningStaffId(null);
+        }
+    };
 
     if (loading) {
         return <div className="loading-container">⏳ Đang tải dữ liệu...</div>;
@@ -191,14 +320,13 @@ const AdminTicketsPage = () => {
         <div className="admin-tickets-page">
             <header className="tickets-header">
                 <div className="header-left-section">
-                    <button className="back-btn" onClick={() => navigate('/admin/dashboard')}>
+                    <button className="back-btn" onClick={() => navigate(-1)}>
                         &larr;
                     </button>
-                    <h1>Quản lý Ticket Xét nghiệm</h1>
+                    <h1>
+                        {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Ticket Xét nghiệm'}
+                    </h1>
                 </div>
-                <button className="add-ticket-btn" onClick={handleCreateNew}>
-                    + Thêm Ticket mới
-                </button>
             </header>
 
             <div className="filters-container">
@@ -209,7 +337,6 @@ const AdminTicketsPage = () => {
                         <option value="PENDING">Pending</option>
                         <option value="IN_PROGRESS">In Progress</option>
                         <option value="COMPLETED">Completed</option>
-                        <option value="CANCELLED">Cancelled</option>
                     </select>
                 </div>
                 <div className="filter-group">
@@ -226,6 +353,15 @@ const AdminTicketsPage = () => {
                     <input type="date" id="date-filter" name="date" value={filters.date} onChange={handleFilterChange} />
                 </div>
                 <button className="reset-filters-btn" onClick={resetFilters}>Xóa bộ lọc</button>
+                {preselectedStaffId && (
+                    <button 
+                        className="reset-filters-btn" 
+                        style={{ background: '#43a047', color: '#fff', marginLeft: 8 }} 
+                        onClick={handleOpenPendingModal}
+                    >
+                        Thêm Ticket
+                    </button>
+                )}
             </div>
 
             <div className="tickets-table-container">
@@ -233,33 +369,39 @@ const AdminTicketsPage = () => {
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Khách hàng</th>
-                            <th>Trạng thái</th>
-                            <th>Loại</th>
-                            <th>Ngày tạo</th>
-                            <th>Hành động</th>
+                            <th>KHÁCH HÀNG</th>
+                            <th>NHÂN VIÊN</th>
+                            <th>TRẠNG THÁI</th>
+                            <th>LOẠI</th>
+                            <th>NGÀY TẠO</th>
+                            <th>HÀNH ĐỘNG</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredTickets.length > 0 ? filteredTickets.map(ticket => (
-                            <tr key={ticket.id}>
-                                <td>{ticket.id}</td>
-                                <td>{ticket.customer ? ticket.customer.fullName : 'N/A'}</td>
-                                <td>
-                                    <span className={`status-badge ${getStatusStyle(ticket.status)}`}>
-                                        {ticket.status}
-                                    </span>
-                                </td>
-                                <td>{ticket.type}</td>
-                                <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
-                                <td className="action-buttons">
-                                    <button className="edit-btn" onClick={() => handleEdit(ticket)}>Sửa</button>
-                                    <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
-                                </td>
-                            </tr>
-                        )) : (
+                        {filteredTickets.length > 0 ? (
+                            filteredTickets.map(ticket => (
+                                <tr key={ticket.id}>
+                                    <td>{ticket.id}</td>
+                                    <td>{ticket.customer?.fullName || 'N/A'}</td>
+                                    <td>{ticket.staff?.fullName || '—'}</td>
+                                    <td><span className={`status-badge status-${ticket.status?.toLowerCase()}`}>{ticket.status}</span></td>
+                                    <td>{ticket.ticketType || ticket.type || '—'}</td>
+                                    <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
+                                    <td>
+                                        <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
+                                        {preselectedCustomerId && (
+                                            ticket.status === 'IN_PROGRESS' ? (
+                                                <button className="edit-btn" style={{background: '#fb8c00', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Đổi staff</button>
+                                            ) : (
+                                                <button className="edit-btn" style={{background: '#43a047', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Thêm staff</button>
+                                            )
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
                             <tr>
-                                <td colSpan="6">Không tìm thấy ticket nào.</td>
+                                <td colSpan="7">Không tìm thấy ticket nào.</td>
                             </tr>
                         )}
                     </tbody>
@@ -277,6 +419,105 @@ const AdminTicketsPage = () => {
                     onClose={handleCloseModal}
                     onSave={handleCreateTicket}
                 />
+            )}
+            {/* Pending Tickets Modal */}
+            {isPendingModalOpen && (
+                <div className="modal-overlay" onClick={handleClosePendingModal}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
+                        <h2>Danh sách Ticket đang PENDING</h2>
+                        <button className="modal-close-btn" onClick={handleClosePendingModal}>&times;</button>
+                        <table style={{width: '100%', marginTop: 16}}>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Khách hàng</th>
+                                    <th>Loại</th>
+                                    <th>Ngày tạo</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {pendingTickets.length === 0 ? (
+                                    <tr><td colSpan="5">Không có ticket nào đang pending.</td></tr>
+                                ) : (
+                                    pendingTickets.map(ticket => (
+                                        <tr key={ticket.id}>
+                                            <td>{ticket.id}</td>
+                                            <td>{ticket.customer?.fullName || 'N/A'}</td>
+                                            <td>{ticket.ticketType || ticket.type || '—'}</td>
+                                            <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
+                                            <td>
+                                                <button disabled={assigning} onClick={async () => {
+                                                    setAssigning(true);
+                                                    try {
+                                                        const token = localStorage.getItem('token');
+                                                        const res = await fetch(`/admin/tickets/${ticket.id}/assign/${preselectedStaffId}`, {
+                                                            method: 'PUT',
+                                                            headers: { 'Authorization': `Bearer ${token}` }
+                                                        });
+                                                        if (!res.ok) throw new Error('Không thể gán ticket');
+                                                        setPendingTickets(pendingTickets.filter(t => t.id !== ticket.id));
+                                                        fetchTickets();
+                                                    } catch (err) {
+                                                        alert('Lỗi khi gán ticket: ' + err.message);
+                                                    } finally {
+                                                        setAssigning(false);
+                                                    }
+                                                }}>+</button>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+            {/* Staff Assign Modal for customer tickets */}
+            {isStaffModalOpen && (
+                <div className="modal-overlay" onClick={handleCloseStaffModal}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
+                        <h2>Chọn nhân viên để {(() => {
+                            const ticket = tickets.find(t => t.id === selectedTicketId);
+                            return ticket && ticket.status === 'IN_PROGRESS' ? 'đổi staff' : 'gán Ticket';
+                        })()}</h2>
+                        <button className="modal-close-btn" onClick={handleCloseStaffModal}>&times;</button>
+                        <table style={{width: '100%', marginTop: 16}}>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Họ tên</th>
+                                    <th>Email</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {staffList.length === 0 ? (
+                                    <tr><td colSpan="4">Không có nhân viên nào.</td></tr>
+                                ) : (
+                                    staffList.map(staff => {
+                                        const ticket = tickets.find(t => t.id === selectedTicketId);
+                                        const isCurrent = ticket && ticket.staff && staff.id === ticket.staff.id;
+                                        return (
+                                            <tr key={staff.id} style={isCurrent ? {background: '#e3f2fd'} : {}}>
+                                                <td>{staff.id}</td>
+                                                <td>{staff.fullName}</td>
+                                                <td>{staff.email}</td>
+                                                <td>
+                                                    {isCurrent ? (
+                                                        <button disabled style={{opacity: 0.7, cursor: 'not-allowed'}}>Đang phụ trách</button>
+                                                    ) : (
+                                                        <button disabled={assigningStaffId === staff.id} onClick={() => handleAssignStaff(staff.id)}>+</button>
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             )}
         </div>
     );

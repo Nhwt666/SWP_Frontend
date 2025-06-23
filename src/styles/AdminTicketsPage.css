@@ -200,6 +200,14 @@ tbody tr:hover {
     background-color: #f1b0b7;
 }
 
+.action-buttons .unassign-btn {
+    background-color: #ffc107; /* A warning color */
+    color: #333;
+}
+.action-buttons .unassign-btn:hover {
+    background-color: #e0a800;
+}
+
 .loading-container, .error-container {
     display: flex;
     justify-content: center;
@@ -207,4 +215,37 @@ tbody tr:hover {
     height: 80vh;
     font-size: 1.5rem;
     color: #6c757d;
+}
+
+.admin-tickets-page .ticket-table .unassign-btn:hover {
+    background-color: #c82333;
+}
+
+.admin-tickets-page .ticket-table .view-ticket-btn {
+    padding: 0.4rem 0.8rem;
+    background-color: #17a2b8; /* Info color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background-color 0.2s;
+    margin-right: 5px;
+}
+
+.admin-tickets-page .ticket-table .view-ticket-btn:hover {
+    background-color: #138496;
+}
+
+.admin-tickets-page .ticket-table .delete-btn {
+    background-color: #dc3545; /* Danger color */
+}
+
+.admin-tickets-page .ticket-table .delete-btn:hover {
+    background-color: #c82333;
+}
+
+/* General button styles */
+button {
+    font-family: 'Roboto', sans-serif;
 } 
