@@ -28,8 +28,7 @@ function App() {
     <UserProvider>
       <Router>
         <div className="App">
-            {/* Header is now rendered on ALL pages */}
-            <Header /> 
+            {/* Remove global <Header /> to avoid duplicate headers */}
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<HomePage />} />
