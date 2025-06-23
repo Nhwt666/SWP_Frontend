@@ -80,11 +80,6 @@ const StaffDashboardPage = () => {
                 </div>
             </div>
 
-            <div className="charts">
-                <div className="chart-box">Biểu đồ A</div>
-                <div className="chart-box">Biểu đồ B</div>
-            </div>
-
             <div className="recent-submissions">
                 <h3>Danh sách Yêu Cầu Mới</h3>
                 <table>

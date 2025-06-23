@@ -8,7 +8,7 @@ const StaffLayout = ({ children }) => {
         <>
             <div className="staff-dashboard-container">
                 <aside className="sidebar">
-                    <div className="logo">STAFF</div>
+                    <div className="staff-badge-animated">STAFF</div>
                     <nav>
                         <ul>
                             <li style={{ fontWeight: 600, cursor: 'pointer' }} onClick={() => navigate('/staff/dashboard')}>Trang chính</li>

@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import '../styles/LoginPage.css';
 import { UserContext } from '../UserContext';
 
@@ -136,7 +135,7 @@ const LoginPage = () => {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
             <div className="login-bg">
                 <div className="login-container flex-col">
                     <div className="login-avatar-section">

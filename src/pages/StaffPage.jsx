@@ -278,6 +278,18 @@ const StaffPage = () => {
 
     const methodMap = { SELF_TEST: 'Tự gửi mẫu', AT_FACILITY: 'Tại cơ sở y tế' };
 
+    // Mappings for request type display and service names
+    const typeDisplayMap = {
+        'CIVIL': 'Dân sự',
+        'ADMINISTRATIVE': 'Hành chính',
+        'OTHER': 'Khác'
+    };
+    const typeServiceMap = {
+        'CIVIL': 'Xác minh quyền thừa kế',
+        'ADMINISTRATIVE': 'Xác minh danh tính',
+        'OTHER': 'Yêu cầu khác',
+    };
+
     const generatePDFReport = async (ticket) => {
         try {
             const type = ticket.type;
@@ -304,11 +316,6 @@ const StaffPage = () => {
             const conclusionText = isMatch ? 'TRÙNG KHỚP' : 'KHÔNG TRÙNG KHỚP';
             const conclusionColor = isMatch ? '#2e7d32' : '#d32f2f';
 
-            const typeDisplayMap = {
-                'CIVIL': 'Dân sự',
-                'ADMINISTRATIVE': 'Hành chính',
-                'OTHER': 'Khác'
-            };
             const displayType = typeDisplayMap[type] || type;
 
             const docDefinition = {
@@ -324,9 +331,9 @@ const StaffPage = () => {
                 content: [
                     {
                         text: [
-                            'Địa chỉ: 123 Đường ABC, Quận XYZ, TP.HCM\n',
-                            'Số điện thoại: 028-1234-5678 | Email: info@adnlab.com\n',
-                            'Website: www.adnlab.com | Giấy phép: 123456789'
+                            'Số Hotline: 1800.9999\n',
+                            'Email: trungtamxetnghiem@gmail.com\n',
+                            'Địa chỉ: 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM'
                         ],
                         style: 'centerInfo',
                         alignment: 'center',
@@ -368,7 +375,7 @@ const StaffPage = () => {
                                 [
                                     {
                                         text: [
-                                            { text: `Loại xét nghiệm: ${displayType || 'N/A'}\n`, style: 'infoText' },
+                                            { text: `Loại xét nghiệm: ${typeServiceMap[type] || typeDisplayMap[type] || type}\n`, style: 'infoText' },
                                             { text: `Lý do xét nghiệm: ${reason}\n`, style: 'infoText' },
                                             { text: `Phương thức nhận mẫu: ${method}\n`, style: 'infoText' },
                                             { text: `Tên mẫu 1: ${sample1Name}\n`, style: 'infoText' },
@@ -606,7 +613,7 @@ const StaffPage = () => {
                                         <tr key={ticket.id}>
                                             <td>#{ticket.id}</td>
                                             <td>{ticket.customer?.fullName || ticket.customer?.name || 'N/A'}</td>
-                                            <td>{ticket.type}</td>
+                                            <td>{typeServiceMap[ticket.type] || typeDisplayMap[ticket.type] || ticket.type}</td>
                                             <td>
                                                 <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
                                                     {(() => {

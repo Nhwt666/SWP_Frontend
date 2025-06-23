@@ -95,9 +95,9 @@ const AdminDashboardPage = () => {
     return (
         <div className="admin-dashboard-container">
             <aside className="sidebar">
-                <div className="logo">ADN ADMIN</div>
                 <nav>
                     <ul>
+                        <li>ADN ADMIN</li>
                         <li onClick={() => navigate('/admin/dashboard')} style={{ cursor: 'pointer' }}>
                             Bảng điều khiển
                         </li>

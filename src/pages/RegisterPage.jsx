@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../components/Header';
 import '../styles/RegisterPage.css';
 
 const RegisterPage = () => {
@@ -96,7 +95,7 @@ const RegisterPage = () => {
 
     return (
         <>
-            <Header />
+            {/* <Header /> */}
             <div className="register-bg">
                 <div className="register-container flex-col">
                     <h2 className="register-title" style={{ fontFamily: 'Be Vietnam Pro, Inter, Arial, sans-serif', fontWeight: 900 }}>Đăng Ký</h2>
