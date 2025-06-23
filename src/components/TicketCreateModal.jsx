@@ -18,6 +18,7 @@ const TicketCreateModal = ({ onClose, onSave }) => {
     const [customers, setCustomers] = useState([]);
     const [error, setError] = useState('');
     const [loadingCustomers, setLoadingCustomers] = useState(true);
+    const [staffList, setStaffList] = useState([]);
 
     useEffect(() => {
         const fetchCustomers = async () => {
@@ -37,6 +38,23 @@ const TicketCreateModal = ({ onClose, onSave }) => {
             }
         };
         fetchCustomers();
+    }, []);
+    
+    useEffect(() => {
+        const fetchStaff = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/admin/all-users?role=STAFF', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                if (!response.ok) throw new Error('Failed to fetch staff list');
+                const staffData = await response.json();
+                setStaffList(staffData.map(s => s.user));
+            } catch (err) {
+                // ignore
+            }
+        };
+        fetchStaff();
     }, []);
     
     const handleChange = (e) => {
@@ -109,6 +127,15 @@ const TicketCreateModal = ({ onClose, onSave }) => {
                     <div className="form-group">
                         <label htmlFor="reason">Lý do xét nghiệm</label>
                         <textarea name="reason" id="reason" value={formData.reason} onChange={handleChange} rows="3"></textarea>
+                    </div>
+                    <div className="form-group">
+                        <label htmlFor="staffId">Nhân viên (tuỳ chọn)</label>
+                        <select name="staffId" id="staffId" value={formData.staffId || ''} onChange={handleChange}>
+                            <option value="">-- Không gán, ticket sẽ ở trạng thái Pending --</option>
+                            {staffList.map(staff => (
+                                <option key={staff.id} value={staff.id}>{staff.fullName} (ID: {staff.id})</option>
+                            ))}
+                        </select>
                     </div>
                     
                     <div className="form-actions">

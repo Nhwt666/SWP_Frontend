@@ -320,9 +320,7 @@ const AdminTicketsPage = () => {
         <div className="admin-tickets-page">
             <header className="tickets-header">
                 <div className="header-left-section">
-                    <button className="back-btn" onClick={() => navigate(-1)}>
-                        &larr;
-                    </button>
+                    <button className="back-btn" onClick={() => navigate(-1)}>&larr;</button>
                     <h1>
                         {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Ticket Xét nghiệm'}
                     </h1>
@@ -412,12 +410,6 @@ const AdminTicketsPage = () => {
                     ticket={editingTicket}
                     onClose={handleCloseModal}
                     onSave={handleSaveTicket}
-                />
-            )}
-            {isCreateModalOpen && (
-                <TicketCreateModal
-                    onClose={handleCloseModal}
-                    onSave={handleCreateTicket}
                 />
             )}
             {/* Pending Tickets Modal */}
