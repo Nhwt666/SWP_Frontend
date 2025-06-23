@@ -36,11 +36,25 @@ body {
 }
 
 .admin-dashboard-container .sidebar .logo {
-    font-size: 1.6em;
-    font-weight: bold;
-    margin-bottom: 30px;
+    font-size: 1.8em;
+    font-weight: 800;
+    margin: 20px auto 40px auto;
     color: #fff;
     letter-spacing: 2px;
+    padding: 15px;
+    text-align: center;
+    width: 100%;
+    display: block;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.admin-dashboard-container .sidebar .logo::before,
+.admin-dashboard-container .sidebar .logo::after {
+    display: none !important;
+    content: "" !important;
 }
 
 .admin-dashboard-container .sidebar nav ul {

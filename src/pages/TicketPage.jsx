@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
 import '../styles/TicketPage.css';
 import { UserContext } from '../UserContext';
+import TicketCreateModal from '../components/TicketCreateModal';
+import TicketEditModal from '../components/TicketEditModal';
 
 const pricingData = {
     'Xác minh quyền thừa kế': 1200000,

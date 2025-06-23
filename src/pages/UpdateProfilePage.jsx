@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../UserContext';
 import '../styles/UpdateProfilePage.css';
+import { UserContext } from '../UserContext';
 
 const UpdateProfilePage = () => {
     const navigate = useNavigate();
-    const { updateFullName } = useContext(UserContext);
+    const { email: userEmail, fullName: currentFullName, phone: currentPhone, address: currentAddress, dob: currentDob, gender: currentGender, updateFullName } = useContext(UserContext);
 
     const [name, setName] = useState('');
     const [phone, setPhone] = useState('');

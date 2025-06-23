@@ -86,7 +86,11 @@ const Header = () => {
                         <div className="user-info-container" ref={dropdownRef}>
                             <div className="user-info-text">
                                 <div className="user-greeting">
-                                    Xin chào, {fullName || 'Người dùng'} {role === 'ADMIN' && '(Quản trị)'}
+                                    {role === 'STAFF' ? (
+                                        'Xin chào, Nhân viên'
+                                    ) : (
+                                        `Xin chào, ${fullName || 'Người dùng'}${role === 'ADMIN' ? ' (Quản trị)' : ''}`
+                                    )}
                                 </div>
                                 {role !== 'ADMIN' && (
                                     <div className="user-wallet">Ví: {(typeof wallet === 'number' && !isNaN(wallet) ? wallet : 0).toLocaleString()}đ</div>
