@@ -27,6 +27,9 @@ const AdminTicketsPage = () => {
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [assigningStaffId, setAssigningStaffId] = useState(null);
     const [assigning, setAssigning] = useState(false);
+    const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+    const [rejectingTicket, setRejectingTicket] = useState(null);
+    const [rejectReason, setRejectReason] = useState('');
 
     // Mapping để chuyển đổi loại ticket từ tiếng Anh sang tiếng Việt
     const typeDisplayMap = {
@@ -401,7 +404,7 @@ const AdminTicketsPage = () => {
                                         <td><span className={`status-badge status-${ticket.status?.toLowerCase()}`}>{statusDisplayMap[ticket.status] || ticket.status}</span></td>
                                         <td>{typeDisplayMap[ticket.ticketType || ticket.type] || ticket.type || '—'}</td>
                                         <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
-                                        <td>
+                                        <td className="action-buttons">
                                             <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
                                             {preselectedCustomerId && (
                                                 ticket.status === 'IN_PROGRESS' ? (
@@ -409,6 +412,18 @@ const AdminTicketsPage = () => {
                                                 ) : (
                                                     <button className="edit-btn" style={{background: '#43a047', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Thêm staff</button>
                                                 )
+                                            )}
+                                            {ticket.status === 'PENDING' && (
+                                                <button
+                                                    className="reject-btn"
+                                                    onClick={() => {
+                                                        setRejectingTicket(ticket);
+                                                        setIsRejectModalOpen(true);
+                                                        setRejectReason('');
+                                                    }}
+                                                >
+                                                    Từ chối
+                                                </button>
                                             )}
                                         </td>
                                     </tr>
@@ -524,6 +539,58 @@ const AdminTicketsPage = () => {
                                     )}
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                )}
+                {/* Reject Ticket Modal */}
+                {isRejectModalOpen && (
+                    <div className="modal-overlay" onClick={() => setIsRejectModalOpen(false)}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 500}}>
+                            <h2>Lý do từ chối Ticket #{rejectingTicket?.id}</h2>
+                            <textarea
+                                value={rejectReason}
+                                onChange={e => setRejectReason(e.target.value)}
+                                placeholder="Nhập lý do từ chối..."
+                                rows={4}
+                                style={{ width: '100%', borderRadius: 8, border: '1px solid #ced4da', padding: '0.6rem 0.8rem', marginTop: 12 }}
+                            />
+                            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                                <button className="btn-cancel" onClick={() => setIsRejectModalOpen(false)}>Hủy</button>
+                                <button
+                                    className="reject-btn"
+                                    style={{ minWidth: 120 }}
+                                    onClick={async () => {
+                                        if (!rejectReason.trim()) {
+                                            alert('Vui lòng nhập lý do từ chối.');
+                                            return;
+                                        }
+                                        try {
+                                            const token = localStorage.getItem('token');
+                                            const res = await fetch(`/admin/tickets/${rejectingTicket.id}/reject`, {
+                                                method: 'PUT',
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'Authorization': `Bearer ${token}`
+                                                },
+                                                body: JSON.stringify({ rejectedReason: rejectReason })
+                                            });
+                                            if (!res.ok) {
+                                                const err = await res.text();
+                                                throw new Error(err || 'Không thể từ chối ticket');
+                                            }
+                                            alert('Đã từ chối ticket thành công!');
+                                            setIsRejectModalOpen(false);
+                                            setRejectingTicket(null);
+                                            setRejectReason('');
+                                            fetchTickets();
+                                        } catch (err) {
+                                            alert('Lỗi khi từ chối ticket: ' + err.message);
+                                        }
+                                    }}
+                                >
+                                    Xác nhận từ chối
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}
