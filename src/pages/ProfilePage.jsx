@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/ProfilePage.css';
 import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaWallet } from 'react-icons/fa';
+import Header from '../components/Header';
 
 const ProfilePage = () => {
     const [userInfo, setUserInfo] = useState(null);
@@ -33,6 +34,7 @@ const ProfilePage = () => {
 
     return (
         <>
+            <Header />
             <div className="profile-page-container">
                 <div className="profile-card">
                     <div className="profile-card-header">

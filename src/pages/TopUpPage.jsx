@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/TopUpPage.css'; // Nếu bạn có file style riêng cho trang này
+import Header from '../components/Header';
 
 const paymentOptions = [
     {
@@ -114,44 +115,68 @@ const TopUpPage = () => {
     };
 
     return (
-        <div className="topup-center-outer">
-            <div className="topup-center-card">
-                <h2><span role="img" aria-label="moneybag">💰</span> Nạp tiền vào ví</h2>
-                <div className="topup-input-row">
-                    <button type="button" onClick={handleDecrease}>-</button>
-                <input
-                    type="number"
-                        min={paymentMethod === 'paypal' ? 10 : 100000}
-                        step={paymentMethod === 'paypal' ? 10 : 100000}
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                        placeholder={paymentMethod === 'paypal' ? 'VD: 10$' : 'VD: 100,000đ'}
-                    />
-                    <button type="button" onClick={handleIncrease}>+</button>
-                </div>
-                <div className="payment-methods-cards">
-                    {paymentOptions.map(option => (
-                        <div
-                            key={option.key}
-                            className={`payment-card${paymentMethod === option.key ? ' selected' : ''}`}
-                            onClick={() => setPaymentMethod(option.key)}
-                        >
-                            {option.icon}
-                            <div style={{ marginTop: 10, fontWeight: 600 }}>{option.label}</div>
-                        </div>
-                    ))}
-                </div>
-                {errorMessage && (
-                    <p role="alert" style={{ color: 'red', marginTop: '10px' }}>
-                        {errorMessage}
-                    </p>
-                )}
-                <div className="topup-actions">
-                    <button onClick={handleTopUp}>Xác nhận</button>
-                    <button onClick={() => navigate(-1)}>Huỷ</button>
+        <>
+            <Header />
+            <div className="topup-center-outer">
+                <div className="topup-center-card">
+                    <h2><span role="img" aria-label="moneybag">💰</span> Nạp tiền vào ví</h2>
+                    <div className="topup-input-row">
+                        <button type="button" onClick={handleDecrease}>-</button>
+                    <input
+                        type="number"
+                            min={paymentMethod === 'paypal' ? 10 : 100000}
+                            step={paymentMethod === 'paypal' ? 10 : 100000}
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                            placeholder={paymentMethod === 'paypal' ? 'VD: 10$' : 'VD: 100,000đ'}
+                        />
+                        <button type="button" onClick={handleIncrease}>+</button>
+                    </div>
+                    <div className="payment-methods-cards">
+                        {paymentOptions.map(option => (
+                            <div
+                                key={option.key}
+                                className={`payment-card${paymentMethod === option.key ? ' selected' : ''}`}
+                                onClick={() => setPaymentMethod(option.key)}
+                            >
+                                {option.icon}
+                                <div style={{ marginTop: 10, fontWeight: 600 }}>{option.label}</div>
+                            </div>
+                        ))}
+                    </div>
+                    {errorMessage && (
+                        <p role="alert" style={{ color: 'red', marginTop: '10px' }}>
+                            {errorMessage}
+                        </p>
+                    )}
+                    <div className="topup-actions">
+                        <button onClick={handleTopUp}>Xác nhận</button>
+                        <button onClick={() => navigate(-1)}>Huỷ</button>
+                    </div>
                 </div>
             </div>
-        </div>
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
+        </>
     );
 };
 

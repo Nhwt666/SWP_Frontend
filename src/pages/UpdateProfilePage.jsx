@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/UpdateProfilePage.css';
 import { UserContext } from '../UserContext';
+import Header from '../components/Header';
 
 const UpdateProfilePage = () => {
     const navigate = useNavigate();
@@ -65,34 +66,58 @@ const UpdateProfilePage = () => {
     };
 
     return (
-        <div className="profile-box">
-            <div className="profile-header">
-                <h2>Cập Nhập Thông Tin</h2>
-                <button className="close-btn" onClick={() => navigate(-1)}>✕</button>
-            </div>
-
-            <form onSubmit={handleSubmit}>
-                <label>Tên</label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Nhập tên" />
-                {errors.fullName && <div className="error-msg">{errors.fullName}</div>}
-
-                <label>Số điện thoại</label>
-                <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Nhập số điện thoại" />
-                {errors.phone && <div className="error-msg">{errors.phone}</div>}
-
-                <label>Địa chỉ</label>
-                <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Nhập địa chỉ" />
-                {errors.address && <div className="error-msg">{errors.address}</div>}
-
-                {errors.general && <div className="error-msg">{errors.general}</div>}
-                {successMsg && <div className="success-msg">{successMsg}</div>}
-
-                <div className="action-buttons">
-                    <button type="button" className="cancel-btn" onClick={() => navigate(-1)}>Cancel</button>
-                    <button type="submit" className="save-btn">Save</button>
+        <>
+            <Header />
+            <div className="profile-box">
+                <div className="profile-header">
+                    <h2>Cập Nhập Thông Tin</h2>
+                    <button className="close-btn" onClick={() => navigate(-1)}>✕</button>
                 </div>
-            </form>
-        </div>
+
+                <form onSubmit={handleSubmit}>
+                    <label>Tên</label>
+                    <input value={name} onChange={e => setName(e.target.value)} placeholder="Nhập tên" />
+                    {errors.fullName && <div className="error-msg">{errors.fullName}</div>}
+
+                    <label>Số điện thoại</label>
+                    <input value={phone} onChange={e => setPhone(e.target.value)} placeholder="Nhập số điện thoại" />
+                    {errors.phone && <div className="error-msg">{errors.phone}</div>}
+
+                    <label>Địa chỉ</label>
+                    <input value={address} onChange={e => setAddress(e.target.value)} placeholder="Nhập địa chỉ" />
+                    {errors.address && <div className="error-msg">{errors.address}</div>}
+
+                    {errors.general && <div className="error-msg">{errors.general}</div>}
+                    {successMsg && <div className="success-msg">{successMsg}</div>}
+
+                    <div className="action-buttons">
+                        <button type="button" className="cancel-btn" onClick={() => navigate(-1)}>Cancel</button>
+                        <button type="submit" className="save-btn">Save</button>
+                    </div>
+                </form>
+            </div>
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
+        </>
     );
 };
 
