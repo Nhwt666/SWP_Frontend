@@ -228,159 +228,185 @@ const TicketPage = () => {
     };
 
     return (
-        <div className="ticket-page">
-            <div className="ticket-form-container">
-                <h2 className="ticket-title">Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
-                <form onSubmit={handleSubmit} className="ticket-form" autoComplete="off">
-                    <div className="form-group">
-                        <label htmlFor="category">Chọn loại yêu cầu:</label>
-                        <select
-                            id="category"
-                            value={category}
-                            onChange={(e) => {
-                                setCategory(e.target.value);
-                                setService('');
-                                setCustomReason('');
-                            }}
-                            required
-                        >
-                            <option value="">-- Chọn --</option>
-                            <option value="Dân sự">Dân sự</option>
-                            <option value="Hành chính">Hành chính</option>
-                            <option value="Khác">Yêu cầu khác</option>
-                        </select>
-                    </div>
-
-                    {(category === 'Dân sự' || category === 'Hành chính') && (
+        <>
+            <div className="ticket-page">
+                <div className="ticket-form-container">
+                    <h2 className="ticket-title">Tạo Đơn Yêu Cầu Xét Nghiệm</h2>
+                    <form onSubmit={handleSubmit} className="ticket-form" autoComplete="off">
                         <div className="form-group">
-                            <label htmlFor="service">Chọn dịch vụ:</label>
+                            <label htmlFor="category">Chọn loại yêu cầu:</label>
                             <select
-                                id="service"
-                                value={service}
-                                onChange={(e) => setService(e.target.value)}
+                                id="category"
+                                value={category}
+                                onChange={(e) => {
+                                    setCategory(e.target.value);
+                                    setService('');
+                                    setCustomReason('');
+                                }}
                                 required
                             >
-                                <option value="">-- Chọn dịch vụ --</option>
-                                {(category === 'Dân sự' ? civilServices : adminServices).map((srv, idx) => (
-                                    <option key={idx} value={srv}>{srv}</option>
-                                ))}
+                                <option value="">-- Chọn --</option>
+                                <option value="Dân sự">Dân sự</option>
+                                <option value="Hành chính">Hành chính</option>
+                                <option value="Khác">Yêu cầu khác</option>
                             </select>
                         </div>
-                    )}
 
-                    {category === 'Khác' && (
+                        {(category === 'Dân sự' || category === 'Hành chính') && (
+                            <div className="form-group">
+                                <label htmlFor="service">Chọn dịch vụ:</label>
+                                <select
+                                    id="service"
+                                    value={service}
+                                    onChange={(e) => setService(e.target.value)}
+                                    required
+                                >
+                                    <option value="">-- Chọn dịch vụ --</option>
+                                    {(category === 'Dân sự' ? civilServices : adminServices).map((srv, idx) => (
+                                        <option key={idx} value={srv}>{srv}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {category === 'Khác' && (
+                            <div className="form-group">
+                                <label htmlFor="customReason">Lý do cần xét nghiệm:</label>
+                                <textarea
+                                    id="customReason"
+                                    value={customReason}
+                                    onChange={(e) => setCustomReason(e.target.value)}
+                                    rows="4"
+                                    placeholder="Nhập lý do..."
+                                    required
+                                />
+                            </div>
+                        )}
+
                         <div className="form-group">
-                            <label htmlFor="customReason">Lý do cần xét nghiệm:</label>
-                            <textarea
-                                id="customReason"
-                                value={customReason}
-                                onChange={(e) => setCustomReason(e.target.value)}
-                                rows="4"
-                                placeholder="Nhập lý do..."
+                            <label htmlFor="method">Chọn phương thức lấy mẫu:</label>
+                            <select
+                                id="method"
+                                value={method}
+                                onChange={(e) => setMethod(e.target.value)}
                                 required
-                            />
+                            >
+                                <option value="">-- Chọn phương thức --</option>
+                                <option value="Tự gửi mẫu">Tự gửi mẫu</option>
+                                <option value="Tại cơ sở y tế">Tại cơ sở y tế</option>
+                            </select>
                         </div>
-                    )}
 
-                    <div className="form-group">
-                        <label htmlFor="method">Chọn phương thức lấy mẫu:</label>
-                        <select
-                            id="method"
-                            value={method}
-                            onChange={(e) => setMethod(e.target.value)}
-                            required
-                        >
-                            <option value="">-- Chọn phương thức --</option>
-                            <option value="Tự gửi mẫu">Tự gửi mẫu</option>
-                            <option value="Tại cơ sở y tế">Tại cơ sở y tế</option>
-                        </select>
-                    </div>
+                        {method === 'Tự gửi mẫu' && (
+                            <div className="method-details">
+                                <div className="form-group">
+                                    <label htmlFor="address"><strong>Địa chỉ nhận mẫu:</strong></label>
+                                    <input
+                                        id="address"
+                                        type="text"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        placeholder="Nhập địa chỉ nhận mẫu"
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="phone"><strong>Số điện thoại:</strong></label>
+                                    <input
+                                        id="phone"
+                                        type="tel"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        placeholder="Nhập số điện thoại"
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="email"><strong>Email:</strong></label>
+                                    <input
+                                        id="email"
+                                        type="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        placeholder="Nhập email"
+                                        required
+                                    />
+                                </div>
+                            </div>
+                        )}
 
-                    {method === 'Tự gửi mẫu' && (
-                        <div className="method-details">
+                        {method === 'Tại cơ sở y tế' && (
                             <div className="form-group">
-                                <label htmlFor="address"><strong>Địa chỉ nhận mẫu:</strong></label>
+                                <label htmlFor="appointmentDate"><strong>Chọn ngày hẹn:</strong></label>
                                 <input
-                                    id="address"
-                                    type="text"
-                                    value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    placeholder="Nhập địa chỉ nhận mẫu"
+                                    id="appointmentDate"
+                                    type="date"
+                                    value={appointmentDate}
+                                    onChange={(e) => setAppointmentDate(e.target.value)}
                                     required
+                                    className="date-picker"
                                 />
                             </div>
-                            <div className="form-group">
-                                <label htmlFor="phone"><strong>Số điện thoại:</strong></label>
-                                <input
-                                    id="phone"
-                                    type="tel"
-                                    value={phone}
-                                    onChange={(e) => setPhone(e.target.value)}
-                                    placeholder="Nhập số điện thoại"
-                                    required
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label htmlFor="email"><strong>Email:</strong></label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Nhập email"
-                                    required
-                                />
-                            </div>
-                        </div>
-                    )}
+                        )}
 
-                    {method === 'Tại cơ sở y tế' && (
                         <div className="form-group">
-                            <label htmlFor="appointmentDate"><strong>Chọn ngày hẹn:</strong></label>
+                            <label htmlFor="sample1Name"><strong>Tên Mẫu 1:</strong></label>
                             <input
-                                id="appointmentDate"
-                                type="date"
-                                value={appointmentDate}
-                                onChange={(e) => setAppointmentDate(e.target.value)}
+                                id="sample1Name"
+                                type="text"
+                                value={sample1Name}
+                                onChange={(e) => setSample1Name(e.target.value)}
+                                placeholder="Nhập tên người cung cấp mẫu 1"
                                 required
-                                className="date-picker"
                             />
                         </div>
-                    )}
 
-                    <div className="form-group">
-                        <label htmlFor="sample1Name"><strong>Tên Mẫu 1:</strong></label>
-                        <input
-                            id="sample1Name"
-                            type="text"
-                            value={sample1Name}
-                            onChange={(e) => setSample1Name(e.target.value)}
-                            placeholder="Nhập tên người cung cấp mẫu 1"
-                            required
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label htmlFor="sample2Name"><strong>Tên Mẫu 2:</strong></label>
+                            <input
+                                id="sample2Name"
+                                type="text"
+                                value={sample2Name}
+                                onChange={(e) => setSample2Name(e.target.value)}
+                                placeholder="Nhập tên người cung cấp mẫu 2"
+                                required
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label htmlFor="sample2Name"><strong>Tên Mẫu 2:</strong></label>
-                        <input
-                            id="sample2Name"
-                            type="text"
-                            value={sample2Name}
-                            onChange={(e) => setSample2Name(e.target.value)}
-                            placeholder="Nhập tên người cung cấp mẫu 2"
-                            required
-                        />
-                    </div>
+                        <div className="price-display">
+                            Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
+                        </div>
 
-                    <div className="price-display">
-                        Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
-                    </div>
-
-                    <button className="submit-btn" type="submit" disabled={loading}>
-                        {loading ? 'Đang xử lý...' : 'Tạo yêu cầu'}
-                    </button>
-                </form>
+                        <button className="submit-btn" type="submit" disabled={loading}>
+                            {loading ? 'Đang xử lý...' : 'Tạo yêu cầu'}
+                        </button>
+                    </form>
+                </div>
             </div>
+            
+            {/* Footer with Map */}
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
+            
             {showConfirmModal && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
@@ -429,7 +455,7 @@ const TicketPage = () => {
             {showSuccessModal && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2100
+                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
                 }}>
                     <div style={{
                         background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
@@ -437,23 +463,28 @@ const TicketPage = () => {
                     }}>
                         <div style={{ marginBottom: 18 }}>
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
-                                <circle cx="24" cy="24" r="22" fill="#e0f2fe"/>
-                                <path d="M16 24l6 6 10-12" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+                                <circle cx="24" cy="24" r="20" fill="#e8f5e8"/>
+                                <path d="M20 24l4 4 8-8" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
-                        <div style={{ fontSize: 18, marginBottom: 18, color: '#22c55e', fontWeight: 700 }}>
-                            🎉 Ticket đã được tạo thành công!
+                        <div style={{ fontSize: 18, marginBottom: 18 }}>
+                            ✅ Yêu cầu đã được tạo thành công!
+                        </div>
+                        <div style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
+                            Chúng tôi sẽ liên hệ với bạn sớm nhất có thể.
                         </div>
                         <button
-                            onClick={() => { setShowSuccessModal(false); setLoading(false); }}
-                            style={{
-                                background: 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)', color: '#fff', border: 'none', borderRadius: 12,
-                                padding: '12px 36px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-                                boxShadow: '0 4px 16px rgba(30,58,138,0.13)', letterSpacing: 0.5, marginTop: 8,
-                                transition: 'background 0.22s, transform 0.18s, box-shadow 0.18s',
+                            onClick={() => {
+                                setShowSuccessModal(false);
+                                resetForm();
                             }}
-                            onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1e40af 60%, #2563eb 100%)'}
-                            onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)'}
+                            style={{
+                                background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
+                                padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
+                            }}
+                            onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
+                            onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
                         >Đóng</button>
                     </div>
                 </div>
@@ -461,7 +492,7 @@ const TicketPage = () => {
             {showErrorModal && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2200
+                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
                 }}>
                     <div style={{
                         background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
@@ -469,28 +500,30 @@ const TicketPage = () => {
                     }}>
                         <div style={{ marginBottom: 18 }}>
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
-                                <circle cx="24" cy="24" r="22" fill="#fee2e2"/>
-                                <path d="M16 16l16 16M32 16l-16 16" stroke="#ef4444" strokeWidth="3" strokeLinecap="round"/>
+                                <circle cx="24" cy="24" r="20" fill="#fee2e2"/>
+                                <path d="M18 18l12 12m0-12l-12 12" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
-                        <div style={{ fontSize: 18, marginBottom: 18, color: '#ef4444', fontWeight: 700 }}>
+                        <div style={{ fontSize: 18, marginBottom: 18, color: '#ef4444' }}>
+                            ❌ Có lỗi xảy ra!
+                        </div>
+                        <div style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
                             {errorMsg}
                         </div>
                         <button
-                            onClick={() => { setShowErrorModal(false); setLoading(false); }}
+                            onClick={() => setShowErrorModal(false)}
                             style={{
-                                background: 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)', color: '#fff', border: 'none', borderRadius: 12,
-                                padding: '12px 36px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-                                boxShadow: '0 4px 16px rgba(30,58,138,0.13)', letterSpacing: 0.5, marginTop: 8,
-                                transition: 'background 0.22s, transform 0.18s, box-shadow 0.18s',
+                                background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8,
+                                padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                boxShadow: '0 2px 8px rgba(239,68,68,0.10)', transition: 'background 0.2s',
                             }}
-                            onMouseOver={e => e.currentTarget.style.background = 'linear-gradient(90deg, #1e40af 60%, #2563eb 100%)'}
-                            onMouseOut={e => e.currentTarget.style.background = 'linear-gradient(90deg, #2563eb 60%, #1e3a8a 100%)'}
-                        >OK</button>
+                            onMouseOver={e => e.currentTarget.style.background = '#dc2626'}
+                            onMouseOut={e => e.currentTarget.style.background = '#ef4444'}
+                        >Đóng</button>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

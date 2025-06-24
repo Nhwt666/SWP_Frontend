@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import '../styles/AdminTicketsPage.css';
 import TicketEditModal from '../components/TicketEditModal';
 import TicketCreateModal from '../components/TicketCreateModal';
+import Header from '../components/Header';
 
 const AdminTicketsPage = () => {
     const [tickets, setTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const location = useLocation();
+    const { preselectedStaffId, preselectedCustomerId, staffName, customerName } = useParams();
     const [filters, setFilters] = useState({ 
-        status: location.state?.filterStatus || '', 
+        status: '', 
         type: '', 
         date: '' 
     });
@@ -18,17 +20,28 @@ const AdminTicketsPage = () => {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [editingTicket, setEditingTicket] = useState(null);
-    const preselectedStaffId = location.state?.staffId;
-    const staffName = location.state?.staffName;
-    const preselectedCustomerId = location.state?.customerId;
-    const customerName = location.state?.customerName;
     const [isPendingModalOpen, setIsPendingModalOpen] = useState(false);
     const [pendingTickets, setPendingTickets] = useState([]);
-    const [assigning, setAssigning] = useState(false);
     const [isStaffModalOpen, setIsStaffModalOpen] = useState(false);
     const [staffList, setStaffList] = useState([]);
     const [selectedTicketId, setSelectedTicketId] = useState(null);
     const [assigningStaffId, setAssigningStaffId] = useState(null);
+    const [assigning, setAssigning] = useState(false);
+
+    // Mapping để chuyển đổi loại ticket từ tiếng Anh sang tiếng Việt
+    const typeDisplayMap = {
+        'CIVIL': 'Dân sự',
+        'ADMINISTRATIVE': 'Hành chính', 
+        'OTHER': 'Yêu cầu khác'
+    };
+
+    // Mapping để chuyển đổi trạng thái từ tiếng Anh sang tiếng Việt
+    const statusDisplayMap = {
+        'PENDING': 'Chờ xử lý',
+        'IN_PROGRESS': 'Đang xử lý',
+        'COMPLETED': 'Đã hoàn thành',
+        'CANCELLED': 'Đã hủy'
+    };
 
     const fetchTickets = async () => {
         try {
@@ -317,201 +330,226 @@ const AdminTicketsPage = () => {
     }
 
     return (
-        <div className="admin-tickets-page">
-            <header className="tickets-header">
-                <div className="header-left-section">
-                    <button className="back-btn" onClick={() => navigate(-1)}>&larr;</button>
-                    <h1>
-                        {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Ticket Xét nghiệm'}
-                    </h1>
-                </div>
-            </header>
-
-            <div className="filters-container">
-                <div className="filter-group">
-                    <label htmlFor="status-filter">Lọc theo trạng thái</label>
-                    <select id="status-filter" name="status" value={filters.status} onChange={handleFilterChange}>
-                        <option value="">Tất cả trạng thái</option>
-                        <option value="PENDING">Pending</option>
-                        <option value="IN_PROGRESS">In Progress</option>
-                        <option value="COMPLETED">Completed</option>
-                    </select>
-                </div>
-                <div className="filter-group">
-                    <label htmlFor="type-filter">Lọc theo loại</label>
-                    <select id="type-filter" name="type" value={filters.type} onChange={handleFilterChange}>
-                        <option value="">Tất cả các loại</option>
-                        <option value="CIVIL">Civil</option>
-                        <option value="ADMINISTRATIVE">Administrative</option>
-                        <option value="OTHER">Other</option>
-                    </select>
-                </div>
-                <div className="filter-group">
-                    <label htmlFor="date-filter">Lọc theo ngày</label>
-                    <input type="date" id="date-filter" name="date" value={filters.date} onChange={handleFilterChange} />
-                </div>
-                <button className="reset-filters-btn" onClick={resetFilters}>Xóa bộ lọc</button>
-                {preselectedStaffId && (
-                    <button 
-                        className="reset-filters-btn" 
-                        style={{ background: '#43a047', color: '#fff', marginLeft: 8 }} 
-                        onClick={handleOpenPendingModal}
-                    >
-                        Thêm Ticket
-                    </button>
-                )}
-            </div>
-
-            <div className="tickets-table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>KHÁCH HÀNG</th>
-                            <th>NHÂN VIÊN</th>
-                            <th>TRẠNG THÁI</th>
-                            <th>LOẠI</th>
-                            <th>NGÀY TẠO</th>
-                            <th>HÀNH ĐỘNG</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredTickets.length > 0 ? (
-                            filteredTickets.map(ticket => (
-                                <tr key={ticket.id}>
-                                    <td>{ticket.id}</td>
-                                    <td>{ticket.customer?.fullName || 'N/A'}</td>
-                                    <td>{ticket.staff?.fullName || '—'}</td>
-                                    <td><span className={`status-badge status-${ticket.status?.toLowerCase()}`}>{ticket.status}</span></td>
-                                    <td>{ticket.ticketType || ticket.type || '—'}</td>
-                                    <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
-                                    <td>
-                                        <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
-                                        {preselectedCustomerId && (
-                                            ticket.status === 'IN_PROGRESS' ? (
-                                                <button className="edit-btn" style={{background: '#fb8c00', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Đổi staff</button>
-                                            ) : (
-                                                <button className="edit-btn" style={{background: '#43a047', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Thêm staff</button>
-                                            )
-                                        )}
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7">Không tìm thấy ticket nào.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-            {isEditModalOpen && (
-                <TicketEditModal
-                    ticket={editingTicket}
-                    onClose={handleCloseModal}
-                    onSave={handleSaveTicket}
-                />
-            )}
-            {/* Pending Tickets Modal */}
-            {isPendingModalOpen && (
-                <div className="modal-overlay" onClick={handleClosePendingModal}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
-                        <h2>Danh sách Ticket đang PENDING</h2>
-                        <button className="modal-close-btn" onClick={handleClosePendingModal}>&times;</button>
-                        <table style={{width: '100%', marginTop: 16}}>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Khách hàng</th>
-                                    <th>Loại</th>
-                                    <th>Ngày tạo</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {pendingTickets.length === 0 ? (
-                                    <tr><td colSpan="5">Không có ticket nào đang pending.</td></tr>
-                                ) : (
-                                    pendingTickets.map(ticket => (
-                                        <tr key={ticket.id}>
-                                            <td>{ticket.id}</td>
-                                            <td>{ticket.customer?.fullName || 'N/A'}</td>
-                                            <td>{ticket.ticketType || ticket.type || '—'}</td>
-                                            <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
-                                            <td>
-                                                <button disabled={assigning} onClick={async () => {
-                                                    setAssigning(true);
-                                                    try {
-                                                        const token = localStorage.getItem('token');
-                                                        const res = await fetch(`/admin/tickets/${ticket.id}/assign/${preselectedStaffId}`, {
-                                                            method: 'PUT',
-                                                            headers: { 'Authorization': `Bearer ${token}` }
-                                                        });
-                                                        if (!res.ok) throw new Error('Không thể gán ticket');
-                                                        setPendingTickets(pendingTickets.filter(t => t.id !== ticket.id));
-                                                        fetchTickets();
-                                                    } catch (err) {
-                                                        alert('Lỗi khi gán ticket: ' + err.message);
-                                                    } finally {
-                                                        setAssigning(false);
-                                                    }
-                                                }}>+</button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+        <>
+            <Header />
+            <div className="admin-tickets-page">
+                <header className="tickets-header">
+                    <div className="header-left-section">
+                        <button className="back-btn" onClick={() => navigate(-1)}>&larr;</button>
+                        <h1>
+                            {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Ticket Xét nghiệm'}
+                        </h1>
                     </div>
+                </header>
+
+                <div className="filters-container">
+                    <div className="filter-group">
+                        <label htmlFor="status-filter">Lọc theo trạng thái</label>
+                        <select id="status-filter" name="status" value={filters.status} onChange={handleFilterChange}>
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="PENDING">Chờ xử lý</option>
+                            <option value="IN_PROGRESS">Đang xử lý</option>
+                            <option value="COMPLETED">Đã hoàn thành</option>
+                            <option value="CANCELLED">Đã hủy</option>
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="type-filter">Lọc theo loại</label>
+                        <select id="type-filter" name="type" value={filters.type} onChange={handleFilterChange}>
+                            <option value="">Tất cả các loại</option>
+                            <option value="CIVIL">Dân sự</option>
+                            <option value="ADMINISTRATIVE">Hành chính</option>
+                            <option value="OTHER">Yêu cầu khác</option>
+                        </select>
+                    </div>
+                    <div className="filter-group">
+                        <label htmlFor="date-filter">Lọc theo ngày</label>
+                        <input type="date" id="date-filter" name="date" value={filters.date} onChange={handleFilterChange} />
+                    </div>
+                    <button className="reset-filters-btn" onClick={resetFilters}>Xóa bộ lọc</button>
+                    {preselectedStaffId && (
+                        <button 
+                            className="reset-filters-btn" 
+                            style={{ background: '#43a047', color: '#fff', marginLeft: 8 }} 
+                            onClick={handleOpenPendingModal}
+                        >
+                            Thêm Ticket
+                        </button>
+                    )}
                 </div>
-            )}
-            {/* Staff Assign Modal for customer tickets */}
-            {isStaffModalOpen && (
-                <div className="modal-overlay" onClick={handleCloseStaffModal}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
-                        <h2>Chọn nhân viên để {(() => {
-                            const ticket = tickets.find(t => t.id === selectedTicketId);
-                            return ticket && ticket.status === 'IN_PROGRESS' ? 'đổi staff' : 'gán Ticket';
-                        })()}</h2>
-                        <button className="modal-close-btn" onClick={handleCloseStaffModal}>&times;</button>
-                        <table style={{width: '100%', marginTop: 16}}>
-                            <thead>
+
+                <div className="tickets-table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>KHÁCH HÀNG</th>
+                                <th>NHÂN VIÊN</th>
+                                <th>TRẠNG THÁI</th>
+                                <th>LOẠI</th>
+                                <th>NGÀY TẠO</th>
+                                <th>HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredTickets.length > 0 ? (
+                                filteredTickets.map(ticket => (
+                                    <tr key={ticket.id}>
+                                        <td>{ticket.id}</td>
+                                        <td>{ticket.customer?.fullName || 'Chưa Có Thông Tin'}</td>
+                                        <td>{ticket.staff?.fullName || '—'}</td>
+                                        <td><span className={`status-badge status-${ticket.status?.toLowerCase()}`}>{statusDisplayMap[ticket.status] || ticket.status}</span></td>
+                                        <td>{typeDisplayMap[ticket.ticketType || ticket.type] || ticket.type || '—'}</td>
+                                        <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
+                                        <td>
+                                            <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
+                                            {preselectedCustomerId && (
+                                                ticket.status === 'IN_PROGRESS' ? (
+                                                    <button className="edit-btn" style={{background: '#fb8c00', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Đổi staff</button>
+                                                ) : (
+                                                    <button className="edit-btn" style={{background: '#43a047', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Thêm staff</button>
+                                                )
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Họ tên</th>
-                                    <th>Email</th>
-                                    <th>Hành động</th>
+                                    <td colSpan="7">Không tìm thấy ticket nào.</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {staffList.length === 0 ? (
-                                    <tr><td colSpan="4">Không có nhân viên nào.</td></tr>
-                                ) : (
-                                    staffList.map(staff => {
-                                        const ticket = tickets.find(t => t.id === selectedTicketId);
-                                        const isCurrent = ticket && ticket.staff && staff.id === ticket.staff.id;
-                                        return (
-                                            <tr key={staff.id} style={isCurrent ? {background: '#e3f2fd'} : {}}>
-                                                <td>{staff.id}</td>
-                                                <td>{staff.fullName}</td>
-                                                <td>{staff.email}</td>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+                {isEditModalOpen && (
+                    <TicketEditModal
+                        ticket={editingTicket}
+                        onClose={handleCloseModal}
+                        onSave={handleSaveTicket}
+                    />
+                )}
+                {/* Pending Tickets Modal */}
+                {isPendingModalOpen && (
+                    <div className="modal-overlay" onClick={handleClosePendingModal}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
+                            <h2>Danh sách Ticket đang Chờ xử lý</h2>
+                            <button className="modal-close-btn" onClick={handleClosePendingModal}>&times;</button>
+                            <table style={{width: '100%', marginTop: 16}}>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Khách hàng</th>
+                                        <th>Loại</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pendingTickets.length === 0 ? (
+                                        <tr><td colSpan="5">Không có ticket nào đang chờ xử lý.</td></tr>
+                                    ) : (
+                                        pendingTickets.map(ticket => (
+                                            <tr key={ticket.id}>
+                                                <td>{ticket.id}</td>
+                                                <td>{ticket.customer?.fullName || 'Chưa Có Thông Tin'}</td>
+                                                <td>{typeDisplayMap[ticket.ticketType || ticket.type] || ticket.type || '—'}</td>
+                                                <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
                                                 <td>
-                                                    {isCurrent ? (
-                                                        <button disabled style={{opacity: 0.7, cursor: 'not-allowed'}}>Đang phụ trách</button>
-                                                    ) : (
-                                                        <button disabled={assigningStaffId === staff.id} onClick={() => handleAssignStaff(staff.id)}>+</button>
-                                                    )}
+                                                    <button disabled={assigning} onClick={async () => {
+                                                        setAssigning(true);
+                                                        try {
+                                                            const token = localStorage.getItem('token');
+                                                            const res = await fetch(`/admin/tickets/${ticket.id}/assign/${preselectedStaffId}`, {
+                                                                method: 'PUT',
+                                                                headers: { 'Authorization': `Bearer ${token}` }
+                                                            });
+                                                            if (!res.ok) throw new Error('Không thể gán ticket');
+                                                            setPendingTickets(pendingTickets.filter(t => t.id !== ticket.id));
+                                                            fetchTickets();
+                                                        } catch (err) {
+                                                            alert('Lỗi khi gán ticket: ' + err.message);
+                                                        } finally {
+                                                            setAssigning(false);
+                                                        }
+                                                    }}>+</button>
                                                 </td>
                                             </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+                {/* Staff Assign Modal for customer tickets */}
+                {isStaffModalOpen && (
+                    <div className="modal-overlay" onClick={handleCloseStaffModal}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
+                            <h2>Chọn nhân viên để {(() => {
+                                const ticket = tickets.find(t => t.id === selectedTicketId);
+                                return ticket && ticket.status === 'IN_PROGRESS' ? 'đổi staff' : 'gán Ticket';
+                            })()}</h2>
+                            <button className="modal-close-btn" onClick={handleCloseStaffModal}>&times;</button>
+                            <table style={{width: '100%', marginTop: 16}}>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Họ tên</th>
+                                        <th>Email</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {staffList.length === 0 ? (
+                                        <tr><td colSpan="4">Không có nhân viên nào.</td></tr>
+                                    ) : (
+                                        staffList.map(staff => {
+                                            const ticket = tickets.find(t => t.id === selectedTicketId);
+                                            const isCurrent = ticket && ticket.staff && staff.id === ticket.staff.id;
+                                            return (
+                                                <tr key={staff.id} style={isCurrent ? {background: '#e3f2fd'} : {}}>
+                                                    <td>{staff.id}</td>
+                                                    <td>{staff.fullName}</td>
+                                                    <td>{staff.email}</td>
+                                                    <td>
+                                                        {isCurrent ? (
+                                                            <button disabled style={{opacity: 0.7, cursor: 'not-allowed'}}>Đang phụ trách</button>
+                                                        ) : (
+                                                            <button disabled={assigningStaffId === staff.id} onClick={() => handleAssignStaff(staff.id)}>+</button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </div>
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
                     </div>
                 </div>
-            )}
-        </div>
+            </footer>
+        </>
     );
 };
 

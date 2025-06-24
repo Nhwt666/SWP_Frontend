@@ -1,6 +1,7 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/BlogPostPage.css';
+import Header from '../components/Header';
 
 const blogPosts = [
   {
@@ -268,40 +269,165 @@ const blogPosts = [
 const BlogPostPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
+  
+  // If no slug, show blog list
+  if (!slug) {
+    return (
+      <>
+        <Header />
+        <main className="blogpost-bg">
+          <div className="blogpost-container">
+            <h1 className="blogpost-title">Tin Tức & Bài Viết</h1>
+            <div className="blog-grid">
+              {blogPosts.map((post, idx) => (
+                <article className="blog-card" key={idx}>
+                  <div className="blog-img-wrap">
+                    <img src={post.image} alt={post.title} className="blog-img" />
+                  </div>
+                  <div className="blog-content">
+                    <h3 className="blog-card-title">{post.title}</h3>
+                    <p className="blog-desc">{post.content[0].text.substring(0, 150)}...</p>
+                    <button 
+                      onClick={() => navigate(`/blog/${post.slug}`)} 
+                      className="blog-btn"
+                    >
+                      Đọc tiếp
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </main>
+        <footer className="member-footer">
+          <div className="member-footer-content">
+            <div className="member-footer-info">
+              <div><strong>Số Hotline:</strong> 1800.9999</div>
+              <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+              <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+            </div>
+            <div className="member-footer-map">
+              <iframe
+                title="Bản đồ Trung tâm xét nghiệm ADN"
+                src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                width="250"
+                height="140"
+                style={{ border: 0, borderRadius: 10 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </footer>
+      </>
+    );
+  }
+
+  // If slug exists, show specific blog post
   const post = blogPosts.find((b) => b.slug === slug);
 
   if (!post) {
     return (
-      <div className="blogpost-notfound">
-        <h2>Bài viết không tồn tại</h2>
-        <button onClick={() => navigate(-1)} className="blogpost-back-btn">Quay lại</button>
-      </div>
+      <>
+        <Header />
+        <div className="blogpost-notfound">
+          <h2>Bài viết không tồn tại</h2>
+          <button onClick={() => navigate('/blog')} className="blogpost-back-btn">Quay lại danh sách</button>
+        </div>
+        <footer className="member-footer">
+          <div className="member-footer-content">
+            <div className="member-footer-info">
+              <div><strong>Số Hotline:</strong> 1800.9999</div>
+              <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+              <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+            </div>
+            <div className="member-footer-map">
+              <iframe
+                title="Bản đồ Trung tâm xét nghiệm ADN"
+                src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                width="250"
+                height="140"
+                style={{ border: 0, borderRadius: 10 }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </footer>
+      </>
     );
   }
 
   return (
-    <main className="blogpost-bg">
-      <div className="blogpost-container">
-        <div className="blogpost-featured-img-wrap">
-          <img src={post.image} alt={post.title} className="blogpost-featured-img" />
+    <>
+      <Header />
+      <main className="blogpost-bg">
+        <div className="blogpost-container">
+          <div className="blogpost-featured-img-wrap">
+            <img src={post.image} alt={post.title} className="blogpost-featured-img" />
+          </div>
+          <h1 className="blogpost-title">{post.title}</h1>
+          <div className="blogpost-meta">
+            <span className="blogpost-author">{post.author}</span>
+            <span className="blogpost-date">{new Date(post.date).toLocaleDateString('vi-VN')}</span>
+          </div>
+          <div className="blogpost-content">
+            {post.content.map((block, idx) => {
+              if (block.type === 'h3') return <h3 key={idx} className="blogpost-h3">{block.text}</h3>;
+              if (block.type === 'h4') return <h4 key={idx} className="blogpost-h4">{block.text}</h4>;
+              if (block.type === 'quote') return <blockquote key={idx} className="blogpost-quote">{block.text}</blockquote>;
+              if (block.type === 'highlight') return <div key={idx} className="blogpost-highlight">{block.text}</div>;
+              if (block.type === 'ul') return <ul key={idx} className="blogpost-ul">{block.items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
+              if (block.type === 'table') {
+                return (
+                  <table key={idx} className="blogpost-table">
+                    <thead>
+                      <tr>
+                        {block.headers.map((header, i) => <th key={i}>{header}</th>)}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {block.rows.map((row, i) => (
+                        <tr key={i}>
+                          {row.map((cell, j) => <td key={`${i}-${j}`}>{cell}</td>)}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                );
+              }
+              return <p key={idx}>{block.text}</p>;
+            })}
+          </div>
+          <div className="blogpost-navigation">
+            <button onClick={() => navigate('/blog')} className="blogpost-back-btn">← Quay lại danh sách</button>
+          </div>
         </div>
-        <h1 className="blogpost-title">{post.title}</h1>
-        <div className="blogpost-meta">
-          <span className="blogpost-author">{post.author}</span>
-          <span className="blogpost-date">{new Date(post.date).toLocaleDateString('vi-VN')}</span>
+      </main>
+      <footer className="member-footer">
+        <div className="member-footer-content">
+          <div className="member-footer-info">
+            <div><strong>Số Hotline:</strong> 1800.9999</div>
+            <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+            <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+          </div>
+          <div className="member-footer-map">
+            <iframe
+              title="Bản đồ Trung tâm xét nghiệm ADN"
+              src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+              width="250"
+              height="140"
+              style={{ border: 0, borderRadius: 10 }}
+              allowFullScreen=""
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
         </div>
-        <div className="blogpost-content">
-          {post.content.map((block, idx) => {
-            if (block.type === 'h3') return <h3 key={idx} className="blogpost-h3">{block.text}</h3>;
-            if (block.type === 'quote') return <blockquote key={idx} className="blogpost-quote">{block.text}</blockquote>;
-            if (block.type === 'highlight') return <div key={idx} className="blogpost-highlight">{block.text}</div>;
-            if (block.type === 'ul') return <ul key={idx} className="blogpost-ul">{block.items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
-            if (block.type === 'table') return <table key={idx} className="blogpost-table">{block.rows.map((row, i) => <tr key={i}>{row.map((cell, j) => <td key={`${i}-${j}`}>{cell}</td>)}</tr>)}</table>;
-            return <p key={idx}>{block.text}</p>;
-          })}
-        </div>
-      </div>
-    </main>
+      </footer>
+    </>
   );
 };
 

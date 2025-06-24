@@ -6,6 +6,7 @@ import '../styles/StaffPage.css';
 import { toast } from 'react-toastify';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
+import Header from '../components/Header';
 
 // Đăng ký fonts mặc định trước
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
@@ -356,9 +357,9 @@ const StaffPage = () => {
                                     {
                                         text: [
                                             { text: 'THÔNG TIN KHÁCH HÀNG\n', style: 'sectionHeader' },
-                                            { text: `Họ và tên: ${customerName || 'N/A'}\n`, style: 'infoText' },
-                                            { text: `Số điện thoại: ${phone || 'N/A'}\n`, style: 'infoText' },
-                                            { text: `Email: ${email || 'N/A'}`, style: 'infoText' }
+                                            { text: `Họ và tên: ${customerName || 'Chưa Có Thông Tin'}\n`, style: 'infoText' },
+                                            { text: `Số điện thoại: ${phone || 'Chưa Có Thông Tin'}\n`, style: 'infoText' },
+                                            { text: `Email: ${email || 'Chưa Có Thông Tin'}`, style: 'infoText' }
                                         ]
                                     }
                                 ]
@@ -566,174 +567,198 @@ const StaffPage = () => {
     };
 
     return (
-        <StaffLayout>
-            <div className="staff-page">
-                <h2 className="staff-title-modern">Quản lý Yêu Cầu (Staff)</h2>
-                <div className="modern-tabs-row">
-                    {tabOptions.map(tab => (
-                        <button
-                            key={tab.key}
-                            className={`modern-tab-btn${activeTab === tab.key ? ' active' : ''}`}
-                            onClick={() => setActiveTab(tab.key)}
-                        >
-                            {tab.label}
-                        </button>
-                    ))}
-                    <input
-                        type="text"
-                        className="modern-search-input"
-                        placeholder="Tìm theo ID hoặc tên khách hàng..."
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                    />
-                </div>
-                {loading ? (
-                    <div className="staff-spinner"><div className="spinner"></div></div>
-                ) : error ? (
-                    <p style={{ color: 'red' }}>{error}</p>
-                ) : (
-                    <div className="ticket-list-modern fade-in">
-                        <table className="modern-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Khách hàng</th>
-                                    <th>Loại yêu cầu</th>
-                                    <th>Trạng thái</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredTickets.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="5" className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</td>
-                                    </tr>
-                                ) : (
-                                    filteredTickets.map((ticket) => (
-                                        <tr key={ticket.id}>
-                                            <td>#{ticket.id}</td>
-                                            <td>{ticket.customer?.fullName || ticket.customer?.name || 'N/A'}</td>
-                                            <td>{typeServiceMap[ticket.type] || typeDisplayMap[ticket.type] || ticket.type}</td>
-                                            <td>
-                                                <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
-                                                    {(() => {
-                                                        switch(ticket.status) {
-                                                            case 'PENDING': return 'Chờ xử lý';
-                                                            case 'IN_PROGRESS': return 'Đang xử lý';
-                                                            case 'COMPLETED': return 'Đã hoàn thành';
-                                                            default: return ticket.status;
-                                                        }
-                                                    })()}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <button className="btn-details" onClick={() => handleOpenModal(ticket)}>
-                                                    {activeTab === 'completed' ? 'Xem chi tiết' : 'Xử lý'}
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
+        <>
+            <Header />
+            <StaffLayout>
+                <div className="staff-page">
+                    <h2 className="staff-title-modern">Quản lý Yêu Cầu (Staff)</h2>
+                    <div className="modern-tabs-row">
+                        {tabOptions.map(tab => (
+                            <button
+                                key={tab.key}
+                                className={`modern-tab-btn${activeTab === tab.key ? ' active' : ''}`}
+                                onClick={() => setActiveTab(tab.key)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                        <input
+                            type="text"
+                            className="modern-search-input"
+                            placeholder="Tìm theo ID hoặc tên khách hàng..."
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                        />
                     </div>
-                )}
-                
-                {isModalOpen && selectedTicket && (
-                    <div className="modal-overlay" onClick={handleCloseModal}>
-                        <div className="modal-content" onClick={e => e.stopPropagation()}>
-                            <button className="modal-close-btn" onClick={handleCloseModal}>&times;</button>
-                            <div className="ticket-detail modern-card">
-                                <h3 className="ticket-detail-title">Chi tiết Ticket #{selectedTicket.id}</h3>
-                                <div className="ticket-status-row">
-                                    <span className={`ticket-status-badge status-${selectedTicket.status.toLowerCase()}`}>
-                                        {(() => {
-                                            switch(selectedTicket.status) {
-                                                case 'PENDING': return 'Chờ xử lý';
-                                                case 'IN_PROGRESS': return 'Đang xử lý';
-                                                case 'COMPLETED': return 'Đã hoàn thành';
-                                                default: return selectedTicket.status;
-                                            }
-                                        })()}
-                                    </span>
-                                </div>
-                                <div className="ticket-info-grid">
-                                    <div><strong>Khách hàng:</strong> <span>{selectedTicket.customer?.fullName || selectedTicket.customer?.name || ''}</span></div>
-                                    <div><strong>Email:</strong> <span>{selectedTicket.customer?.email || ''}</span></div>
-                                    <div><strong>SĐT:</strong> <span>{selectedTicket.customer?.phone || ''}</span></div>
-                                    <div><strong>Phương thức:</strong> <span>{methodMap[selectedTicket.method] || selectedTicket.method}</span></div>
-                                    <div><strong>Lý do:</strong> <span>{selectedTicket.reason || ''}</span></div>
-                                    <div><strong>Thời gian tạo:</strong> <span>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : 'Không có thông tin'}</span></div>
-                                    {selectedTicket.appointmentDate &&
-                                        <div><strong>Ngày hẹn:</strong> <span>{new Date(selectedTicket.appointmentDate).toLocaleDateString('vi-VN')}</span></div>
-                                    }
-                                    {selectedTicket.address &&
-                                        <div><strong>Địa chỉ gửi mẫu:</strong> <span>{selectedTicket.address}</span></div>
-                                    }
-                                    <div><strong>Tên Mẫu 1:</strong> <span>{selectedTicket.sample1Name || ''}</span></div>
-                                    <div><strong>Tên Mẫu 2:</strong> <span>{selectedTicket.sample2Name || ''}</span></div>
-                                </div>
+                    {loading ? (
+                        <div className="staff-spinner"><div className="spinner"></div></div>
+                    ) : error ? (
+                        <p style={{ color: 'red' }}>{error}</p>
+                    ) : (
+                        <div className="ticket-list-modern fade-in">
+                            <table className="modern-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Khách hàng</th>
+                                        <th>Loại yêu cầu</th>
+                                        <th>Trạng thái</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {filteredTickets.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</td>
+                                        </tr>
+                                    ) : (
+                                        filteredTickets.map((ticket) => (
+                                            <tr key={ticket.id}>
+                                                <td>#{ticket.id}</td>
+                                                <td>{ticket.customer?.fullName || ticket.customer?.name || 'Chưa Có Thông Tin'}</td>
+                                                <td>{typeServiceMap[ticket.type] || typeDisplayMap[ticket.type] || ticket.type}</td>
+                                                <td>
+                                                    <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
+                                                        {(() => {
+                                                            switch(ticket.status) {
+                                                                case 'PENDING': return 'Chờ xử lý';
+                                                                case 'IN_PROGRESS': return 'Đang xử lý';
+                                                                case 'COMPLETED': return 'Đã hoàn thành';
+                                                                default: return ticket.status;
+                                                            }
+                                                        })()}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <button className="btn-details" onClick={() => handleOpenModal(ticket)}>
+                                                        {activeTab === 'completed' ? 'Xem chi tiết' : 'Xử lý'}
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    
+                    {isModalOpen && selectedTicket && (
+                        <div className="modal-overlay" onClick={handleCloseModal}>
+                            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                                <button className="modal-close-btn" onClick={handleCloseModal}>&times;</button>
+                                <div className="ticket-detail modern-card">
+                                    <h3 className="ticket-detail-title">Chi tiết Ticket #{selectedTicket.id}</h3>
+                                    <div className="ticket-status-row">
+                                        <span className={`ticket-status-badge status-${selectedTicket.status.toLowerCase()}`}>
+                                            {(() => {
+                                                switch(selectedTicket.status) {
+                                                    case 'PENDING': return 'Chờ xử lý';
+                                                    case 'IN_PROGRESS': return 'Đang xử lý';
+                                                    case 'COMPLETED': return 'Đã hoàn thành';
+                                                    default: return selectedTicket.status;
+                                                }
+                                            })()}
+                                        </span>
+                                    </div>
+                                    <div className="ticket-info-grid">
+                                        <div><strong>Khách hàng:</strong> <span>{selectedTicket.customer?.fullName || selectedTicket.customer?.name || 'Chưa Có Thông Tin'}</span></div>
+                                        <div><strong>Email:</strong> <span>{selectedTicket.customer?.email || 'Chưa Có Thông Tin'}</span></div>
+                                        <div><strong>SĐT:</strong> <span>{selectedTicket.customer?.phone || 'Chưa Có Thông Tin'}</span></div>
+                                        <div><strong>Phương thức:</strong> <span>{methodMap[selectedTicket.method] || selectedTicket.method}</span></div>
+                                        <div><strong>Lý do:</strong> <span>{selectedTicket.reason || 'Chưa Có Thông Tin'}</span></div>
+                                        <div><strong>Thời gian tạo:</strong> <span>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : 'Không có thông tin'}</span></div>
+                                        {selectedTicket.appointmentDate &&
+                                            <div><strong>Ngày hẹn:</strong> <span>{new Date(selectedTicket.appointmentDate).toLocaleDateString('vi-VN')}</span></div>
+                                        }
+                                        {selectedTicket.address &&
+                                            <div><strong>Địa chỉ gửi mẫu:</strong> <span>{selectedTicket.address}</span></div>
+                                        }
+                                        <div><strong>Tên Mẫu 1:</strong> <span>{selectedTicket.sample1Name || 'Chưa Có Thông Tin'}</span></div>
+                                        <div><strong>Tên Mẫu 2:</strong> <span>{selectedTicket.sample2Name || 'Chưa Có Thông Tin'}</span></div>
+                                    </div>
 
-                                {selectedTicket.status === 'PENDING' && selectedTicket.staff == null && (
-                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
-                                        <button
-                                            className="btn-processing modern-btn"
-                                            onClick={() => handleAssignSelf(selectedTicket.id)}
-                                            disabled={statusLoading}
-                                        >
-                                            Nhận xử lý
-                                        </button>
-                                    </div>
-                                )}
-                                {selectedTicket.status === 'IN_PROGRESS' && (
-                                    <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
-                                        <label style={{ marginRight: 10, fontWeight: 600, fontSize: 16 }}>Kết quả xử lý:</label>
-                                        <select
-                                            value={resultOption}
-                                            onChange={e => setResultOption(e.target.value)}
-                                            className="modern-select"
-                                        >
-                                            <option value="">-- Chọn kết quả --</option>
-                                            <option value="Thông tin trùng khớp">Thông tin trùng khớp</option>
-                                            <option value="Thông tin không trùng khớp">Thông tin không trùng khớp</option>
-                                        </select>
-                                        {resultOption && (
-                                            <>
-                                                <p style={{ marginTop: 12, fontStyle: 'italic', color: '#1976d2', fontSize: 15 }}>
-                                                    Kết luận: {resultOption}.
-                                                </p>
-                                                <button
-                                                    className="btn-complete modern-btn"
-                                                    style={{ marginTop: 16 }}
-                                                    onClick={() => handleCompleteTicket(selectedTicket.id, resultOption)}
-                                                    disabled={statusLoading || !resultOption}
-                                                >
-                                                    Xác nhận Hoàn thành
-                                                </button>
-                                            </>
-                                        )}
-                                    </div>
-                                )}
-                                {selectedTicket.status === 'COMPLETED' && (
-                                    <div className="result-display-box">
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                                            <h4>Kết quả xử lý</h4>
+                                    {selectedTicket.status === 'PENDING' && selectedTicket.staff == null && (
+                                        <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
                                             <button
-                                                onClick={() => generatePDFReport(selectedTicket)}
-                                                className="pdf-download-btn"
+                                                className="btn-processing modern-btn"
+                                                onClick={() => handleAssignSelf(selectedTicket.id)}
+                                                disabled={statusLoading}
                                             >
-                                                📄 Tải PDF
+                                                Nhận xử lý
                                             </button>
                                         </div>
-                                        <ResultDisplay resultString={selectedTicket.resultString} />
-                                    </div>
-                                )}
+                                    )}
+                                    {selectedTicket.status === 'IN_PROGRESS' && (
+                                        <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                            <label style={{ marginRight: 10, fontWeight: 600, fontSize: 16 }}>Kết quả xử lý:</label>
+                                            <select
+                                                value={resultOption}
+                                                onChange={e => setResultOption(e.target.value)}
+                                                className="modern-select"
+                                            >
+                                                <option value="">-- Chọn kết quả --</option>
+                                                <option value="Thông tin trùng khớp">Thông tin trùng khớp</option>
+                                                <option value="Thông tin không trùng khớp">Thông tin không trùng khớp</option>
+                                            </select>
+                                            {resultOption && (
+                                                <>
+                                                    <p style={{ marginTop: 12, fontStyle: 'italic', color: '#1976d2', fontSize: 15 }}>
+                                                        Kết luận: {resultOption}.
+                                                    </p>
+                                                    <button
+                                                        className="btn-complete modern-btn"
+                                                        style={{ marginTop: 16 }}
+                                                        onClick={() => handleCompleteTicket(selectedTicket.id, resultOption)}
+                                                        disabled={statusLoading || !resultOption}
+                                                    >
+                                                        Xác nhận Hoàn thành
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                    {selectedTicket.status === 'COMPLETED' && (
+                                        <div className="result-display-box">
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                                                <h4>Kết quả xử lý</h4>
+                                                <button
+                                                    onClick={() => generatePDFReport(selectedTicket)}
+                                                    className="pdf-download-btn"
+                                                >
+                                                    📄 Tải PDF
+                                                </button>
+                                            </div>
+                                            <ResultDisplay resultString={selectedTicket.resultString} />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
+                    )}
+                </div>
+            </StaffLayout>
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
                     </div>
-                )}
-            </div>
-        </StaffLayout>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
+        </>
     );
 };
 

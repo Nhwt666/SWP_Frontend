@@ -65,7 +65,7 @@ const TicketEditModal = ({ ticket, onClose, onSave, error }) => {
                     <div className="form-grid">
                         <div className="form-group info-only">
                             <label>Khách hàng</label>
-                            <span>{ticket.customer?.fullName || 'N/A'}</span>
+                            <span>{ticket.customer?.fullName || 'Chưa Có Thông Tin'}</span>
                         </div>
 
                         <div className="form-group">
@@ -81,9 +81,9 @@ const TicketEditModal = ({ ticket, onClose, onSave, error }) => {
                         <div className="form-group">
                             <label htmlFor="ticketType">Loại Ticket</label>
                             <select name="ticketType" id="ticketType" value={formData.ticketType} onChange={handleChange}>
-                                <option value="CIVIL">Civil</option>
-                                <option value="ADMINISTRATIVE">Administrative</option>
-                                <option value="OTHER">Other</option>
+                                <option value="CIVIL">Dân sự</option>
+                                <option value="ADMINISTRATIVE">Hành chính</option>
+                                <option value="OTHER">Yêu cầu khác</option>
                             </select>
                         </div>
 

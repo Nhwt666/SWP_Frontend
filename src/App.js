@@ -19,7 +19,6 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffPage from './pages/StaffPage';
 import AdminTicketsPage from "./pages/AdminTicketsPage";
-import Header from './components/Header';
 import { UserProvider } from './UserContext';
 
 // Main App component
@@ -28,8 +27,6 @@ function App() {
     <UserProvider>
       <Router>
         <div className="App">
-            {/* Header is now rendered on ALL pages */}
-            <Header /> 
             <Routes>
                 {/* Public Routes */}
                 <Route path="/" element={<HomePage />} />
@@ -37,6 +34,7 @@ function App() {
                 <Route path="/register" element={<RegisterPage />} />
                 <Route path="/pricing" element={<PricingPage />} />
                 <Route path="/blog" element={<BlogPostPage />} />
+                <Route path="/blog/:slug" element={<BlogPostPage />} />
                 <Route path="/guide" element={<GuidePage />} />
                 <Route path="/confirm-register" element={<ConfirmRegisterPage />} />
                 

@@ -93,8 +93,9 @@ const TicketCreateModal = ({ onClose, onSave }) => {
                     <div className="form-group">
                         <label htmlFor="type">Loại xét nghiệm</label>
                         <select name="type" id="type" value={formData.type} onChange={handleChange}>
-                            <option value="CIVIL">Civil</option>
-                            <option value="ADMINISTRATIVE">Administrative</option>
+                            <option value="CIVIL">Dân sự</option>
+                            <option value="ADMINISTRATIVE">Hành chính</option>
+                            <option value="OTHER">Yêu cầu khác</option>
                         </select>
                     </div>
                     <div className="form-group">

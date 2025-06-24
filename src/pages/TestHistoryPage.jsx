@@ -3,6 +3,7 @@ import { vfs } from '../fonts/RobotoVFS.js';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { toast } from 'react-toastify';
+import { Link } from 'react-router-dom';
 
 // Đăng ký fonts mặc định trước
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
@@ -31,6 +32,12 @@ const methodMap = {
     SELF_TEST: 'Tự gửi mẫu',
     AT_FACILITY: 'Tại cơ sở y tế',
     // Thêm các phương thức khác nếu có
+};
+
+const typeDisplayMap = {
+    'CIVIL': 'Dân sự',
+    'ADMINISTRATIVE': 'Hành chính',
+    'OTHER': 'Yêu cầu khác'
 };
 
 const TestHistoryPage = () => {
@@ -123,25 +130,20 @@ const TestHistoryPage = () => {
         try {
             const type = ticket.type;
             const method = methodMap[ticket.method] || ticket.method;
-            const customerName = ticket.customer?.fullName || ticket.customer?.name || 'N/A';
-            const phone = ticket.customer?.phone || ticket.phone || 'N/A';
-            const email = ticket.customer?.email || ticket.email || 'N/A';
+            const customerName = ticket.customer?.fullName || ticket.customer?.name || 'Chưa Có Thông Tin';
+            const phone = ticket.customer?.phone || ticket.phone || 'Chưa Có Thông Tin';
+            const email = ticket.customer?.email || ticket.email || 'Chưa Có Thông Tin';
             const { conclusion: conclusionText, details: result } = getResultInfo(ticket.resultString);
-            const reason = ticket.reason || 'N/A';
+            const reason = ticket.reason || 'Chưa Có Thông Tin';
             const sample1Name = ticket.sample1Name || 'Mẫu 1';
             const sample2Name = ticket.sample2Name || 'Mẫu 2';
-            const address = ticket.address || 'N/A';
-            const appointmentDate = ticket.appointmentDate ? new Date(ticket.appointmentDate).toLocaleDateString('vi-VN') : 'N/A';
+            const address = ticket.address || 'Chưa Có Thông Tin';
+            const appointmentDate = ticket.appointmentDate ? new Date(ticket.appointmentDate).toLocaleDateString('vi-VN') : 'Chưa Có Thông Tin';
             const customerCode = `KH${ticket.id.toString().padStart(6, '0')}`;
             
             const isMatch = conclusionText === 'TRÙNG KHỚP';
             const conclusionColor = isMatch ? '#2e7d32' : '#d32f2f';
 
-            const typeDisplayMap = {
-                'CIVIL': 'Dân sự',
-                'ADMINISTRATIVE': 'Hành chính',
-                'OTHER': 'Khác'
-            };
             const displayType = typeDisplayMap[type] || type;
 
             const docDefinition = {
@@ -392,126 +394,171 @@ const TestHistoryPage = () => {
     };
 
     return (
-        <div className="test-history-page" style={{ padding: '20px' }}>
-            <h2>Lịch sử xét nghiệm</h2>
-            {message && <p style={{ color: 'red' }}>{message}</p>}
-            {history.length === 0 && !message ? (
-                <p>Không có dữ liệu xét nghiệm.</p>
-            ) : (
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                    <tr>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Ngày</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Loại xét nghiệm</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Phương thức</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Kết quả</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Trạng thái</th>
-                        <th style={{ border: '1px solid #ccc', padding: '8px' }}>Xem chi tiết</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {history.map((item, index) => (
-                        <tr key={index}>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.createdAt ? new Date(item.createdAt).toLocaleString('vi-VN') : ''}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.reason || ''}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{methodMap[item.method] || item.method || ''}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.resultString ? getResultInfo(item.resultString).conclusion : 'Chưa có'}</td>
-                            <td style={{ border: '1px solid #ccc', padding: '8px', color: '#1976d2', fontWeight: 500 }}>{statusMap[item.status] || item.status || ''}</td>
-                            <td style={{ padding: '8px' }}>
-                                <button
-                                    onClick={() => handleRowClick(item)}
-                                    style={{
-                                        display: 'flex', alignItems: 'center', gap: 6,
-                                        background: '#1976d2', color: '#fff', border: 'none', borderRadius: 20,
-                                        padding: '6px 16px', cursor: 'pointer', fontWeight: 500, fontSize: 14,
-                                        boxShadow: '0 2px 8px rgba(25, 118, 210, 0.08)', transition: 'background 0.2s',
-                                    }}
-                                    onMouseOver={e => e.currentTarget.style.background = '#1251a3'}
-                                    onMouseOut={e => e.currentTarget.style.background = '#1976d2'}
-                                >
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M2.05 12a9.94 9.94 0 0 1 19.9 0 9.94 9.94 0 0 1-19.9 0Z"/></svg>
-                                    Xem lại
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            )}
+        <>
+            <div className="test-history-page">
+                <div className="test-history-header">
+                    <h1>Lịch Sử Xét Nghiệm</h1>
+                    <p>Xem lại tất cả các yêu cầu xét nghiệm của bạn</p>
+                </div>
 
-            {showModal && selectedTicket && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                }}>
-                    <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 350, maxWidth: 500, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
-                        <h3>Chi tiết phiếu xét nghiệm</h3>
-                        <table style={{ width: '100%' }}>
-                            <tbody>
-                                <tr><td><b>Ngày tạo:</b></td><td>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : ''}</td></tr>
-                                <tr><td><b>Loại xét nghiệm:</b></td><td>{selectedTicket.reason || ''}</td></tr>
-                                <tr><td><b>Phương thức:</b></td><td>{methodMap[selectedTicket.method] || selectedTicket.method || ''}</td></tr>
-                                <tr><td><b>Tên Mẫu 1:</b></td><td>{selectedTicket.sample1Name || ''}</td></tr>
-                                <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
-                                <tr><td><b>Kết quả:</b></td><td>{getResultInfo(selectedTicket.resultString).conclusion}</td></tr>
-                                <tr><td><b>Trạng thái:</b></td><td>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
-                                {selectedTicket.staffId && <tr><td><b>Nhân viên xử lý:</b></td><td>{getStaffName(selectedTicket.staffId)}</td></tr>}
-                                {selectedTicket.method === 'SELF_TEST' && (
-                                    <>
-                                        <tr><td><b>Địa chỉ:</b></td><td>{selectedTicket.address || ''}</td></tr>
-                                        <tr><td><b>Email:</b></td><td>{selectedTicket.email || ''}</td></tr>
-                                        <tr><td><b>Số điện thoại:</b></td><td>{selectedTicket.phone || ''}</td></tr>
-                                    </>
+                {message ? (
+                    <div className="error-container">
+                        <p>❌ Lỗi: {message}</p>
+                        <button onClick={() => window.location.reload()} className="retry-btn">Thử lại</button>
+                    </div>
+                ) : history.length === 0 ? (
+                    <div className="empty-state">
+                        <div className="empty-icon">📋</div>
+                        <h3>Chưa có lịch sử xét nghiệm</h3>
+                        <p>Bạn chưa có yêu cầu xét nghiệm nào. Hãy tạo yêu cầu đầu tiên!</p>
+                        <Link to="/ticket" className="create-ticket-btn">Tạo yêu cầu xét nghiệm</Link>
+                    </div>
+                ) : (
+                    <div className="tickets-container">
+                        {history.map((item, index) => (
+                            <div key={index} className="ticket-card">
+                                <div className="ticket-header">
+                                    <div className="ticket-id">#{item.id}</div>
+                                    <div className={`ticket-status status-${item.status?.toLowerCase()}`}>
+                                        {(() => {
+                                            switch(item.status) {
+                                                case 'PENDING': return 'Chờ xử lý';
+                                                case 'IN_PROGRESS': return 'Đang xử lý';
+                                                case 'COMPLETED': return 'Đã hoàn thành';
+                                                case 'CANCELLED': return 'Đã hủy';
+                                                default: return item.status;
+                                            }
+                                        })()}
+                                    </div>
+                                </div>
+                                
+                                <div className="ticket-details">
+                                    <div className="detail-row">
+                                        <span className="detail-label">Loại xét nghiệm:</span>
+                                        <span className="detail-value">{typeDisplayMap[item.type] || item.type}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Lý do:</span>
+                                        <span className="detail-value">{item.reason || 'Chưa Có Thông Tin'}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Phương thức:</span>
+                                        <span className="detail-value">{methodMap[item.method] || item.method}</span>
+                                    </div>
+                                    <div className="detail-row">
+                                        <span className="detail-label">Ngày tạo:</span>
+                                        <span className="detail-value">
+                                            {new Date(item.createdAt).toLocaleDateString('vi-VN')}
+                                        </span>
+                                    </div>
+                                    {item.amount && (
+                                        <div className="detail-row">
+                                            <span className="detail-label">Chi phí:</span>
+                                            <span className="detail-value amount">
+                                                {Number(item.amount).toLocaleString('vi-VN')} VND
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="ticket-actions">
+                                    <button 
+                                        className="view-details-btn"
+                                        onClick={() => handleRowClick(item)}
+                                    >
+                                        Xem chi tiết
+                                    </button>
+                                    {item.status === 'COMPLETED' && item.resultString && (
+                                        <button 
+                                            className="download-report-btn"
+                                            onClick={() => generatePDFReport(item)}
+                                        >
+                                            Tải báo cáo
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+
+            {/* Footer with Map */}
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
+
+            {/* Ticket Detail Modal */}
+            {selectedTicket && (
+                <div className="modal-overlay" onClick={() => setSelectedTicket(null)}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h2>Chi tiết Ticket #{selectedTicket.id}</h2>
+                            <button className="modal-close" onClick={() => setSelectedTicket(null)}>&times;</button>
+                        </div>
+                        
+                        <div className="modal-body">
+                            <table className="detail-table">
+                                <tbody>
+                                    <tr><td><b>Trạng thái:</b></td><td>{(() => {
+                                        switch(selectedTicket.status) {
+                                            case 'PENDING': return 'Chờ xử lý';
+                                            case 'IN_PROGRESS': return 'Đang xử lý';
+                                            case 'COMPLETED': return 'Đã hoàn thành';
+                                            case 'CANCELLED': return 'Đã hủy';
+                                            default: return selectedTicket.status;
+                                        }
+                                    })()}</td></tr>
+                                    <tr><td><b>Loại xét nghiệm:</b></td><td>{typeDisplayMap[selectedTicket.type] || selectedTicket.type}</td></tr>
+                                    <tr><td><b>Lý do:</b></td><td>{selectedTicket.reason || 'Chưa Có Thông Tin'}</td></tr>
+                                    <tr><td><b>Phương thức:</b></td><td>{methodMap[selectedTicket.method] || selectedTicket.method}</td></tr>
+                                    <tr><td><b>Tên mẫu 1:</b></td><td>{selectedTicket.sample1Name || ''}</td></tr>
+                                    <tr><td><b>Tên mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
+                                    {selectedTicket.method === 'AT_FACILITY' && selectedTicket.appointmentDate && (
+                                        <tr><td><b>Ngày hẹn:</b></td><td>{new Date(selectedTicket.appointmentDate).toLocaleDateString('vi-VN')}</td></tr>
+                                    )}
+                                    {selectedTicket.method === 'SELF_TEST' && (
+                                        <>
+                                            <tr><td><b>Địa chỉ:</b></td><td>{selectedTicket.address || ''}</td></tr>
+                                            <tr><td><b>Email:</b></td><td>{selectedTicket.email || ''}</td></tr>
+                                            <tr><td><b>Số điện thoại:</b></td><td>{selectedTicket.phone || ''}</td></tr>
+                                        </>
+                                    )}
+                                </tbody>
+                            </table>
+                            <div style={{ textAlign: 'right', marginTop: 24 }}>
+                                {selectedTicket.status === 'COMPLETED' && selectedTicket.resultString && (
+                                    <button 
+                                        className="download-report-btn"
+                                        onClick={() => generatePDFReport(selectedTicket)}
+                                    >
+                                        Tải báo cáo PDF
+                                    </button>
                                 )}
-                            </tbody>
-                        </table>
-                        <div style={{ textAlign: 'right', marginTop: 24 }}>
-                            {selectedTicket.status === 'COMPLETED' && selectedTicket.resultString && (
-                                <button 
-                                    onClick={() => generatePDFReport(selectedTicket)} 
-                                    style={{ 
-                                        padding: '10px 20px', 
-                                        background: '#4caf50', 
-                                        color: '#fff', 
-                                        border: 'none', 
-                                        borderRadius: 6, 
-                                        cursor: 'pointer', 
-                                        marginRight: 10,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 6,
-                                        fontWeight: 600,
-                                        boxShadow: '0 2px 8px rgba(76, 175, 80, 0.3)',
-                                        transition: 'all 0.2s'
-                                    }}
-                                    onMouseOver={e => e.currentTarget.style.background = '#45a049'}
-                                    onMouseOut={e => e.currentTarget.style.background = '#4caf50'}
-                                >
-                                    📄 Tải PDF
-                                </button>
-                            )}
-                            <button 
-                                onClick={closeModal} 
-                                style={{ 
-                                    padding: '10px 20px', 
-                                    background: '#1976d2', 
-                                    color: '#fff', 
-                                    border: 'none', 
-                                    borderRadius: 6, 
-                                    cursor: 'pointer',
-                                    fontWeight: 600,
-                                    transition: 'background 0.2s'
-                                }}
-                                onMouseOver={e => e.currentTarget.style.background = '#1565c0'}
-                                onMouseOut={e => e.currentTarget.style.background = '#1976d2'}
-                            >
-                                Đóng
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             )}
-        </div>
+        </>
     );
 };
 

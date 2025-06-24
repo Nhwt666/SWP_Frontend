@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Header from '../components/Header';
 import '../styles/RegisterPage.css';
 
 const RegisterPage = () => {
@@ -95,7 +96,7 @@ const RegisterPage = () => {
 
     return (
         <>
-            {/* <Header /> */}
+            <Header />
             <div className="register-bg">
                 <div className="register-container flex-col">
                     <h2 className="register-title" style={{ fontFamily: 'Be Vietnam Pro, Inter, Arial, sans-serif', fontWeight: 900 }}>Đăng Ký</h2>
@@ -177,6 +178,29 @@ const RegisterPage = () => {
                     {message && <div className="message" style={{ fontFamily: 'inherit', marginTop: 10, animation: 'fadeInLogin 0.5s' }}>{message}</div>}
                 </div>
             </div>
+            
+            {/* Footer with Map */}
+            <footer className="member-footer">
+                <div className="member-footer-content">
+                    <div className="member-footer-info">
+                        <div><strong>Số Hotline:</strong> 1800.9999</div>
+                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                    </div>
+                    <div className="member-footer-map">
+                        <iframe
+                            title="Bản đồ Trung tâm xét nghiệm ADN"
+                            src="https://www.google.com/maps?q=643+Điện+Biên+Phủ,+Phường+1,+Quận+3,+TPHCM&output=embed"
+                            width="250"
+                            height="140"
+                            style={{ border: 0, borderRadius: 10 }}
+                            allowFullScreen=""
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                        ></iframe>
+                    </div>
+                </div>
+            </footer>
         </>
     );
 };
