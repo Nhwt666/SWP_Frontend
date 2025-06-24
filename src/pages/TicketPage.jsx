@@ -3,6 +3,7 @@ import '../styles/TicketPage.css';
 import { UserContext } from '../UserContext';
 import TicketCreateModal from '../components/TicketCreateModal';
 import TicketEditModal from '../components/TicketEditModal';
+import Header from '../components/Header';
 
 const pricingData = {
     'Xác minh quyền thừa kế': 1200000,
@@ -229,6 +230,7 @@ const TicketPage = () => {
 
     return (
         <>
+            <Header />
             <div className="ticket-page">
                 <div className="ticket-form-container">
                     <h2 className="ticket-title">Tạo Đơn Yêu Cầu Xét Nghiệm</h2>

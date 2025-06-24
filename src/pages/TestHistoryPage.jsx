@@ -27,6 +27,7 @@ const statusMap = {
     IN_PROGRESS: 'Đang xử lý',
     DONE: 'Hoàn thành',
     COMPLETED: 'Hoàn thành',
+    REJECTED: 'Đã từ chối',
 };
 
 const methodMap = {
@@ -423,7 +424,7 @@ const TestHistoryPage = () => {
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.reason || ''}</td>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{methodMap[item.method] || item.method || ''}</td>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>{item.resultString ? getResultInfo(item.resultString).conclusion : 'Chưa có'}</td>
-                                <td style={{ border: '1px solid #ccc', padding: '8px', color: '#1976d2', fontWeight: 500 }}>{statusMap[item.status] || item.status || ''}</td>
+                                <td style={{ border: '1px solid #ccc', padding: '8px', color: item.status === 'REJECTED' ? '#e53935' : '#1976d2', fontWeight: 500 }}>{statusMap[item.status] || item.status || ''}</td>
                                 <td style={{ padding: '8px' }}>
                                     <button
                                         onClick={() => handleRowClick(item)}
@@ -461,7 +462,13 @@ const TestHistoryPage = () => {
                                     <tr><td><b>Tên Mẫu 1:</b></td><td>{selectedTicket.sample1Name || ''}</td></tr>
                                     <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
                                     <tr><td><b>Kết quả:</b></td><td>{getResultInfo(selectedTicket.resultString).conclusion}</td></tr>
-                                    <tr><td><b>Trạng thái:</b></td><td>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
+                                    <tr><td><b>Trạng thái:</b></td><td style={selectedTicket.status === 'REJECTED' ? { color: '#e53935', fontWeight: 700 } : {}}>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
+                                    {selectedTicket.status === 'REJECTED' && (
+                                        <tr>
+                                            <td><b>Lý Do:</b></td>
+                                            <td style={{ color: '#e53935', fontWeight: 600 }}>{selectedTicket.rejectedReason || selectedTicket.rejected_reason || 'Không có lý do'}</td>
+                                        </tr>
+                                    )}
                                     {selectedTicket.staffId && <tr><td><b>Nhân viên xử lý:</b></td><td>{getStaffName(selectedTicket.staffId)}</td></tr>}
                                     {selectedTicket.method === 'SELF_TEST' && (
                                         <>

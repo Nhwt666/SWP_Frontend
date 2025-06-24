@@ -545,20 +545,23 @@ const AdminTicketsPage = () => {
                 {/* Reject Ticket Modal */}
                 {isRejectModalOpen && (
                     <div className="modal-overlay" onClick={() => setIsRejectModalOpen(false)}>
-                        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 500}}>
-                            <h2>Lý do từ chối Ticket #{rejectingTicket?.id}</h2>
+                        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 440, borderRadius: 16, padding: 32, boxShadow: '0 4px 32px rgba(239,68,68,0.13)'}}>
+                            <div style={{display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10}}>
+                                <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#fee2e2"/><path d="M16 10v7" stroke="#ef4444" strokeWidth="2.2" strokeLinecap="round"/><circle cx="16" cy="22" r="1.4" fill="#ef4444"/></svg>
+                                <h2 style={{color: '#ef4444', fontWeight: 800, fontSize: 20, margin: 0}}>Lý do từ chối Yêu Cầu #{rejectingTicket?.id}</h2>
+                            </div>
                             <textarea
                                 value={rejectReason}
                                 onChange={e => setRejectReason(e.target.value)}
                                 placeholder="Nhập lý do từ chối..."
                                 rows={4}
-                                style={{ width: '100%', borderRadius: 8, border: '1px solid #ced4da', padding: '0.6rem 0.8rem', marginTop: 12 }}
+                                style={{ width: '100%', borderRadius: 10, border: '1.5px solid #3b82f6', padding: '0.7rem 1rem', marginTop: 12, fontSize: 16, fontFamily: 'inherit', outline: 'none', boxSizing: 'border-box', resize: 'vertical', minHeight: 80 }}
                             />
-                            <div style={{ marginTop: 20, display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
-                                <button className="btn-cancel" onClick={() => setIsRejectModalOpen(false)}>Hủy</button>
+                            <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+                                <button className="btn-cancel" style={{background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(30,58,138,0.06)', transition: 'background 0.2s'}} onClick={() => setIsRejectModalOpen(false)}>Hủy</button>
                                 <button
                                     className="reject-btn"
-                                    style={{ minWidth: 120 }}
+                                    style={{ minWidth: 120, background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer', boxShadow: '0 2px 8px rgba(239,68,68,0.10)', transition: 'background 0.2s'}}
                                     onClick={async () => {
                                         if (!rejectReason.trim()) {
                                             alert('Vui lòng nhập lý do từ chối.');
@@ -572,7 +575,10 @@ const AdminTicketsPage = () => {
                                                     'Content-Type': 'application/json',
                                                     'Authorization': `Bearer ${token}`
                                                 },
-                                                body: JSON.stringify({ rejectedReason: rejectReason })
+                                                body: JSON.stringify({
+                                                    rejectedReason: rejectReason,
+                                                    status: 'REJECTED'
+                                                })
                                             });
                                             if (!res.ok) {
                                                 const err = await res.text();
