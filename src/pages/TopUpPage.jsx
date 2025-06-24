@@ -54,6 +54,7 @@ const TopUpPage = () => {
                 });
                 if (res.ok) {
                     link = await res.text();
+                    localStorage.setItem('momoAmount', value);
                     window.location.href = link + (link.includes('?') ? '&' : '?') + 'returnUrl=' + encodeURIComponent(window.location.origin + '/paypal-success');
                 } else {
                     const errText = await res.text();
@@ -70,6 +71,7 @@ const TopUpPage = () => {
                     const data = await res.json();
                     if (data && data.payUrl && data.orderId) {
                         localStorage.setItem('momoOrderId', data.orderId);
+                        localStorage.setItem('momoAmount', value);
                         window.open(data.payUrl, '_blank');
                         navigate('/payment-success?method=momo');
                     } else {

@@ -15,6 +15,7 @@ const PaymentSuccess = () => {
     const [manualCheckMsg, setManualCheckMsg] = useState('');
     const query = useQuery();
     const method = query.get('method'); // 'paypal' hoặc 'momo'
+    const [amount, setAmount] = useState(null);
 
     // Tự động chuyển về /topup sau khi thanh toán paypal thành công
     useEffect(() => {
@@ -105,36 +106,98 @@ const PaymentSuccess = () => {
         }
     }, [method, status, updateFullName, updateWallet]);
 
+    useEffect(() => {
+        // Lấy số tiền nạp từ localStorage hoặc query param (nếu có)
+        const storedAmount = localStorage.getItem('momoAmount');
+        const queryAmount = query.get('amount');
+        if (queryAmount) setAmount(Number(queryAmount));
+        else if (storedAmount) setAmount(Number(storedAmount));
+    }, [query]);
+
     return (
         <div style={{ textAlign: 'center', marginTop: '100px' }}>
             {method === 'paypal' && (
                 <div style={{
-                    display: 'inline-block',
-                    padding: '10px 20px',
-                    backgroundColor: '#d4edda',
-                    color: '#155724',
-                    border: '1px solid #c3e6cb',
-                    borderRadius: '5px',
-                    minWidth: 300
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#fff',
+                    borderRadius: 18,
+                    boxShadow: '0 4px 24px 0 rgba(76, 175, 80, 0.13)',
+                    padding: '38px 32px 32px 32px',
+                    minWidth: 340,
+                    maxWidth: 420,
+                    margin: '60px auto 0 auto',
+                    border: '2px solid #43d477',
                 }}>
-                    ✅ Thanh toán PayPal thành công! Số dư ví của bạn đã được cộng.
+                    <div style={{
+                        width: 54,
+                        height: 54,
+                        background: '#e8f5e9',
+                        borderRadius: '16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: 18,
+                        fontSize: 32,
+                        color: '#43d477',
+                        border: '2px solid #43d477'
+                    }}>
+                        <span style={{fontWeight:700}}>&#8358;</span>
+                    </div>
+                    <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#219653', marginBottom: 8 }}>Xác nhận nạp tiền PayPal thành công!</div>
+                    {amount && <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#1976d2', marginBottom: 8 }}>{amount.toLocaleString('vi-VN')}<span style={{fontSize:'1.1rem', fontWeight:600}}>$</span></div>}
+                    <div style={{ color: '#219653', fontWeight: 500, marginBottom: 6 }}>Số tiền đã được cộng vào ví của bạn.</div>
+                    <div style={{ color: '#888', fontSize: 15, marginTop: 8 }}>
+                        {amount ? (
+                            <span style={{color:'#1976d2', fontWeight:700, fontSize:'1.15rem'}}>Bạn vừa nạp thành công: {amount.toLocaleString('vi-VN')}$</span>
+                        ) : 'Đang chuyển hướng...'}
+                    </div>
                 </div>
             )}
             {method === 'momo' && (
                 <>
                     {status === 'SUCCESS' ? (
                         <div style={{
-                            display: 'inline-block',
-                            padding: '10px 20px',
-                            backgroundColor: '#d4edda',
-                            color: '#155724',
-                            border: '1px solid #c3e6cb',
-                            borderRadius: '5px',
-                            minWidth: 300
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: '#fff',
+                            borderRadius: 18,
+                            boxShadow: '0 4px 24px 0 rgba(76, 175, 80, 0.13)',
+                            padding: '38px 32px 32px 32px',
+                            minWidth: 340,
+                            maxWidth: 420,
+                            margin: '60px auto 0 auto',
+                            border: '2px solid #43d477',
                         }}>
-                            ✅ Nạp tiền thành công! Đang chuyển hướng...
-                </div>
-            ) : (
+                            <div style={{
+                                width: 54,
+                                height: 54,
+                                background: '#e8f5e9',
+                                borderRadius: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: 18,
+                                fontSize: 32,
+                                color: '#43d477',
+                                border: '2px solid #43d477'
+                            }}>
+                                <span style={{fontWeight:700}}>&#8358;</span>
+                            </div>
+                            <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#219653', marginBottom: 8 }}>Xác nhận nạp tiền MoMo thành công!</div>
+                            {amount && <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#e53e9f', marginBottom: 8 }}>{amount.toLocaleString('vi-VN')}<span style={{fontSize:'1.1rem', fontWeight:600}}>đ</span></div>}
+                            <div style={{ color: '#219653', fontWeight: 500, marginBottom: 6 }}>Số tiền đã được cộng vào ví của bạn.</div>
+                            <div style={{ color: '#888', fontSize: 15, marginTop: 8 }}>
+                                {amount ? (
+                                    <span style={{color:'#e53e9f', fontWeight:700, fontSize:'1.15rem'}}>Bạn vừa nạp thành công: {amount.toLocaleString('vi-VN')}đ</span>
+                                ) : 'Đang chuyển hướng...'}
+                            </div>
+                        </div>
+                    ) : (
                         <div style={{ marginTop: 24, color: '#1976d2', fontWeight: 500 }}>
                             <p>🔄 Sau khi thanh toán trên app MoMo, vui lòng bấm nút bên dưới để xác nhận.</p>
                             <p>Bạn có thể đóng tab QR MoMo sau khi đã thanh toán xong.</p>
