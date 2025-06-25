@@ -8,6 +8,7 @@ import BlogPostPage from './pages/BlogPostPage';
 import GuidePage from './pages/GuidePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
+import AdminBlogPage from './pages/AdminBlogPage';
 import ConfirmRegisterPage from './pages/ConfirmRegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import UpdateProfilePage from './pages/UpdateProfilePage';
@@ -50,6 +51,7 @@ function App() {
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/users" element={<AdminUsersPage />} />
+                <Route path="/admin/blog" element={<AdminBlogPage />} />
                 <Route path="/admin/tickets" element={<AdminTicketsPage />} />
 
                 {/* Staff Routes */}

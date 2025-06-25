@@ -133,6 +133,19 @@ const TicketPage = () => {
             return;
         }
 
+        if (method === 'Tại cơ sở y tế' && appointmentDate) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const appointmentDateObj = new Date(appointmentDate);
+            
+            if (appointmentDateObj < today) {
+                setErrorMsg('❌ Ngày hẹn không được nhỏ hơn ngày hiện tại! Vui lòng chọn ngày hẹn từ hôm nay trở đi.');
+                setShowErrorModal(true);
+                setLoading(false);
+                return;
+            }
+        }
+
         if (wallet < price) {
             setErrorMsg('❌ Số dư ví không đủ để thanh toán!');
             setShowErrorModal(true);
@@ -345,9 +358,13 @@ const TicketPage = () => {
                                     type="date"
                                     value={appointmentDate}
                                     onChange={(e) => setAppointmentDate(e.target.value)}
+                                    min={new Date().toISOString().split('T')[0]}
                                     required
                                     className="date-picker"
                                 />
+                                <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                    ⚠️ Ngày hẹn phải từ hôm nay trở đi
+                                </small>
                             </div>
                         )}
 

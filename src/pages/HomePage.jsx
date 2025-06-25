@@ -1,61 +1,54 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import '../styles/HomePage.css';
 
-const images = ['/img1.jpg', '/img2.jpg', '/img3.jpg'];
+const images = ['/18009999.png'];
 
 const HomePage = () => {
-    const [currentImage, setCurrentImage] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentImage((prev) => (prev + 1) % images.length);
-        }, 4000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const goNext = () => setCurrentImage((prev) => (prev + 1) % images.length);
-    const goPrev = () => setCurrentImage((prev) => (prev - 1 + images.length) % images.length);
-
     return (
         <>
             <Header />
-            <main className="homepage-root">
+            <main className="homepage-root" style={{padding: 0, margin: 0, background: 'none'}}>
+                <div className="slideshow fade-style" aria-label="Image Slideshow">
+                    <img
+                        src={images[0]}
+                        alt="Banner"
+                        className="slide active"
+                        aria-hidden={false}
+                    />
+                </div>
                 <section className="gallery">
                     <div className="container">
-                        <div className="slideshow fade-style" aria-label="Image Slideshow">
-                            {images.map((img, index) => (
-                                <img
-                                    key={index}
-                                    src={img}
-                                    alt={`Slide ${index + 1}`}
-                                    className={`slide ${index === currentImage ? 'active' : ''}`}
-                                    aria-hidden={index !== currentImage}
-                                />
-                            ))}
-                            <button className="nav-btn left" onClick={goPrev} aria-label="Previous Slide">❮</button>
-                            <button className="nav-btn right" onClick={goNext} aria-label="Next Slide">❯</button>
-                        </div>
-
                         <h2 className="section-title">Về Chúng Tôi</h2>
-
                         <section className="about-section">
                             <div className="about-left">
-                                <img src="/nurse.png" alt="Nurse" />
+                                <img src="/nurse.png" alt="Nurse" className="about-avatar" />
                             </div>
                             <div className="about-right">
                                 <div className="about-box">
-                                    Chúng tôi là đơn vị tiên phong trong lĩnh vực xét nghiệm ADN tại Việt Nam, với đội ngũ chuyên gia giàu kinh nghiệm.
+                                    <span className="about-icon">🌟</span>
+                                    <div>
+                                        <strong>Tiên phong</strong> trong lĩnh vực xét nghiệm ADN tại Việt Nam, với đội ngũ chuyên gia giàu kinh nghiệm.
+                                    </div>
                                 </div>
                                 <div className="about-box">
-                                    Hệ thống thiết bị hiện đại đạt chuẩn quốc tế, phục vụ các nhu cầu xét nghiệm huyết thống, pháp lý, y tế và di truyền.
+                                    <span className="about-icon">🧬</span>
+                                    <div>
+                                        <strong>Thiết bị hiện đại</strong> đạt chuẩn quốc tế, phục vụ các nhu cầu xét nghiệm huyết thống, pháp lý, y tế và di truyền.
+                                    </div>
                                 </div>
                                 <div className="about-box">
-                                    Uy tín được khẳng định qua hàng chục nghìn ca xét nghiệm chính xác và bảo mật, hỗ trợ cho cá nhân và cơ quan pháp luật.
+                                    <span className="about-icon">🔒</span>
+                                    <div>
+                                        <strong>Uy tín</strong> qua hàng chục nghìn ca xét nghiệm chính xác và bảo mật, hỗ trợ cho cá nhân và cơ quan pháp luật.
+                                    </div>
                                 </div>
                                 <div className="about-box">
-                                    Sứ mệnh của chúng tôi là <strong>"Chính xác – Bảo mật – Nhanh chóng"</strong>, mang đến dịch vụ ADN đáng tin cậy nhất.
+                                    <span className="about-icon">🚀</span>
+                                    <div>
+                                        Sứ mệnh: <strong>"Chính xác – Bảo mật – Nhanh chóng"</strong>, mang đến dịch vụ ADN đáng tin cậy nhất.
+                                    </div>
                                 </div>
                             </div>
                         </section>

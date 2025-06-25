@@ -15,7 +15,7 @@ const AdminLayout = ({ children }) => {
                         <li onClick={() => navigate('/admin/dashboard')}>Bảng điều khiển</li>
                         <li onClick={() => navigate('/admin/users')}>Người dùng</li>
                         <li>Xét nghiệm ADN</li>
-                        <li>Báo cáo</li>
+                        <li onClick={() => navigate('/admin/blog')}>Quản lý blog</li>
                         <li>Cài đặt</li>
                     </ul>
                 </nav>

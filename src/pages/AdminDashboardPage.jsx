@@ -182,8 +182,8 @@ const AdminDashboardPage = () => {
                             <li onClick={() => navigate('/admin/users')} style={{ cursor: 'pointer' }}>
                                 Người dùng
                             </li>
-                            <li onClick={() => navigate('/admin/reports')} style={{ cursor: 'pointer' }}>
-                                Báo cáo
+                            <li onClick={() => navigate('/admin/blog')} style={{ cursor: 'pointer' }}>
+                                Quản lý blog
                             </li>
                             <li onClick={() => navigate('/admin/settings')} style={{ cursor: 'pointer' }}>
                                 Cài đặt

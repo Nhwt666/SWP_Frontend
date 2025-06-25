@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/BlogPostPage.css';
 import Header from '../components/Header';
+import { getBlogs, resetBlogs } from '../blogService';
 
-const blogPosts = [
+const mockBlogPosts = [
   {
     slug: '1',
     title: 'Tại sao xét nghiệm ADN lại quan trọng?',
@@ -269,8 +270,19 @@ const blogPosts = [
 const BlogPostPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
-  
-  // If no slug, show blog list
+  const [blogs, setBlogs] = useState([]);
+
+  useEffect(() => {
+    let loaded = getBlogs();
+    if (!loaded || loaded.length === 0) {
+      // Nếu localStorage rỗng, reset về mock data
+      resetBlogs(mockBlogPosts);
+      loaded = mockBlogPosts;
+    }
+    setBlogs(loaded);
+  }, []);
+
+  // Nếu không có slug, show blog list
   if (!slug) {
     return (
       <>
@@ -279,16 +291,16 @@ const BlogPostPage = () => {
           <div className="blogpost-container">
             <h1 className="blogpost-title">Tin Tức & Bài Viết</h1>
             <div className="blog-grid">
-              {blogPosts.map((post, idx) => (
-                <article className="blog-card" key={idx}>
+              {blogs.map((post, idx) => (
+                <article className="blog-card" key={post.id || idx}>
                   <div className="blog-img-wrap">
                     <img src={post.image} alt={post.title} className="blog-img" />
                   </div>
                   <div className="blog-content">
                     <h3 className="blog-card-title">{post.title}</h3>
-                    <p className="blog-desc">{post.content[0].text.substring(0, 150)}...</p>
+                    <p className="blog-desc">{(post.content && typeof post.content === 'string') ? post.content.substring(0, 150) : ''}...</p>
                     <button 
-                      onClick={() => navigate(`/blog/${post.slug}`)} 
+                      onClick={() => navigate(`/blog/${post.id || post.slug}`)} 
                       className="blog-btn"
                     >
                       Đọc tiếp
@@ -324,8 +336,8 @@ const BlogPostPage = () => {
     );
   }
 
-  // If slug exists, show specific blog post
-  const post = blogPosts.find((b) => b.slug === slug);
+  // Nếu slug tồn tại, show blog chi tiết
+  const post = blogs.find((b) => (b.id && b.id.toString() === slug) || b.slug === slug);
 
   if (!post) {
     return (
@@ -371,38 +383,12 @@ const BlogPostPage = () => {
           <h1 className="blogpost-title">{post.title}</h1>
           <div className="blogpost-meta">
             <span className="blogpost-author">{post.author}</span>
-            <span className="blogpost-date">{new Date(post.date).toLocaleDateString('vi-VN')}</span>
+            <span className="blogpost-date">{post.createdAt || (post.date ? new Date(post.date).toLocaleDateString('vi-VN') : '')}</span>
           </div>
           <div className="blogpost-content">
-            {post.content.map((block, idx) => {
-              if (block.type === 'h3') return <h3 key={idx} className="blogpost-h3">{block.text}</h3>;
-              if (block.type === 'h4') return <h4 key={idx} className="blogpost-h4">{block.text}</h4>;
-              if (block.type === 'quote') return <blockquote key={idx} className="blogpost-quote">{block.text}</blockquote>;
-              if (block.type === 'highlight') return <div key={idx} className="blogpost-highlight">{block.text}</div>;
-              if (block.type === 'ul') return <ul key={idx} className="blogpost-ul">{block.items.map((item, i) => <li key={i}>{item}</li>)}</ul>;
-              if (block.type === 'table') {
-                return (
-                  <table key={idx} className="blogpost-table">
-                    <thead>
-                      <tr>
-                        {block.headers.map((header, i) => <th key={i}>{header}</th>)}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {block.rows.map((row, i) => (
-                        <tr key={i}>
-                          {row.map((cell, j) => <td key={`${i}-${j}`}>{cell}</td>)}
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                );
-              }
-              return <p key={idx}>{block.text}</p>;
-            })}
-          </div>
-          <div className="blogpost-navigation">
-            <button onClick={() => navigate('/blog')} className="blogpost-back-btn">← Quay lại danh sách</button>
+            {(post.content && typeof post.content === 'string') ? (
+              <div style={{whiteSpace: 'pre-line'}}>{post.content}</div>
+            ) : null}
           </div>
         </div>
       </main>
