@@ -43,7 +43,8 @@ const AdminTicketsPage = () => {
         'PENDING': 'Chờ xử lý',
         'IN_PROGRESS': 'Đang xử lý',
         'COMPLETED': 'Đã hoàn thành',
-        'CANCELLED': 'Đã hủy'
+        'CANCELLED': 'Đã hủy',
+        'REJECTED': 'Đã từ chối'
     };
 
     const fetchTickets = async () => {
@@ -251,6 +252,10 @@ const AdminTicketsPage = () => {
                 return 'status-completed';
             case 'CANCELLED':
                 return 'status-cancelled';
+            case 'REJECTED':
+                return 'status-rejected';
+            case 'IN_PROGRESS':
+                return 'status-in_progress';
             default:
                 return '';
         }
@@ -340,7 +345,7 @@ const AdminTicketsPage = () => {
                     <div className="header-left-section">
                         <button className="back-btn" onClick={() => navigate(-1)}>&larr;</button>
                         <h1>
-                            {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Ticket Xét nghiệm'}
+                            {staffName ? `Tickets cho: ${staffName}` : customerName ? `Tickets của: ${customerName}` : 'Quản lý Yêu Cầu Xét nghiệm'}
                         </h1>
                     </div>
                 </header>
@@ -401,7 +406,7 @@ const AdminTicketsPage = () => {
                                         <td>{ticket.id}</td>
                                         <td>{ticket.customer?.fullName || 'Chưa Có Thông Tin'}</td>
                                         <td>{ticket.staff?.fullName || '—'}</td>
-                                        <td><span className={`status-badge status-${ticket.status?.toLowerCase()}`}>{statusDisplayMap[ticket.status] || ticket.status}</span></td>
+                                        <td><span className={`status-badge ${getStatusStyle(ticket.status)}`}>{statusDisplayMap[ticket.status] || ticket.status}</span></td>
                                         <td>{typeDisplayMap[ticket.ticketType || ticket.type] || ticket.type || '—'}</td>
                                         <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
                                         <td className="action-buttons">

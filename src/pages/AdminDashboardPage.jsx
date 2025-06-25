@@ -340,14 +340,25 @@ const AdminDashboardPage = () => {
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {stats.baiGuiGanDay.map((item) => (
+                                        {stats.baiGuiGanDay
+                                          .filter(item => {
+                                            // Lọc trạng thái hoàn thành
+                                            if (item.trangThai !== 'COMPLETED') return false;
+                                            // Lọc ngày hoàn thành là hôm nay
+                                            const today = new Date();
+                                            const itemDate = new Date(item.ngay);
+                                            return itemDate.getFullYear() === today.getFullYear() &&
+                                                   itemDate.getMonth() === today.getMonth() &&
+                                                   itemDate.getDate() === today.getDate();
+                                          })
+                                          .map((item) => (
                                             <tr key={item.id}>
-                                                <td>{item.id}</td>
-                                                <td>{item.khachHang}</td>
-                                                <td>{item.ngay}</td>
-                                                <td>{item.trangThai}</td>
+                                              <td>{item.id}</td>
+                                              <td>{item.khachHang}</td>
+                                              <td>{item.ngay}</td>
+                                              <td>{item.trangThai}</td>
                                             </tr>
-                                        ))}
+                                          ))}
                                         </tbody>
                                     </table>
                                 )}
