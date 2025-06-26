@@ -186,7 +186,7 @@ tbody tr:hover {
 
 .status-in_progress, .status-inprogress, .status-in-progress {
     background: #e0f2fe;
-    color: #1976d2;
+    color: #ffc107 !important;
     font-weight: 700;
     border-radius: 14px;
     padding: 4px 14px;

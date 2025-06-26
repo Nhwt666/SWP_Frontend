@@ -154,6 +154,7 @@ textarea {
 
 .status-in_progress {
     background: #1976d2;
+    color: #ffc107 !important;
 }
 
 .status-completed {
@@ -656,6 +657,7 @@ textarea {
 
 .ticket-status-badge-list.status-in_progress {
     background: #1976d2;
+    color: #ffc107 !important;
 }
 
 .ticket-status-badge-list.status-completed {

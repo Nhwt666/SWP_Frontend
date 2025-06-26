@@ -116,7 +116,7 @@ const TicketPage = () => {
     };
     const handleCancel = () => {
         setShowConfirmModal(false);
-        if (confirmResolve) confirmResolve(false);
+        if (confirmResolve) confirmResolve('cancel');
     };
 
     const payFunction = async (amount) => {
@@ -183,8 +183,12 @@ const TicketPage = () => {
 
         try {
             const paymentSuccess = await payFunction(price);
+            if (paymentSuccess === 'cancel') {
+                setLoading(false);
+                return;
+            }
             if (!paymentSuccess) {
-                alert('❌ Thanh toán thất bại hoặc bị huỷ. Không tạo ticket.');
+                alert('❌ Thanh toán thất bại. Không tạo ticket.');
                 setLoading(false);
                 return;
             }

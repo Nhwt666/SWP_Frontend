@@ -36,7 +36,7 @@ const UserCreateModal = ({ onClose, onSave, error }) => {
                 {error && <p className="error-message">{error}</p>}
                 <form onSubmit={handleSubmit} className="user-form user-form-modern">
                     <div className="form-group">
-                        <label htmlFor="fullName" className="user-form-label">Tài Khoản</label>
+                        <label htmlFor="fullName" className="user-form-label">Họ Tên</label>
                         <input
                             type="text"
                             id="fullName"
