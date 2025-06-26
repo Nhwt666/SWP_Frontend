@@ -25,6 +25,7 @@ const AdminDashboardPage = () => {
     const [depositError, setDepositError] = useState('');
     const [ticketStats, setTicketStats] = useState([]);
     const [ticketStatusStats, setTicketStatusStats] = useState([]);
+    const [recentCompletedTickets, setRecentCompletedTickets] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -159,10 +160,28 @@ const AdminDashboardPage = () => {
             }
         };
 
+        // Fetch recent completed tickets for 7 days
+        const fetchRecentCompletedTickets = async () => {
+            try {
+                const res = await fetch('/admin/recent-completed-tickets', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    setRecentCompletedTickets(data);
+                } else {
+                    setRecentCompletedTickets([]);
+                }
+            } catch (err) {
+                setRecentCompletedTickets([]);
+            }
+        };
+
         fetchDashboardData();
         fetchDepositStats();
         fetchTicketStats();
         fetchTicketStatusStats();
+        fetchRecentCompletedTickets();
     }, []);
 
     return (
@@ -327,7 +346,7 @@ const AdminDashboardPage = () => {
 
                             <div className="recent-submissions">
                                 <h3>Xét nghiệm ADN gần đây</h3>
-                                {stats.baiGuiGanDay.length === 0 ? (
+                                {recentCompletedTickets.length === 0 ? (
                                     <p>Không có dữ liệu.</p>
                                 ) : (
                                     <table>
@@ -335,30 +354,19 @@ const AdminDashboardPage = () => {
                                         <tr>
                                             <th>Mã đơn</th>
                                             <th>Khách hàng</th>
-                                            <th>Ngày</th>
+                                            <th>Ngày hoàn thành</th>
                                             <th>Trạng thái</th>
                                         </tr>
                                         </thead>
                                         <tbody>
-                                        {stats.baiGuiGanDay
-                                          .filter(item => {
-                                            // Lọc trạng thái hoàn thành
-                                            if (item.trangThai !== 'COMPLETED') return false;
-                                            // Lọc ngày hoàn thành là hôm nay
-                                            const today = new Date();
-                                            const itemDate = new Date(item.ngay);
-                                            return itemDate.getFullYear() === today.getFullYear() &&
-                                                   itemDate.getMonth() === today.getMonth() &&
-                                                   itemDate.getDate() === today.getDate();
-                                          })
-                                          .map((item) => (
+                                        {recentCompletedTickets.map(item => (
                                             <tr key={item.id}>
-                                              <td>{item.id}</td>
-                                              <td>{item.khachHang}</td>
-                                              <td>{item.ngay}</td>
-                                              <td>{item.trangThai}</td>
+                                                <td>{item.id}</td>
+                                                <td>{item.customerName}</td>
+                                                <td>{item.completedAt ? new Date(item.completedAt).toLocaleString('vi-VN') : ''}</td>
+                                                <td>{item.status}</td>
                                             </tr>
-                                          ))}
+                                        ))}
                                         </tbody>
                                     </table>
                                 )}

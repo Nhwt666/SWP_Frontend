@@ -110,6 +110,11 @@ const Header = () => {
                                                 <button onClick={() => navigate('/admin/dashboard')}>Bảng điều khiển</button>
                                                 <button onClick={handleLogout}>Đăng xuất</button>
                                             </>
+                                        ) : role === 'STAFF' ? (
+                                            <>
+                                                <button onClick={() => navigate('/staff/dashboard')}>Trang chính</button>
+                                                <button onClick={handleLogout}>Đăng xuất</button>
+                                            </>
                                         ) : (
                                             <>
                                                 <button onClick={() => navigate('/profile')}>Thông tin của tôi</button>
