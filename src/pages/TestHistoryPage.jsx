@@ -42,6 +42,12 @@ const TestHistoryPage = () => {
     const [selectedTicket, setSelectedTicket] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [staffList, setStaffList] = useState([]);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [feedbackRating, setFeedbackRating] = useState(5);
+    const [feedbackComment, setFeedbackComment] = useState('');
+    const [feedbackLoading, setFeedbackLoading] = useState(false);
+    const [feedbackError, setFeedbackError] = useState('');
+    const [feedbackSuccess, setFeedbackSuccess] = useState('');
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -394,6 +400,65 @@ const TestHistoryPage = () => {
         }
     };
 
+    // Helper to check if feedback exists (assume feedback property or null)
+    const hasFeedback = (ticket) => {
+        // Adjust this if your ticket object has a different way to check feedback
+        return ticket.feedback != null;
+    };
+
+    // Open feedback modal
+    const openFeedbackModal = () => {
+        setFeedbackRating(5);
+        setFeedbackComment('');
+        setFeedbackError('');
+        setFeedbackSuccess('');
+        setShowFeedbackModal(true);
+    };
+    // Close feedback modal
+    const closeFeedbackModal = () => {
+        setShowFeedbackModal(false);
+    };
+    // Submit feedback
+    const handleSubmitFeedback = async () => {
+        if (!feedbackRating || feedbackRating < 1 || feedbackRating > 5) {
+            setFeedbackError('Vui lòng chọn số sao từ 1 đến 5.');
+            return;
+        }
+        setFeedbackLoading(true);
+        setFeedbackError('');
+        setFeedbackSuccess('');
+        try {
+            const res = await fetch(`/customer/tickets/${selectedTicket.id}/feedback`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify({ rating: feedbackRating, feedback: feedbackComment })
+            });
+            if (!res.ok) {
+                let data;
+                try {
+                    data = await res.json();
+                } catch {
+                    data = await res.text();
+                }
+                setFeedbackError((data && data.message) || data || 'Gửi phản hồi thất bại.');
+            } else {
+                setFeedbackSuccess('Gửi phản hồi thành công!');
+                // Optionally update ticket in history to reflect feedback
+                setHistory(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, feedback: { rating: feedbackRating, feedback: feedbackComment } } : t));
+                setTimeout(() => {
+                    setShowFeedbackModal(false);
+                }, 1200);
+            }
+        } catch (err) {
+            setFeedbackError('Lỗi khi gửi phản hồi.');
+        } finally {
+            setFeedbackLoading(false);
+        }
+    };
+
     return (
         <>
             <Header />
@@ -504,6 +569,27 @@ const TestHistoryPage = () => {
                                         📄 Tải PDF
                                     </button>
                                 )}
+                                {/* Feedback button: only show if COMPLETED, no feedback yet */}
+                                {selectedTicket.status === 'COMPLETED' && !hasFeedback(selectedTicket) && (
+                                    <button
+                                        onClick={openFeedbackModal}
+                                        style={{
+                                            padding: '10px 20px',
+                                            background: '#ff9800',
+                                            color: '#fff',
+                                            border: 'none',
+                                            borderRadius: 6,
+                                            cursor: 'pointer',
+                                            marginRight: 10,
+                                            fontWeight: 600,
+                                            transition: 'background 0.2s'
+                                        }}
+                                        onMouseOver={e => e.currentTarget.style.background = '#f57c00'}
+                                        onMouseOut={e => e.currentTarget.style.background = '#ff9800'}
+                                    >
+                                        Gửi phản hồi
+                                    </button>
+                                )}
                                 <button 
                                     onClick={closeModal} 
                                     style={{ 
@@ -526,7 +612,53 @@ const TestHistoryPage = () => {
                     </div>
                 )}
 
-                
+                {/* Feedback Modal */}
+                {showFeedbackModal && selectedTicket && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                        background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                    }}>
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 28, minWidth: 320, maxWidth: 400, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+                            <h3>Gửi phản hồi</h3>
+                            <div style={{ marginBottom: 16 }}>
+                                <label>Đánh giá:&nbsp;</label>
+                                <select value={feedbackRating} onChange={e => setFeedbackRating(Number(e.target.value))} style={{ fontSize: 16, padding: 4 }}>
+                                    {[5,4,3,2,1].map(star => (
+                                        <option key={star} value={star}>{'★'.repeat(star)}{'☆'.repeat(5-star)}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div style={{ marginBottom: 16 }}>
+                                <label>Nhận xét:</label>
+                                <textarea
+                                    value={feedbackComment}
+                                    onChange={e => setFeedbackComment(e.target.value)}
+                                    rows={4}
+                                    style={{ width: '100%', fontSize: 15, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
+                                    placeholder="Nhập nhận xét của bạn (không bắt buộc)"
+                                />
+                            </div>
+                            {feedbackError && <div style={{ color: 'red', marginBottom: 8 }}>{feedbackError}</div>}
+                            {feedbackSuccess && <div style={{ color: 'green', marginBottom: 8 }}>{feedbackSuccess}</div>}
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                                <button
+                                    onClick={closeFeedbackModal}
+                                    style={{ padding: '8px 18px', background: '#888', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer' }}
+                                    disabled={feedbackLoading}
+                                >
+                                    Hủy
+                                </button>
+                                <button
+                                    onClick={handleSubmitFeedback}
+                                    style={{ padding: '8px 18px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}
+                                    disabled={feedbackLoading}
+                                >
+                                    {feedbackLoading ? 'Đang gửi...' : 'Gửi'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
             <footer className="member-footer">
                     <div className="member-footer-content">
