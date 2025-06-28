@@ -9,6 +9,7 @@ import GuidePage from './pages/GuidePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import AdminBlogPage from './pages/AdminBlogPage';
+import AdminReportsPage from './pages/AdminReportsPage';
 import ConfirmRegisterPage from './pages/ConfirmRegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import UpdateProfilePage from './pages/UpdateProfilePage';
@@ -53,6 +54,8 @@ function App() {
                 <Route path="/admin/users" element={<AdminUsersPage />} />
                 <Route path="/admin/blog" element={<AdminBlogPage />} />
                 <Route path="/admin/tickets" element={<AdminTicketsPage />} />
+                <Route path="/admin/reports" element={<AdminReportsPage />} />
+                <Route path="/admin/settings" element={<AdminDashboardPage />} />
 
                 {/* Staff Routes */}
                 <Route path="/staff/dashboard" element={<StaffDashboardPage />} />

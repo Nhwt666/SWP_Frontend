@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/AdminDashboardPage.css';
 import Header from '../components/Header';
+import AdminLayout from '../components/AdminLayout';
 import { Bar, Pie } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -187,194 +188,186 @@ const AdminDashboardPage = () => {
     return (
         <>
             <Header />
-            <div className="admin-dashboard-container">
-                <aside className="sidebar">
-                    <nav>
-                        <ul>
-                            <li>ADN ADMIN</li>
-                            <li onClick={() => navigate('/admin/dashboard')} style={{ cursor: 'pointer' }}>
-                                Bảng điều khiển
-                            </li>
-                            <li onClick={() => navigate('/admin/tickets')} style={{ cursor: 'pointer' }}>
-                                Xét nghiệm ADN
-                            </li>
-                            <li onClick={() => navigate('/admin/users')} style={{ cursor: 'pointer' }}>
-                                Người dùng
-                            </li>
-                            <li onClick={() => navigate('/admin/blog')} style={{ cursor: 'pointer' }}>
-                                Quản lý blog
-                            </li>
-                            <li onClick={() => navigate('/admin/settings')} style={{ cursor: 'pointer' }}>
-                                Cài đặt
-                            </li>
-                        </ul>
-                    </nav>
-                </aside>
+            <AdminLayout>
+                <div className="dashboard-content">
+                    <div className="dashboard-main-box">
+                        <header className="dashboard-header">
+                            <h2>Bảng điều khiển quản trị</h2>
+                            <div className="admin-badge">Quản trị viên</div>
+                        </header>
 
-                <main className="dashboard-content">
-                    <header className="dashboard-header">
-                        <h2>Bảng điều khiển quản trị</h2>
-                        <div className="admin-badge">Quản trị viên</div>
-                    </header>
+                        {error && <p className="error-message">{error}</p>}
+                        {!error && !stats && <p>⏳ Đang tải dữ liệu...</p>}
 
-                    {error && <p className="error-message">{error}</p>}
-                    {!error && !stats && <p>⏳ Đang tải dữ liệu...</p>}
-
-                    {stats && (
-                        <>
-                            <div className="stats-cards">
-                                <div className="card">
-                                    <h3>Tổng số xét nghiệm ADN</h3>
-                                    <p>{stats.tongXetNghiem.toLocaleString()}</p>
-                                    <button onClick={() => navigate('/admin/tickets')}>Xem chi tiết</button>
-                                </div>
-                                <div className="card">
-                                    <h3>Số người dùng đăng ký</h3>
-                                    <p>{customerCount.toLocaleString()}</p>
-                                    <button onClick={() => navigate('/admin/users')}>Xem chi tiết</button>
-                                </div>
-                                <div className="card">
-                                    <h3>Xét nghiệm chờ duyệt</h3>
-                                    <p>{pendingTicketCount.toLocaleString()}</p>
-                                    <button onClick={() => navigate('/admin/tickets')}>Xem chi tiết</button>
-                                </div>
-                                {(depositStats || (stats && stats.totalTicketSpending !== undefined)) && (
-                                    <div className="card" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                                        <div style={{fontWeight: 700, fontSize: '1.25rem', color: '#009688', marginBottom: 8, textAlign: 'center'}}>Tổng tiền đã nạp</div>
-                                        <div style={{fontSize: '2.2rem', fontWeight: 800, color: '#673ab7', textAlign: 'center', marginBottom: 10}}>
-                                            {depositStats ? Number(depositStats.totalDeposits).toLocaleString('vi-VN') : 0}đ
+                        {stats && (
+                            <>
+                                <div className="dashboard-row">
+                                    <div className="stats-cards">
+                                        <div className="card card-blue">
+                                            <span className="card-icon">
+                                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#e3f0ff"/><path d="M10 10c4 4 8 8 12 12" stroke="#1976d2" strokeWidth="2"/><path d="M22 10c-4 4-8 8-12 12" stroke="#1976d2" strokeWidth="2"/></svg>
+                                            </span>
+                                            <h3>Tổng số xét nghiệm ADN</h3>
+                                            <p>{stats.tongXetNghiem.toLocaleString()}</p>
+                                            <button onClick={() => navigate('/admin/tickets')}>Xem chi tiết</button>
                                         </div>
-                                        <div style={{fontWeight: 700, fontSize: '1.1rem', color: '#1976d2', marginTop: 4, textAlign: 'center'}}>Tổng tiền xét nghiệm</div>
-                                        <div style={{fontSize: '1.7rem', fontWeight: 800, color: '#1976d2', textAlign: 'center'}}>
-                                            {stats && stats.totalTicketSpending !== undefined ? Number(stats.totalTicketSpending).toLocaleString('vi-VN') : 0}đ
+                                        <div className="card card-green">
+                                            <span className="card-icon">
+                                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#e0f7fa"/><path d="M16 18c-3 0-6 1.5-6 3v1h12v-1c0-1.5-3-3-6-3z" fill="#17a2b8"/><circle cx="16" cy="13" r="3" fill="#17a2b8"/></svg>
+                                            </span>
+                                            <h3>Số người dùng đăng ký</h3>
+                                            <p>{customerCount.toLocaleString()}</p>
+                                            <button onClick={() => navigate('/admin/users')}>Xem chi tiết</button>
+                                        </div>
+                                        <div className="card card-orange">
+                                            <span className="card-icon">
+                                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#fff3e0"/><path d="M16 10v6l4 2" stroke="#ff9800" strokeWidth="2" strokeLinecap="round"/></svg>
+                                            </span>
+                                            <h3>Xét nghiệm chờ duyệt</h3>
+                                            <p>{pendingTicketCount.toLocaleString()}</p>
+                                            <button onClick={() => navigate('/admin/tickets')}>Xem chi tiết</button>
+                                        </div>
+                                        <div className="card card-purple">
+                                            <span className="card-icon">
+                                                <svg width="32" height="32" fill="none" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#ede7f6"/><path d="M10 20c2-2 10-2 12 0" stroke="#7b47d8" strokeWidth="2"/><circle cx="16" cy="16" r="3" fill="#7b47d8"/></svg>
+                                            </span>
+                                            <h3>Tổng tiền đã nạp</h3>
+                                            <p>{depositStats ? Number(depositStats.totalDeposits).toLocaleString('vi-VN') : 0}đ</p>
+                                            <div style={{color:'#1976d2', fontWeight:600, fontSize:'1.1rem'}}>Tổng tiền xét nghiệm<br/>{stats && stats.totalTicketSpending !== undefined ? Number(stats.totalTicketSpending).toLocaleString('vi-VN') : 0}đ</div>
                                         </div>
                                     </div>
-                                )}
-                            </div>
-
-                            {depositError && <p className="error-message" style={{textAlign: 'center', width: '100%'}}>{depositError}</p>}
-
-                            <div className="charts">
-                                <div className="chart-box" style={{background: '#f3e8ff', minWidth: 340, minHeight: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-                                    <div style={{fontWeight: 700, color: '#6c47d8', marginBottom: 12, fontSize: '1.08rem'}}> Số lượng ticket tạo 5 ngày gần nhất</div>
-                                    {ticketStats.length > 0 ? (
-                                        <Bar
-                                            data={{
-                                                labels: ticketStats.map(item => item.date.slice(5)),
-                                                datasets: [
-                                                    {
-                                                        label: 'Số ticket',
-                                                        data: ticketStats.map(item => item.count),
-                                                        backgroundColor: '#6c47d8',
-                                                        borderRadius: 8,
-                                                    }
-                                                ]
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                plugins: {
-                                                    legend: { display: false },
-                                                    title: { display: false }
-                                                },
-                                                scales: {
-                                                    x: {
-                                                        grid: { display: false },
-                                                        title: { display: true, text: 'Ngày', color: '#6c47d8', font: { weight: 700 } }
-                                                    },
-                                                    y: {
-                                                        beginAtZero: true,
-                                                        grid: { color: '#e0e0e0' },
-                                                        title: { display: true, text: 'Số ticket', color: '#6c47d8', font: { weight: 700 } }
-                                                    }
-                                                }
-                                            }}
-                                            height={260}
-                                            width={340}
-                                            style={{maxHeight: 260, maxWidth: 340}}
-                                        />
-                                    ) : (
-                                        <div style={{color: '#aaa'}}>Không có dữ liệu.</div>
-                                    )}
                                 </div>
-                                <div className="chart-box" style={{background: '#f3e8ff'}}>
-                                    <div style={{fontWeight: 700, color: '#6c47d8', marginBottom: 12, fontSize: '1.08rem'}}>🟣 Tỉ lệ trạng thái ticket</div>
-                                    {ticketStatusStats.length > 0 ? (
-                                        <Pie
-                                            data={{
-                                                labels: ticketStatusStats.map(item => {
-                                                    switch(item.status) {
-                                                        case 'PENDING': return 'Chờ xử lý';
-                                                        case 'IN_PROGRESS': return 'Đang xử lý';
-                                                        case 'COMPLETED': return 'Hoàn thành';
-                                                        case 'REJECTED': return 'Từ chối';
-                                                        default: return item.status;
-                                                    }
-                                                }),
-                                                datasets: [
-                                                    {
-                                                        data: ticketStatusStats.map(item => item.count),
-                                                        backgroundColor: [
-                                                            '#fbc02d', // PENDING
-                                                            '#1976d2', // IN_PROGRESS
-                                                            '#43a047', // COMPLETED
-                                                            '#e53935'  // REJECTED
-                                                        ],
-                                                        borderWidth: 2,
-                                                        borderColor: '#fff',
-                                                    }
-                                                ]
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                plugins: {
-                                                    legend: {
-                                                        display: true,
-                                                        position: 'bottom',
-                                                        labels: { color: '#6c47d8', font: { weight: 700 } }
-                                                    },
-                                                    title: { display: false }
-                                                }
-                                            }}
-                                            height={120}
-                                        />
-                                    ) : (
-                                        <div style={{color: '#aaa'}}>Không có dữ liệu.</div>
-                                    )}
-                                </div>
-                            </div>
 
-                            <div className="recent-submissions">
-                                <h3>Xét nghiệm ADN gần đây</h3>
-                                {recentCompletedTickets.length === 0 ? (
-                                    <p>Không có dữ liệu.</p>
-                                ) : (
-                                    <table>
-                                        <thead>
-                                        <tr>
-                                            <th>Mã đơn</th>
-                                            <th>Khách hàng</th>
-                                            <th>Ngày hoàn thành</th>
-                                            <th>Trạng thái</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {recentCompletedTickets.map(item => (
-                                            <tr key={item.id}>
-                                                <td>{item.id}</td>
-                                                <td>{item.customerName}</td>
-                                                <td>{item.completedAt ? new Date(item.completedAt).toLocaleString('vi-VN') : ''}</td>
-                                                <td>{item.status}</td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </table>
-                                )}
-                            </div>
-                        </>
-                    )}
-                </main>
-            </div>
+                                <div className="dashboard-row">
+                                    {depositError && <p className="error-message" style={{textAlign: 'center', width: '100%'}}>{depositError}</p>}
+                                </div>
+
+                                <div className="dashboard-row">
+                                    <div className="charts">
+                                        <div className="chart-box" style={{background: '#f3e8ff', minWidth: 340, minHeight: 320, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
+                                            <div style={{fontWeight: 700, color: '#6c47d8', marginBottom: 12, fontSize: '1.08rem'}}> Số lượng ticket tạo 5 ngày gần nhất</div>
+                                            {ticketStats.length > 0 ? (
+                                                <Bar
+                                                    data={{
+                                                        labels: ticketStats.map(item => item.date.slice(5)),
+                                                        datasets: [
+                                                            {
+                                                                label: 'Số ticket',
+                                                                data: ticketStats.map(item => item.count),
+                                                                backgroundColor: '#6c47d8',
+                                                                borderRadius: 8,
+                                                            }
+                                                        ]
+                                                    }}
+                                                    options={{
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        plugins: {
+                                                            legend: { display: false },
+                                                            title: { display: false }
+                                                        },
+                                                        scales: {
+                                                            x: {
+                                                                grid: { display: false },
+                                                                title: { display: true, text: 'Ngày', color: '#6c47d8', font: { weight: 700 } }
+                                                            },
+                                                            y: {
+                                                                beginAtZero: true,
+                                                                grid: { color: '#e0e0e0' },
+                                                                title: { display: true, text: 'Số ticket', color: '#6c47d8', font: { weight: 700 } }
+                                                            }
+                                                        }
+                                                    }}
+                                                    height={260}
+                                                    width={340}
+                                                    style={{maxHeight: 260, maxWidth: 340}}
+                                                />
+                                            ) : (
+                                                <div style={{color: '#aaa'}}>Không có dữ liệu.</div>
+                                            )}
+                                        </div>
+                                        <div className="chart-box" style={{background: '#f3e8ff'}}>
+                                            <div style={{fontWeight: 700, color: '#6c47d8', marginBottom: 12, fontSize: '1.08rem'}}>🟣 Tỉ lệ trạng thái ticket</div>
+                                            {ticketStatusStats.length > 0 ? (
+                                                <Pie
+                                                    data={{
+                                                        labels: ticketStatusStats.map(item => {
+                                                            switch(item.status) {
+                                                                case 'PENDING': return 'Chờ xử lý';
+                                                                case 'IN_PROGRESS': return 'Đang xử lý';
+                                                                case 'COMPLETED': return 'Hoàn thành';
+                                                                case 'REJECTED': return 'Từ chối';
+                                                                default: return item.status;
+                                                            }
+                                                        }),
+                                                        datasets: [
+                                                            {
+                                                                data: ticketStatusStats.map(item => item.count),
+                                                                backgroundColor: [
+                                                                    '#fbc02d', // PENDING
+                                                                    '#1976d2', // IN_PROGRESS
+                                                                    '#43a047', // COMPLETED
+                                                                    '#e53935'  // REJECTED
+                                                                ],
+                                                                borderWidth: 2,
+                                                                borderColor: '#fff',
+                                                            }
+                                                        ]
+                                                    }}
+                                                    options={{
+                                                        responsive: true,
+                                                        plugins: {
+                                                            legend: {
+                                                                display: true,
+                                                                position: 'bottom',
+                                                                labels: { color: '#6c47d8', font: { weight: 700 } }
+                                                            },
+                                                            title: { display: false }
+                                                        }
+                                                    }}
+                                                    height={120}
+                                                />
+                                            ) : (
+                                                <div style={{color: '#aaa'}}>Không có dữ liệu.</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="dashboard-row">
+                                    <div className="recent-submissions">
+                                        <h3>Xét nghiệm ADN gần đây</h3>
+                                        {recentCompletedTickets.length === 0 ? (
+                                            <p>Không có dữ liệu.</p>
+                                        ) : (
+                                            <table>
+                                                <thead>
+                                                <tr>
+                                                    <th>Mã đơn</th>
+                                                    <th>Khách hàng</th>
+                                                    <th>Ngày hoàn thành</th>
+                                                    <th>Trạng thái</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {recentCompletedTickets.map(item => (
+                                                    <tr key={item.id}>
+                                                        <td>{item.id}</td>
+                                                        <td>{item.customerName}</td>
+                                                        <td>{item.completedAt ? new Date(item.completedAt).toLocaleString('vi-VN') : ''}</td>
+                                                        <td>{item.status}</td>
+                                                    </tr>
+                                                ))}
+                                                </tbody>
+                                            </table>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+            </AdminLayout>
             <footer className="member-footer">
                 <div className="member-footer-content">
                     <div className="member-footer-info">

@@ -48,6 +48,8 @@ const TestHistoryPage = () => {
     const [feedbackLoading, setFeedbackLoading] = useState(false);
     const [feedbackError, setFeedbackError] = useState('');
     const [feedbackSuccess, setFeedbackSuccess] = useState('');
+    const [diagnosticResults, setDiagnosticResults] = useState('');
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     useEffect(() => {
         const fetchHistory = async () => {
@@ -76,8 +78,25 @@ const TestHistoryPage = () => {
                 console.error("Failed to fetch staff list", error);
             }
         };
+        
+        // Get current user info
+        const getCurrentUser = async () => {
+            try {
+                const res = await fetch('/auth/me', {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                if (res.ok) {
+                    const user = await res.json();
+                    setCurrentUserId(user.id);
+                }
+            } catch (error) {
+                console.error("Failed to get current user", error);
+            }
+        };
+        
         fetchHistory();
         fetchStaff();
+        getCurrentUser();
     }, []);
 
     const handleRowClick = (item) => {
@@ -400,10 +419,26 @@ const TestHistoryPage = () => {
         }
     };
 
-    // Helper to check if feedback exists (assume feedback property or null)
+    // Helper to check if feedback exists
     const hasFeedback = (ticket) => {
-        // Adjust this if your ticket object has a different way to check feedback
-        return ticket.feedback != null;
+        console.log('Checking feedback for ticket:', ticket.id, 'Feedback data:', ticket.feedback);
+        
+        // Check various possible feedback properties
+        if (ticket.feedback && typeof ticket.feedback === 'object') {
+            return ticket.feedback.rating != null || ticket.feedback.feedback != null;
+        }
+        
+        // Check if feedback is a string
+        if (typeof ticket.feedback === 'string' && ticket.feedback.trim() !== '') {
+            return true;
+        }
+        
+        // Check other possible feedback properties
+        if (ticket.rating != null || ticket.review != null) {
+            return true;
+        }
+        
+        return false;
     };
 
     // Open feedback modal
@@ -418,6 +453,119 @@ const TestHistoryPage = () => {
     const closeFeedbackModal = () => {
         setShowFeedbackModal(false);
     };
+
+    // Test API connection
+    const testAPIConnection = async () => {
+        try {
+            const testRes = await fetch('/tickets/history', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            console.log('API test response:', testRes.status);
+            return testRes.ok;
+        } catch (err) {
+            console.error('API test failed:', err);
+            return false;
+        }
+    };
+
+    // Check backend information
+    const checkBackendInfo = async () => {
+        console.log('=== BACKEND DIAGNOSTIC ===');
+        let results = [];
+        
+        // 1. Check if server is running
+        try {
+            const healthCheck = await fetch('/actuator/health', { method: 'GET' });
+            console.log('Health check status:', healthCheck.status);
+            results.push(`Health check: ${healthCheck.status} ${healthCheck.statusText}`);
+        } catch (err) {
+            console.log('Health check failed:', err.message);
+            results.push(`Health check: ERROR - ${err.message}`);
+        }
+
+        // 2. Check authentication
+        const token = localStorage.getItem('token');
+        console.log('Token exists:', !!token);
+        results.push(`Token exists: ${!!token}`);
+        if (token) {
+            console.log('Token length:', token.length);
+            console.log('Token starts with:', token.substring(0, 20) + '...');
+            results.push(`Token length: ${token.length}`);
+        }
+
+        // 3. Check available endpoints
+        const endpointsToTest = [
+            '/tickets/history',
+            '/tickets',
+            '/api/tickets',
+            '/customer/tickets'
+        ];
+
+        for (const endpoint of endpointsToTest) {
+            try {
+                const res = await fetch(endpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                console.log(`${endpoint}: ${res.status} ${res.statusText}`);
+                results.push(`${endpoint}: ${res.status} ${res.statusText}`);
+            } catch (err) {
+                console.log(`${endpoint}: ERROR - ${err.message}`);
+                results.push(`${endpoint}: ERROR - ${err.message}`);
+            }
+        }
+
+        // 4. Check feedback endpoint specifically
+        if (selectedTicket) {
+            const feedbackEndpoints = [
+                `/customer/tickets/${selectedTicket.id}/feedback`,
+                `/tickets/${selectedTicket.id}/feedback`,
+                `/api/tickets/${selectedTicket.id}/feedback`
+            ];
+            
+            for (const feedbackEndpoint of feedbackEndpoints) {
+                try {
+                    const res = await fetch(feedbackEndpoint, {
+                        method: 'OPTIONS',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    console.log(`Feedback endpoint ${feedbackEndpoint} OPTIONS: ${res.status} ${res.statusText}`);
+                    console.log('Allowed methods:', res.headers.get('allow'));
+                    results.push(`${feedbackEndpoint} OPTIONS: ${res.status} ${res.statusText}`);
+                    results.push(`Allowed methods: ${res.headers.get('allow') || 'None'}`);
+                    
+                    // Also try GET to see if endpoint exists
+                    try {
+                        const getRes = await fetch(feedbackEndpoint, {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        });
+                        console.log(`Feedback endpoint ${feedbackEndpoint} GET: ${getRes.status} ${getRes.statusText}`);
+                        results.push(`${feedbackEndpoint} GET: ${getRes.status} ${getRes.statusText}`);
+                    } catch (getErr) {
+                        console.log(`Feedback endpoint ${feedbackEndpoint} GET: ERROR - ${getErr.message}`);
+                        results.push(`${feedbackEndpoint} GET: ERROR - ${getErr.message}`);
+                    }
+                } catch (err) {
+                    console.log(`Feedback endpoint ${feedbackEndpoint} OPTIONS: ERROR - ${err.message}`);
+                    results.push(`${feedbackEndpoint} OPTIONS: ERROR - ${err.message}`);
+                }
+            }
+        }
+
+        console.log('=== END DIAGNOSTIC ===');
+        setDiagnosticResults(results.join('\n'));
+    };
+
     // Submit feedback
     const handleSubmitFeedback = async () => {
         if (!feedbackRating || feedbackRating < 1 || feedbackRating > 5) {
@@ -427,33 +575,125 @@ const TestHistoryPage = () => {
         setFeedbackLoading(true);
         setFeedbackError('');
         setFeedbackSuccess('');
+        
         try {
+            console.log('Đang gửi feedback:', {
+                ticketId: selectedTicket.id,
+                rating: feedbackRating,
+                feedback: feedbackComment
+            });
+
+            // Thêm timeout để tránh chờ quá lâu
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 giây timeout
+
+            // Sử dụng endpoint đã được backend implement
             const res = await fetch(`/customer/tickets/${selectedTicket.id}/feedback`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 },
-                body: JSON.stringify({ rating: feedbackRating, feedback: feedbackComment })
+                body: JSON.stringify({ 
+                    rating: feedbackRating, 
+                    feedback: feedbackComment 
+                }),
+                signal: controller.signal
             });
+
+            clearTimeout(timeoutId);
+            console.log('Response status:', res.status);
+
             if (!res.ok) {
-                let data;
+                let errorData;
                 try {
-                    data = await res.json();
-                } catch {
-                    data = await res.text();
+                    const responseText = await res.text();
+                    console.log('Error response text:', responseText);
+                    
+                    // Try to parse as JSON
+                    try {
+                        errorData = JSON.parse(responseText);
+                        console.log('Error response JSON:', errorData);
+                    } catch (parseError) {
+                        errorData = responseText;
+                    }
+                } catch (readError) {
+                    console.log('Could not read response body:', readError);
+                    errorData = `HTTP ${res.status}: ${res.statusText}`;
                 }
-                setFeedbackError((data && data.message) || data || 'Gửi phản hồi thất bại.');
+                
+                const errorMessage = errorData?.message || errorData || `HTTP ${res.status}: ${res.statusText}`;
+                
+                // Xử lý lỗi cụ thể dựa trên status code
+                if (res.status === 403) {
+                    setFeedbackError(`Lỗi quyền truy cập: ${errorMessage}`);
+                } else if (res.status === 401) {
+                    setFeedbackError('Token không hợp lệ hoặc đã hết hạn. Vui lòng đăng nhập lại.');
+                } else if (res.status === 404) {
+                    setFeedbackError('Ticket không tồn tại.');
+                } else if (res.status === 400) {
+                    if (errorMessage.includes('timestamp') || errorMessage.includes('JDBC') || errorMessage.includes('ResultSet')) {
+                        setFeedbackError('Lỗi cấu hình database. Vui lòng liên hệ admin để kiểm tra cấu hình backend.');
+                    } else {
+                        setFeedbackError(`Dữ liệu không hợp lệ: ${errorMessage}`);
+                    }
+                } else if (res.status === 500) {
+                    setFeedbackError('Lỗi server. Vui lòng thử lại sau hoặc liên hệ admin.');
+                } else {
+                    setFeedbackError(`Gửi phản hồi thất bại: ${errorMessage}`);
+                }
             } else {
-                setFeedbackSuccess('Gửi phản hồi thành công!');
-                // Optionally update ticket in history to reflect feedback
-                setHistory(prev => prev.map(t => t.id === selectedTicket.id ? { ...t, feedback: { rating: feedbackRating, feedback: feedbackComment } } : t));
+                let successData;
+                try {
+                    const responseText = await res.text();
+                    console.log('Success response text:', responseText);
+                    
+                    // Try to parse as JSON
+                    try {
+                        successData = JSON.parse(responseText);
+                        console.log('Success response JSON:', successData);
+                    } catch (parseError) {
+                        successData = responseText;
+                    }
+                } catch (readError) {
+                    console.log('Could not read success response body:', readError);
+                    successData = 'Success';
+                }
+
+                setFeedbackSuccess('Gửi phản hồi thành công! Cảm ơn bạn đã đánh giá dịch vụ của chúng tôi.');
+                
+                // Update ticket in history to reflect feedback
+                setHistory(prev => prev.map(t => 
+                    t.id === selectedTicket.id 
+                        ? { 
+                            ...t, 
+                            feedback: { 
+                                rating: feedbackRating, 
+                                feedback: feedbackComment,
+                                feedbackDate: new Date().toISOString()
+                            } 
+                        } 
+                        : t
+                ));
+                
                 setTimeout(() => {
                     setShowFeedbackModal(false);
-                }, 1200);
+                }, 2000);
             }
         } catch (err) {
-            setFeedbackError('Lỗi khi gửi phản hồi.');
+            console.error('Network error khi gửi phản hồi:', err);
+            
+            if (err.name === 'AbortError') {
+                setFeedbackError('Yêu cầu bị timeout. Vui lòng thử lại.');
+            } else if (err.message.includes('Failed to fetch')) {
+                setFeedbackError('Không thể kết nối đến máy chủ. Vui lòng kiểm tra internet và thử lại.');
+            } else if (err.message.includes('CORS')) {
+                setFeedbackError('Lỗi CORS. Backend chưa được cấu hình đúng để cho phép frontend truy cập.');
+            } else if (err.message.includes('body stream already read')) {
+                setFeedbackError('Lỗi xử lý response. Vui lòng thử lại.');
+            } else {
+                setFeedbackError(`Lỗi kết nối: ${err.message}`);
+            }
         } finally {
             setFeedbackLoading(false);
         }
@@ -461,6 +701,14 @@ const TestHistoryPage = () => {
 
     return (
         <>
+            <style>
+                {`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}
+            </style>
             <Header />
             <div className="test-history-page" style={{ padding: '20px' }}>
                 <div className="test-history-header">
@@ -582,12 +830,16 @@ const TestHistoryPage = () => {
                                             cursor: 'pointer',
                                             marginRight: 10,
                                             fontWeight: 600,
-                                            transition: 'background 0.2s'
+                                            transition: 'background 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 6,
+                                            boxShadow: '0 2px 8px rgba(255, 152, 0, 0.3)'
                                         }}
                                         onMouseOver={e => e.currentTarget.style.background = '#f57c00'}
                                         onMouseOut={e => e.currentTarget.style.background = '#ff9800'}
                                     >
-                                        Gửi phản hồi
+                                        ⭐ Gửi đánh giá
                                     </button>
                                 )}
                                 <button 
@@ -616,44 +868,206 @@ const TestHistoryPage = () => {
                 {showFeedbackModal && selectedTicket && (
                     <div style={{
                         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                        background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
+                        background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
                     }}>
-                        <div style={{ background: '#fff', borderRadius: 8, padding: 28, minWidth: 320, maxWidth: 400, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
-                            <h3>Gửi phản hồi</h3>
-                            <div style={{ marginBottom: 16 }}>
-                                <label>Đánh giá:&nbsp;</label>
-                                <select value={feedbackRating} onChange={e => setFeedbackRating(Number(e.target.value))} style={{ fontSize: 16, padding: 4 }}>
+                        <div style={{ 
+                            background: '#fff', 
+                            borderRadius: 12, 
+                            padding: 32, 
+                            minWidth: 400, 
+                            maxWidth: 500, 
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                            maxHeight: '90vh',
+                            overflowY: 'auto'
+                        }}>
+                            <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                                <h3 style={{ color: '#233a7d', margin: '0 0 8px 0', fontSize: '1.5rem' }}>
+                                    ⭐ Đánh giá dịch vụ
+                                </h3>
+                                <p style={{ color: '#666', margin: 0, fontSize: '0.9rem' }}>
+                                    Chia sẻ trải nghiệm của bạn về dịch vụ xét nghiệm ADN
+                                </p>
+                            </div>
+                            
+                            <div style={{ marginBottom: 20 }}>
+                                <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: '#333' }}>
+                                    Đánh giá: <span style={{ color: '#e74c3c' }}>*</span>
+                                </label>
+                                <select 
+                                    value={feedbackRating} 
+                                    onChange={e => setFeedbackRating(Number(e.target.value))} 
+                                    style={{ 
+                                        fontSize: 16, 
+                                        padding: 12, 
+                                        borderRadius: 8, 
+                                        border: '2px solid #e1e8ed',
+                                        width: '100%',
+                                        background: '#fff',
+                                        cursor: 'pointer'
+                                    }}
+                                >
                                     {[5,4,3,2,1].map(star => (
-                                        <option key={star} value={star}>{'★'.repeat(star)}{'☆'.repeat(5-star)}</option>
+                                        <option key={star} value={star}>
+                                            {'★'.repeat(star)}{'☆'.repeat(5-star)} ({star} sao)
+                                        </option>
                                     ))}
                                 </select>
                             </div>
-                            <div style={{ marginBottom: 16 }}>
-                                <label>Nhận xét:</label>
+                            
+                            <div style={{ marginBottom: 24 }}>
+                                <label style={{ display: 'block', marginBottom: 8, fontWeight: 600, color: '#333' }}>
+                                    Nhận xét (không bắt buộc):
+                                </label>
                                 <textarea
                                     value={feedbackComment}
                                     onChange={e => setFeedbackComment(e.target.value)}
                                     rows={4}
-                                    style={{ width: '100%', fontSize: 15, padding: 6, borderRadius: 4, border: '1px solid #ccc' }}
-                                    placeholder="Nhập nhận xét của bạn (không bắt buộc)"
+                                    style={{ 
+                                        width: '100%', 
+                                        fontSize: 15, 
+                                        padding: 12, 
+                                        borderRadius: 8, 
+                                        border: '2px solid #e1e8ed',
+                                        resize: 'vertical',
+                                        fontFamily: 'inherit'
+                                    }}
+                                    placeholder="Chia sẻ trải nghiệm của bạn về dịch vụ xét nghiệm ADN..."
                                 />
                             </div>
-                            {feedbackError && <div style={{ color: 'red', marginBottom: 8 }}>{feedbackError}</div>}
-                            {feedbackSuccess && <div style={{ color: 'green', marginBottom: 8 }}>{feedbackSuccess}</div>}
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10 }}>
+                            
+                            {feedbackError && (
+                                <div style={{ 
+                                    background: '#ffebee', 
+                                    color: '#c62828', 
+                                    padding: 12, 
+                                    borderRadius: 8, 
+                                    marginBottom: 16,
+                                    border: '1px solid #ffcdd2',
+                                    fontSize: 14
+                                }}>
+                                    ❌ {feedbackError}
+                                </div>
+                            )}
+                            
+                            {feedbackSuccess && (
+                                <div style={{ 
+                                    background: '#e8f5e8', 
+                                    color: '#2e7d32', 
+                                    padding: 12, 
+                                    borderRadius: 8, 
+                                    marginBottom: 16,
+                                    border: '1px solid #c8e6c9',
+                                    fontSize: 14
+                                }}>
+                                    ✅ {feedbackSuccess}
+                                </div>
+                            )}
+                            
+                            {/* Debug info */}
+                            <div style={{ 
+                                background: '#f5f5f5', 
+                                padding: 8, 
+                                borderRadius: 4, 
+                                marginBottom: 16, 
+                                fontSize: 12,
+                                color: '#666'
+                            }}>
+                                <strong>Thông tin Ticket:</strong><br/>
+                                ID: {selectedTicket.id}<br/>
+                                Trạng thái: {selectedTicket.status}<br/>
+                                Ngày tạo: {selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleDateString('vi-VN') : 'N/A'}<br/>
+                                Đã có feedback: {hasFeedback(selectedTicket) ? 'Có' : 'Chưa có'}<br/>
+                                <br/>
+                                <strong>API Endpoint:</strong><br/>
+                                PUT /customer/tickets/{selectedTicket.id}/feedback<br/>
+                                <br/>
+                                <button 
+                                    onClick={checkBackendInfo}
+                                    style={{ 
+                                        padding: '4px 8px', 
+                                        background: '#ff9800', 
+                                        color: '#fff', 
+                                        border: 'none', 
+                                        borderRadius: 3, 
+                                        cursor: 'pointer',
+                                        fontSize: 10
+                                    }}
+                                >
+                                    🔍 Kiểm tra Backend
+                                </button>
+                                {diagnosticResults && (
+                                    <div style={{ 
+                                        marginTop: 8, 
+                                        padding: 6, 
+                                        background: '#fff', 
+                                        border: '1px solid #ddd',
+                                        borderRadius: 3,
+                                        maxHeight: 120,
+                                        overflowY: 'auto',
+                                        whiteSpace: 'pre-wrap',
+                                        fontSize: 10
+                                    }}>
+                                        <strong>Kết quả kiểm tra:</strong><br/>
+                                        {diagnosticResults}
+                                    </div>
+                                )}
+                            </div>
+                            
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                                 <button
                                     onClick={closeFeedbackModal}
-                                    style={{ padding: '8px 18px', background: '#888', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer' }}
+                                    style={{ 
+                                        padding: '12px 24px', 
+                                        background: '#6c757d', 
+                                        color: '#fff', 
+                                        border: 'none', 
+                                        borderRadius: 8, 
+                                        cursor: 'pointer',
+                                        fontWeight: 600,
+                                        transition: 'background 0.2s'
+                                    }}
                                     disabled={feedbackLoading}
+                                    onMouseOver={e => !feedbackLoading && (e.currentTarget.style.background = '#5a6268')}
+                                    onMouseOut={e => !feedbackLoading && (e.currentTarget.style.background = '#6c757d')}
                                 >
                                     Hủy
                                 </button>
                                 <button
                                     onClick={handleSubmitFeedback}
-                                    style={{ padding: '8px 18px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', fontWeight: 600 }}
+                                    style={{ 
+                                        padding: '12px 24px', 
+                                        background: '#1976d2', 
+                                        color: '#fff', 
+                                        border: 'none', 
+                                        borderRadius: 8, 
+                                        cursor: 'pointer', 
+                                        fontWeight: 600,
+                                        transition: 'background 0.2s',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 8
+                                    }}
                                     disabled={feedbackLoading}
+                                    onMouseOver={e => !feedbackLoading && (e.currentTarget.style.background = '#1565c0')}
+                                    onMouseOut={e => !feedbackLoading && (e.currentTarget.style.background = '#1976d2')}
                                 >
-                                    {feedbackLoading ? 'Đang gửi...' : 'Gửi'}
+                                    {feedbackLoading ? (
+                                        <>
+                                            <div style={{ 
+                                                width: 16, 
+                                                height: 16, 
+                                                border: '2px solid #fff', 
+                                                borderTop: '2px solid transparent', 
+                                                borderRadius: '50%', 
+                                                animation: 'spin 1s linear infinite' 
+                                            }}></div>
+                                            Đang gửi...
+                                        </>
+                                    ) : (
+                                        <>
+                                            📤 Gửi đánh giá
+                                        </>
+                                    )}
                                 </button>
                             </div>
                         </div>
