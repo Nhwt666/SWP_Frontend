@@ -42,6 +42,8 @@ const AdminTicketsPage = () => {
     const statusDisplayMap = {
         'PENDING': 'Chờ xử lý',
         'IN_PROGRESS': 'Đang xử lý',
+        'RECEIVED': 'Đã nhận kit',
+        'CONFIRMED': 'Đã xác nhận Yêu Cầu',
         'COMPLETED': 'Đã hoàn thành',
         'CANCELLED': 'Đã hủy',
         'REJECTED': 'Đã từ chối'
@@ -256,6 +258,10 @@ const AdminTicketsPage = () => {
                 return 'status-rejected';
             case 'IN_PROGRESS':
                 return 'status-in_progress';
+            case 'RECEIVED':
+                return 'status-received';
+            case 'CONFIRMED':
+                return 'status-confirmed';
             default:
                 return '';
         }
@@ -357,8 +363,11 @@ const AdminTicketsPage = () => {
                             <option value="">Tất cả trạng thái</option>
                             <option value="PENDING">Chờ xử lý</option>
                             <option value="IN_PROGRESS">Đang xử lý</option>
+                            <option value="RECEIVED">Đã nhận kit</option>
+                            <option value="CONFIRMED">Đã xác nhận Yêu Cầu</option>
                             <option value="COMPLETED">Đã hoàn thành</option>
                             <option value="CANCELLED">Đã hủy</option>
+                            <option value="REJECTED">Đã từ chối</option>
                         </select>
                     </div>
                     <div className="filter-group">
@@ -429,6 +438,20 @@ const AdminTicketsPage = () => {
                                                 >
                                                     Từ chối
                                                 </button>
+                                            )}
+                                            {/* Thông báo cho CIVIL SELF_TEST tickets */}
+                                            {ticket.type === 'CIVIL' && ticket.method === 'SELF_TEST' && (ticket.status === 'CONFIRMED' || ticket.status === 'RECEIVED') && (
+                                                <span style={{ 
+                                                    fontSize: '0.8rem', 
+                                                    color: '#666', 
+                                                    fontStyle: 'italic',
+                                                    marginLeft: '8px'
+                                                }}>
+                                                    {ticket.status === 'CONFIRMED' 
+                                                        ? '⏳ Chờ member xác nhận nhận kit'
+                                                        : '⏳ Chờ member gửi kit về'
+                                                    }
+                                                </span>
                                             )}
                                         </td>
                                     </tr>

@@ -664,6 +664,14 @@ textarea {
     background: #43a047;
 }
 
+.ticket-status-badge-list.status-received {
+    background: #2e7d32;
+}
+
+.ticket-status-badge-list.status-confirmed {
+    background: #f57c00;
+}
+
 .ticket-customer-modern {
     margin-left: auto;
     font-weight: 600;

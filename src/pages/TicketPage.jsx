@@ -178,8 +178,19 @@ const TicketPage = () => {
             sample2Name: sample2Name,
             customerId: userId,
             amount: price,
-            status: 'PENDING',
+            status: (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') ? 'CONFIRMED' : 'PENDING',
         };
+
+        // Debug log để kiểm tra trạng thái được gửi
+        console.log('=== DEBUG TICKET CREATION ===');
+        console.log('Category:', category);
+        console.log('Method:', method);
+        console.log('TypeMap[category]:', typeMap[category]);
+        console.log('MethodMap[method]:', methodMap[method]);
+        console.log('Is CIVIL SELF_TEST:', typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST');
+        console.log('Expected status:', (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') ? 'CONFIRMED' : 'PENDING');
+        console.log('Ticket data being sent:', ticketData);
+        console.log('=== END DEBUG ===');
 
         try {
             const paymentSuccess = await payFunction(price);
@@ -207,6 +218,14 @@ const TicketPage = () => {
                 const history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
+                
+                // Thông báo đặc biệt cho CIVIL SELF_TEST tickets
+                if (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') {
+                    alert(`✅ Tạo ticket thành công!\n\n📦 Ticket Dân sự + Tự gửi mẫu\n\nQuy trình mới:\n1. Kit sẽ được gửi đến bạn\n2. Bạn xác nhận nhận kit\n3. Bạn thu thập mẫu và gửi về\n4. Staff xử lý và trả kết quả\n\nVui lòng kiểm tra trạng thái trong "Lịch sử xét nghiệm"`);
+                } else {
+                    alert('✅ Tạo ticket thành công!');
+                }
+                
                 try {
                     const resUser = await fetch('/auth/me', {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -221,11 +240,35 @@ const TicketPage = () => {
                 resetForm();
             } else {
                 const errText = await res.text();
-                alert(`❌ Tạo ticket thất bại: ${errText || 'Lỗi không xác định'}`);
+                console.error('=== TICKET CREATION ERROR ===');
+                console.error('Response status:', res.status);
+                console.error('Response status text:', res.statusText);
+                console.error('Response headers:', Object.fromEntries(res.headers.entries()));
+                console.error('Error response body:', errText);
+                console.error('Request data sent:', ticketData);
+                console.error('=== END ERROR DEBUG ===');
+                
+                let errorMessage = 'Lỗi không xác định';
+                try {
+                    const errorData = JSON.parse(errText);
+                    errorMessage = errorData.message || errorData.error || errText || 'Lỗi không xác định';
+                } catch (e) {
+                    errorMessage = errText || 'Lỗi không xác định';
+                }
+                
+                setErrorMsg(`❌ Tạo ticket thất bại:\n\n${errorMessage}\n\n📋 Chi tiết:\n- Status: ${res.status}\n- Type: ${ticketData.type}\n- Method: ${ticketData.method}\n- Status: ${ticketData.status}`);
+                setShowErrorModal(true);
             }
         } catch (err) {
-            console.error('Lỗi:', err);
-            alert('❌ Không thể kết nối đến máy chủ');
+            console.error('=== NETWORK ERROR ===');
+            console.error('Error type:', err.name);
+            console.error('Error message:', err.message);
+            console.error('Error stack:', err.stack);
+            console.error('Request data that failed:', ticketData);
+            console.error('=== END NETWORK ERROR ===');
+            
+            setErrorMsg(`❌ Không thể kết nối đến máy chủ:\n\n${err.message}\n\n📋 Chi tiết:\n- Error type: ${err.name}\n- Type: ${ticketData.type}\n- Method: ${ticketData.method}\n- Status: ${ticketData.status}`);
+            setShowErrorModal(true);
         } finally {
             setLoading(false);
         }

@@ -25,6 +25,8 @@ pdfMake.fonts = {
 const statusMap = {
     PENDING: 'Đang chờ xử lý',
     IN_PROGRESS: 'Đang xử lý',
+    RECEIVED: 'Đã nhận kit',
+    CONFIRMED: 'Đã xác nhận Yêu Cầu',
     DONE: 'Hoàn thành',
     COMPLETED: 'Hoàn thành',
     REJECTED: 'Đã từ chối',
@@ -51,20 +53,21 @@ const TestHistoryPage = () => {
     const [diagnosticResults, setDiagnosticResults] = useState('');
     const [currentUserId, setCurrentUserId] = useState(null);
 
+    const fetchHistory = async () => {
+        try {
+            // Gọi đúng endpoint BE: /tickets/history (dựa vào token)
+            const historyRes = await fetch('/tickets/history', {
+                headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+            });
+            if (!historyRes.ok) throw new Error('Không thể tải lịch sử xét nghiệm');
+            const data = await historyRes.json();
+            setHistory(data);
+        } catch (err) {
+            setMessage(err.message || 'Lỗi khi tải lịch sử xét nghiệm');
+        }
+    };
+
     useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                // Gọi đúng endpoint BE: /tickets/history (dựa vào token)
-                const historyRes = await fetch('/tickets/history', {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
-                if (!historyRes.ok) throw new Error('Không thể tải lịch sử xét nghiệm');
-                const data = await historyRes.json();
-                setHistory(data);
-            } catch (err) {
-                setMessage(err.message || 'Lỗi khi tải lịch sử xét nghiệm');
-            }
-        };
         const fetchStaff = async () => {
             try {
                 const res = await fetch('/admin/users/role/STAFF', {
@@ -792,6 +795,100 @@ const TestHistoryPage = () => {
                                     )}
                                 </tbody>
                             </table>
+                            
+                            {/* Kit confirmation buttons for CIVIL SELF_TEST tickets */}
+                            {selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
+                                <div style={{ marginTop: '20px', padding: '16px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #dee2e6' }}>
+                                    <h4 style={{ margin: '0 0 12px 0', color: '#495057', fontSize: '1rem' }}>📦 Quản lý Kit xét nghiệm</h4>
+                                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                                        {selectedTicket.status === 'CONFIRMED' && (
+                                            <button
+                                                onClick={async () => {
+                                                    try {
+                                                        const res = await fetch(`/customer/tickets/${selectedTicket.id}/confirm-received`, {
+                                                            method: 'PUT',
+                                                            headers: {
+                                                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                                                'Content-Type': 'application/json'
+                                                            }
+                                                        });
+                                                        if (res.ok) {
+                                                            alert('✅ Đã xác nhận nhận kit thành công!');
+                                                            setShowModal(false);
+                                                            fetchHistory();
+                                                        } else {
+                                                            const error = await res.json();
+                                                            alert(`❌ Lỗi: ${error.message || 'Không thể xác nhận nhận kit'}`);
+                                                        }
+                                                    } catch (err) {
+                                                        alert('❌ Lỗi kết nối: ' + err.message);
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '8px 16px',
+                                                    background: '#2e7d32',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: '600'
+                                                }}
+                                            >
+                                                ✅ Xác nhận đã nhận kit
+                                            </button>
+                                        )}
+                                        {selectedTicket.status === 'RECEIVED' && (
+                                            <button
+                                                onClick={async () => {
+                                                    try {
+                                                        const res = await fetch(`/customer/tickets/${selectedTicket.id}/confirm-sent`, {
+                                                            method: 'PUT',
+                                                            headers: {
+                                                                'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                                                                'Content-Type': 'application/json'
+                                                            }
+                                                        });
+                                                        if (res.ok) {
+                                                            alert('✅ Đã xác nhận gửi kit thành công!');
+                                                            setShowModal(false);
+                                                            fetchHistory();
+                                                        } else {
+                                                            const error = await res.json();
+                                                            alert(`❌ Lỗi: ${error.message || 'Không thể xác nhận gửi kit'}`);
+                                                        }
+                                                    } catch (err) {
+                                                        alert('❌ Lỗi kết nối: ' + err.message);
+                                                    }
+                                                }}
+                                                style={{
+                                                    padding: '8px 16px',
+                                                    background: '#f57c00',
+                                                    color: '#fff',
+                                                    border: 'none',
+                                                    borderRadius: '6px',
+                                                    cursor: 'pointer',
+                                                    fontSize: '0.9rem',
+                                                    fontWeight: '600'
+                                                }}
+                                            >
+                                                📤 Xác nhận đã gửi kit
+                                            </button>
+                                        )}
+                                        {(selectedTicket.status === 'CONFIRMED' || selectedTicket.status === 'RECEIVED' || selectedTicket.status === 'PENDING') && (
+                                            <div style={{ fontSize: '0.85rem', color: '#6c757d', fontStyle: 'italic' }}>
+                                                {selectedTicket.status === 'CONFIRMED' 
+                                                    ? '💡 Kit đã được gửi đến bạn. Hãy xác nhận khi nhận được kit.'
+                                                    : selectedTicket.status === 'RECEIVED'
+                                                    ? '💡 Bạn đã nhận kit. Sau khi thu thập mẫu, hãy gửi kit về trung tâm.'
+                                                    : '💡 Kit đã được gửi về trung tâm. Chúng tôi sẽ xử lý và trả kết quả sớm nhất.'
+                                                }
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                            
                             <div style={{ textAlign: 'right', marginTop: 24 }}>
                                 {selectedTicket.status === 'COMPLETED' && selectedTicket.resultString && (
                                     <button 

@@ -295,6 +295,8 @@ const AdminDashboardPage = () => {
                                                             switch(item.status) {
                                                                 case 'PENDING': return 'Chờ xử lý';
                                                                 case 'IN_PROGRESS': return 'Đang xử lý';
+                                                                case 'RECEIVED': return 'Đã nhận kit';
+                                                                case 'CONFIRMED': return 'Đã xác nhận Yêu Cầu';
                                                                 case 'COMPLETED': return 'Hoàn thành';
                                                                 case 'REJECTED': return 'Từ chối';
                                                                 default: return item.status;

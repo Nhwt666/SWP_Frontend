@@ -623,6 +623,8 @@ const StaffPage = () => {
                                                             switch(ticket.status) {
                                                                 case 'PENDING': return 'Chờ xử lý';
                                                                 case 'IN_PROGRESS': return 'Đang xử lý';
+                                                                case 'RECEIVED': return 'Đã nhận kit';
+                                                                case 'CONFIRMED': return 'Đã xác nhận Yêu Cầu';
                                                                 case 'COMPLETED': return 'Đã hoàn thành';
                                                                 default: return ticket.status;
                                                             }
@@ -654,6 +656,8 @@ const StaffPage = () => {
                                                 switch(selectedTicket.status) {
                                                     case 'PENDING': return 'Chờ xử lý';
                                                     case 'IN_PROGRESS': return 'Đang xử lý';
+                                                    case 'RECEIVED': return 'Đã nhận kit';
+                                                    case 'CONFIRMED': return 'Đã xác nhận Yêu Cầu';
                                                     case 'COMPLETED': return 'Đã hoàn thành';
                                                     default: return selectedTicket.status;
                                                 }
@@ -677,8 +681,19 @@ const StaffPage = () => {
                                         <div><strong>Tên Mẫu 2:</strong> <span>{selectedTicket.sample2Name || 'Chưa Có Thông Tin'}</span></div>
                                     </div>
 
-                                    {selectedTicket.status === 'PENDING' && selectedTicket.staff == null && (
+                                    {selectedTicket.status === 'PENDING' && selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
                                         <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                            <div style={{
+                                                background: '#e3f2fd',
+                                                padding: '12px',
+                                                borderRadius: '8px',
+                                                marginBottom: '16px',
+                                                border: '1px solid #2196f3'
+                                            }}>
+                                                <p style={{ margin: 0, color: '#1976d2', fontWeight: 600 }}>
+                                                    📦 Kit đã được gửi về từ khách hàng. Sẵn sàng xử lý!
+                                                </p>
+                                            </div>
                                             <button
                                                 className="btn-processing modern-btn"
                                                 onClick={() => handleAssignSelf(selectedTicket.id)}
@@ -686,6 +701,40 @@ const StaffPage = () => {
                                             >
                                                 Nhận xử lý
                                             </button>
+                                        </div>
+                                    )}
+                                    {selectedTicket.status === 'CONFIRMED' && selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
+                                        <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                            <div style={{ 
+                                                background: '#fff3e0', 
+                                                padding: '16px', 
+                                                borderRadius: '8px', 
+                                                border: '1px solid #ff9800'
+                                            }}>
+                                                <p style={{ margin: 0, color: '#f57c00', fontWeight: 600, fontSize: '1rem' }}>
+                                                    📦 Kit đã được gửi đến khách hàng
+                                                </p>
+                                                <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                                                    Đang chờ khách hàng xác nhận nhận kit. Staff không thể can thiệp vào giai đoạn này.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {selectedTicket.status === 'RECEIVED' && selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
+                                        <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
+                                            <div style={{ 
+                                                background: '#e8f5e8', 
+                                                padding: '16px', 
+                                                borderRadius: '8px', 
+                                                border: '1px solid #4caf50'
+                                            }}>
+                                                <p style={{ margin: 0, color: '#2e7d32', fontWeight: 600, fontSize: '1rem' }}>
+                                                    ✅ Khách hàng đã xác nhận nhận kit
+                                                </p>
+                                                <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.9rem' }}>
+                                                    Đang chờ khách hàng gửi kit về trung tâm. Staff không thể can thiệp vào giai đoạn này.
+                                                </p>
+                                            </div>
                                         </div>
                                     )}
                                     {selectedTicket.status === 'IN_PROGRESS' && (

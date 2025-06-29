@@ -54,6 +54,15 @@ const AdminBlogPage = () => {
             // Nếu không có trong localStorage, sử dụng mock data
             const mockBlogs = [
                 {
+                    id: 10,
+                    title: 'Quy trình xét nghiệm ADN dân sự bằng cách tự gửi mẫu',
+                    author: 'Dr. Nguyễn Văn A',
+                    status: 'published',
+                    createdAt: '2024-01-15',
+                    image: '/blog1.jpg',
+                    content: 'Quản lý quá trình thực hiện xét nghiệm bằng cách tự gửi mẫu (chỉ áp dụng cho các dịch vụ xét nghiệm ADN dân sự).\n\nQuy trình thực hiện:\n\n1. Đăng ký đặt hẹn dịch vụ xét nghiệm\n• Khách hàng đăng ký trực tuyến hoặc qua điện thoại\n• Chọn loại xét nghiệm ADN dân sự phù hợp\n• Cung cấp thông tin cá nhân và lý do xét nghiệm\n• Thanh toán phí dịch vụ\n\n2. Nhận bộ kit xét nghiệm\n• Bộ kit được gửi đến địa chỉ khách hàng\n• Bao gồm: que tăm bông, túi đựng mẫu, hướng dẫn chi tiết\n• Kit được đóng gói an toàn, đảm bảo vệ sinh\n\n3. Thu thập mẫu xét nghiệm\n• Thực hiện theo hướng dẫn trong bộ kit\n• Sử dụng que tăm bông để lấy mẫu niêm mạc miệng\n• Đảm bảo mẫu được thu thập đúng cách\n• Ghi chép thông tin người cung cấp mẫu\n\n4. Chuyển mẫu đến cơ sở y tế\n• Đóng gói mẫu theo hướng dẫn\n• Gửi mẫu về trung tâm xét nghiệm\n• Có thể sử dụng dịch vụ chuyển phát nhanh\n• Mẫu được bảo quản trong điều kiện phù hợp\n\n5. Thực hiện xét nghiệm tại cơ sở y tế và ghi nhận kết quả\n• Mẫu được kiểm tra chất lượng\n• Thực hiện phân tích ADN bằng công nghệ hiện đại\n• Quá trình được giám sát nghiêm ngặt\n• Kết quả được ghi nhận chi tiết\n\n6. Trả kết quả xét nghiệm\n• Kết quả được gửi qua email hoặc bưu điện\n• Báo cáo chi tiết với độ chính xác cao\n• Tư vấn kết quả nếu cần thiết\n• Bảo mật thông tin tuyệt đối\n\nLưu ý quan trọng:\n• Chỉ áp dụng cho xét nghiệm ADN dân sự\n• Đảm bảo tuân thủ hướng dẫn thu thập mẫu\n• Thời gian xử lý: 3-5 ngày làm việc\n• Độ chính xác: 99.99%\n• Bảo mật thông tin theo quy định pháp luật'
+                },
+                {
                     id: 1,
                     title: 'Tại sao xét nghiệm ADN lại quan trọng?',
                     author: 'Dr. Nguyễn Văn A',
