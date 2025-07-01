@@ -310,3 +310,25 @@ button {
     background-color: #b71c1c;
     box-shadow: 0 2px 8px rgba(229,57,53,0.12);
 } 
+
+/* General button styles */
+button {
+    font-family: 'Roboto', sans-serif;
+}
+
+.reject-btn {
+    background-color: #e53935;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    margin-left: 6px;
+}
+.reject-btn:hover {
+    background-color: #b71c1c;
+    box-shadow: 0 2px 8px rgba(229,57,53,0.12);
+} 

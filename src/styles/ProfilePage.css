@@ -9,6 +9,14 @@
   background-color: #f4f7fc;
   min-height: calc(100vh - 200px); /* Trừ đi chiều cao của header */
   font-family: 'Roboto', sans-serif;
+  margin-left: 250px; /* Khắc phục việc bị che bởi sidebar */
+}
+
+@media (max-width: 900px) {
+  .profile-page-container {
+    margin-left: 0;
+    padding: 20px 10px;
+  }
 }
 
 /* The main card holding the profile information */

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import Header from '../components/Header';
+import NotificationService from '../services/NotificationService';
 
 // Đăng ký fonts mặc định trước
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
@@ -86,6 +87,9 @@ const StaffPage = () => {
     const handleAssignSelf = async (id) => {
         setStatusLoading(true);
         try {
+            const ticket = tickets.find(t => t.id === id);
+            const oldStatus = ticket.status;
+            
             const res = await fetch(`${API_BASE}/tickets/${id}/assign`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -98,6 +102,19 @@ const StaffPage = () => {
             if (!statusRes.ok) throw new Error('Không thể chuyển trạng thái.');
             const updated = await statusRes.json();
             setTickets((prev) => prev.map(t => t.id === id ? updated : t));
+            
+            // Tạo notification cho thay đổi trạng thái
+            try {
+                await NotificationService.createStatusChangeNotification(
+                    id, 
+                    oldStatus, 
+                    'IN_PROGRESS', 
+                    ticket.customer?.fullName || ticket.customer?.name || 'Khách hàng'
+                );
+            } catch (notiError) {
+                console.error('Lỗi tạo notification:', notiError);
+            }
+            
             toast.success('Đã nhận xử lý yêu cầu và chuyển sang Đang xử lý!');
             fetchTickets(activeTab);
             handleCloseModal();
@@ -248,6 +265,7 @@ const StaffPage = () => {
             const ticket = tickets.find(t => t.id === id);
             if (!ticket) throw new Error('Không tìm thấy thông tin ticket.');
             
+            const oldStatus = ticket.status;
             const detailedResult = generateDetailedResult(ticket, result);
             
             const res = await fetch(`${API_BASE}/tickets/${id}/complete`, {
@@ -258,6 +276,19 @@ const StaffPage = () => {
             if (!res.ok) throw new Error('Không thể hoàn thành ticket.');
             const updated = await res.json();
             setTickets((prev) => prev.map(t => (t.id === id ? updated : t)));
+            
+            // Tạo notification cho thay đổi trạng thái
+            try {
+                await NotificationService.createStatusChangeNotification(
+                    id, 
+                    oldStatus, 
+                    'COMPLETED', 
+                    ticket.customer?.fullName || ticket.customer?.name || 'Khách hàng'
+                );
+            } catch (notiError) {
+                console.error('Lỗi tạo notification:', notiError);
+            }
+            
             toast.success('Đã hoàn thành và lưu kết quả!');
             setResultOption('');
             fetchTickets(activeTab);
@@ -681,19 +712,8 @@ const StaffPage = () => {
                                         <div><strong>Tên Mẫu 2:</strong> <span>{selectedTicket.sample2Name || 'Chưa Có Thông Tin'}</span></div>
                                     </div>
 
-                                    {selectedTicket.status === 'PENDING' && selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
+                                    {selectedTicket.status === 'PENDING' && (
                                         <div style={{ margin: '24px 0 0 0', textAlign: 'center' }}>
-                                            <div style={{
-                                                background: '#e3f2fd',
-                                                padding: '12px',
-                                                borderRadius: '8px',
-                                                marginBottom: '16px',
-                                                border: '1px solid #2196f3'
-                                            }}>
-                                                <p style={{ margin: 0, color: '#1976d2', fontWeight: 600 }}>
-                                                    📦 Kit đã được gửi về từ khách hàng. Sẵn sàng xử lý!
-                                                </p>
-                                            </div>
                                             <button
                                                 className="btn-processing modern-btn"
                                                 onClick={() => handleAssignSelf(selectedTicket.id)}

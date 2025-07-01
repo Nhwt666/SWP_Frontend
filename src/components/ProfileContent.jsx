@@ -1,16 +1,32 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../styles/ProfilePage.css';
-import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaWallet } from 'react-icons/fa';
+import { FaUserCircle, FaEnvelope, FaPhone, FaMapMarkerAlt, FaWallet, FaBell } from 'react-icons/fa';
 
-const ProfileContent = ({ userInfo }) => {
+const ProfileContent = ({ userInfo, hasNotification }) => {
     return (
         <>
             <div className="profile-page-container">
                 <div className="profile-card">
                     <div className="profile-card-header">
-                        <div className="avatar-container">
+                        <div className="avatar-container" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
                             <FaUserCircle className="avatar-icon" />
+                            <div className="noti-bell-container" style={{ position: 'relative' }}>
+                                <FaBell className="noti-bell-icon" style={{ fontSize: 28, cursor: 'pointer' }} />
+                                {hasNotification && (
+                                    <span className="noti-dot" style={{
+                                        position: 'absolute',
+                                        top: 2,
+                                        right: 2,
+                                        width: 10,
+                                        height: 10,
+                                        background: '#e53935',
+                                        borderRadius: '50%',
+                                        border: '2px solid #fff',
+                                        display: 'inline-block'
+                                    }}></span>
+                                )}
+                            </div>
                         </div>
                         <div className="user-info-header">
                             <h2 className="user-name">{userInfo.fullName || 'Tên người dùng'}</h2>

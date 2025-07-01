@@ -632,9 +632,11 @@ const AdminTicketsPage = () => {
             <footer className="member-footer">
                 <div className="member-footer-content">
                     <div className="member-footer-info">
-                        <div><strong>Số Hotline:</strong> 1800.9999</div>
-                        <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
-                        <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                        <div>
+                            <div><strong>Số Hotline:</strong> 1800.9999</div>
+                            <div><strong>Email:</strong> trungtamxetnghiem@gmail.com</div>
+                            <div><strong>Địa chỉ:</strong> 643 Điện Biên Phủ, Phường 1, Quận 3, TPHCM</div>
+                        </div>
                     </div>
                     <div className="member-footer-map">
                         <iframe

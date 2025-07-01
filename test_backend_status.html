@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Backend Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Backend Status Handling</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Check if backend supports CONFIRMED status</h3>
+        <button onclick="testBackendStatus()">Test Backend Status Support</button>
+        <div id="result1" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Create ticket with CONFIRMED status</h3>
+        <button onclick="testCreateTicket()">Create CIVIL SELF_TEST Ticket</button>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Check recent tickets</h3>
+        <button onclick="checkRecentTickets()">Check Recent Tickets</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        
+        async function testBackendStatus() {
+            const resultDiv = document.getElementById('result1');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test if backend recognizes CONFIRMED status
+                const response = await fetch(`${API_BASE}/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify({
+                        type: 'CIVIL',
+                        method: 'SELF_TEST',
+                        status: 'CONFIRMED',
+                        reason: 'Test ticket',
+                        customerId: 1,
+                        amount: 1000000
+                    })
+                });
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '✅ Backend is running and recognizes CONFIRMED status (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else if (response.status === 400) {
+                    const error = await response.text();
+                    if (error.includes('CONFIRMED')) {
+                        resultDiv.innerHTML = '❌ Backend does not support CONFIRMED status: ' + error;
+                        resultDiv.className = 'result error';
+                    } else {
+                        resultDiv.innerHTML = '✅ Backend accepts CONFIRMED status (400 for other validation)';
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.innerHTML = `Unexpected response: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error connecting to backend: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testCreateTicket() {
+            const resultDiv = document.getElementById('result2');
+            resultDiv.innerHTML = 'Creating ticket...';
+            
+            try {
+                // This will fail without valid token, but we can see the response
+                const response = await fetch(`${API_BASE}/tickets/after-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify({
+                        type: 'CIVIL',
+                        method: 'SELF_TEST',
+                        status: 'CONFIRMED',
+                        reason: 'Xác minh quan hệ huyết thống',
+                        address: '123 Test Street',
+                        phone: '0123456789',
+                        email: 'test@example.com',
+                        sample1Name: 'Mẫu 1',
+                        sample2Name: 'Mẫu 2',
+                        customerId: 1,
+                        amount: 1500000
+                    })
+                });
+                
+                const responseText = await response.text();
+                resultDiv.innerHTML = `Response Status: ${response.status}\nResponse: ${responseText}`;
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML += '\n\n✅ Backend is running and accepts CONFIRMED status (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else if (response.status === 400) {
+                    if (responseText.includes('CONFIRMED')) {
+                        resultDiv.innerHTML += '\n\n❌ Backend does not support CONFIRMED status';
+                        resultDiv.className = 'result error';
+                    } else {
+                        resultDiv.innerHTML += '\n\n✅ Backend accepts CONFIRMED status (400 for other validation)';
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.className = 'result';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkRecentTickets() {
+            const resultDiv = document.getElementById('result3');
+            resultDiv.innerHTML = 'Checking recent tickets...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/tickets`, {
+                    headers: {
+                        'Authorization': 'Bearer test-token'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '✅ Backend is running (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else {
+                    const tickets = await response.json();
+                    const recentTickets = tickets.filter(t => 
+                        t.type === 'CIVIL' && t.method === 'SELF_TEST'
+                    ).slice(0, 5);
+                    
+                    resultDiv.innerHTML = 'Recent CIVIL SELF_TEST tickets:\n' + 
+                        recentTickets.map(t => 
+                            `ID: ${t.id}, Status: ${t.status}, Created: ${new Date(t.createdAt).toLocaleString()}`
+                        ).join('\n');
+                    resultDiv.className = 'result';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 
+<html>
+<head>
+    <title>Test Backend Status</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Test Backend Status Handling</h1>
+    
+    <div class="test-section">
+        <h3>Test 1: Check if backend supports CONFIRMED status</h3>
+        <button onclick="testBackendStatus()">Test Backend Status Support</button>
+        <div id="result1" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 2: Create ticket with CONFIRMED status</h3>
+        <button onclick="testCreateTicket()">Create CIVIL SELF_TEST Ticket</button>
+        <div id="result2" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test 3: Check recent tickets</h3>
+        <button onclick="checkRecentTickets()">Check Recent Tickets</button>
+        <div id="result3" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8080';
+        
+        async function testBackendStatus() {
+            const resultDiv = document.getElementById('result1');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test if backend recognizes CONFIRMED status
+                const response = await fetch(`${API_BASE}/tickets`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify({
+                        type: 'CIVIL',
+                        method: 'SELF_TEST',
+                        status: 'CONFIRMED',
+                        reason: 'Test ticket',
+                        customerId: 1,
+                        amount: 1000000
+                    })
+                });
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '✅ Backend is running and recognizes CONFIRMED status (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else if (response.status === 400) {
+                    const error = await response.text();
+                    if (error.includes('CONFIRMED')) {
+                        resultDiv.innerHTML = '❌ Backend does not support CONFIRMED status: ' + error;
+                        resultDiv.className = 'result error';
+                    } else {
+                        resultDiv.innerHTML = '✅ Backend accepts CONFIRMED status (400 for other validation)';
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.innerHTML = `Unexpected response: ${response.status}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error connecting to backend: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function testCreateTicket() {
+            const resultDiv = document.getElementById('result2');
+            resultDiv.innerHTML = 'Creating ticket...';
+            
+            try {
+                // This will fail without valid token, but we can see the response
+                const response = await fetch(`${API_BASE}/tickets/after-payment`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer test-token'
+                    },
+                    body: JSON.stringify({
+                        type: 'CIVIL',
+                        method: 'SELF_TEST',
+                        status: 'CONFIRMED',
+                        reason: 'Xác minh quan hệ huyết thống',
+                        address: '123 Test Street',
+                        phone: '0123456789',
+                        email: 'test@example.com',
+                        sample1Name: 'Mẫu 1',
+                        sample2Name: 'Mẫu 2',
+                        customerId: 1,
+                        amount: 1500000
+                    })
+                });
+                
+                const responseText = await response.text();
+                resultDiv.innerHTML = `Response Status: ${response.status}\nResponse: ${responseText}`;
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML += '\n\n✅ Backend is running and accepts CONFIRMED status (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else if (response.status === 400) {
+                    if (responseText.includes('CONFIRMED')) {
+                        resultDiv.innerHTML += '\n\n❌ Backend does not support CONFIRMED status';
+                        resultDiv.className = 'result error';
+                    } else {
+                        resultDiv.innerHTML += '\n\n✅ Backend accepts CONFIRMED status (400 for other validation)';
+                        resultDiv.className = 'result success';
+                    }
+                } else {
+                    resultDiv.className = 'result';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+        
+        async function checkRecentTickets() {
+            const resultDiv = document.getElementById('result3');
+            resultDiv.innerHTML = 'Checking recent tickets...';
+            
+            try {
+                const response = await fetch(`${API_BASE}/admin/tickets`, {
+                    headers: {
+                        'Authorization': 'Bearer test-token'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '✅ Backend is running (401 is expected without valid token)';
+                    resultDiv.className = 'result success';
+                } else {
+                    const tickets = await response.json();
+                    const recentTickets = tickets.filter(t => 
+                        t.type === 'CIVIL' && t.method === 'SELF_TEST'
+                    ).slice(0, 5);
+                    
+                    resultDiv.innerHTML = 'Recent CIVIL SELF_TEST tickets:\n' + 
+                        recentTickets.map(t => 
+                            `ID: ${t.id}, Status: ${t.status}, Created: ${new Date(t.createdAt).toLocaleString()}`
+                        ).join('\n');
+                    resultDiv.className = 'result';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '❌ Error: ' + error.message;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html> 

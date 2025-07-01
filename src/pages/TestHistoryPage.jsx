@@ -5,6 +5,7 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import { toast } from 'react-toastify';
 import '../styles/TestHistoryPage.css';
 import Header from '../components/Header';
+import NotificationService from '../services/NotificationService';
 
 // Đăng ký fonts mặc định trước
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
@@ -805,6 +806,7 @@ const TestHistoryPage = () => {
                                             <button
                                                 onClick={async () => {
                                                     try {
+                                                        const oldStatus = selectedTicket.status;
                                                         const res = await fetch(`/customer/tickets/${selectedTicket.id}/confirm-received`, {
                                                             method: 'PUT',
                                                             headers: {
@@ -813,6 +815,18 @@ const TestHistoryPage = () => {
                                                             }
                                                         });
                                                         if (res.ok) {
+                                                            // Tạo notification cho thay đổi trạng thái
+                                                            try {
+                                                                await NotificationService.createStatusChangeNotification(
+                                                                    selectedTicket.id,
+                                                                    oldStatus,
+                                                                    'RECEIVED',
+                                                                    selectedTicket.customer?.fullName || selectedTicket.customer?.name || 'Khách hàng'
+                                                                );
+                                                            } catch (notiError) {
+                                                                console.error('Lỗi tạo notification:', notiError);
+                                                            }
+                                                            
                                                             alert('✅ Đã xác nhận nhận kit thành công!');
                                                             setShowModal(false);
                                                             fetchHistory();
@@ -842,6 +856,7 @@ const TestHistoryPage = () => {
                                             <button
                                                 onClick={async () => {
                                                     try {
+                                                        const oldStatus = selectedTicket.status;
                                                         const res = await fetch(`/customer/tickets/${selectedTicket.id}/confirm-sent`, {
                                                             method: 'PUT',
                                                             headers: {
@@ -850,6 +865,18 @@ const TestHistoryPage = () => {
                                                             }
                                                         });
                                                         if (res.ok) {
+                                                            // Tạo notification cho thay đổi trạng thái
+                                                            try {
+                                                                await NotificationService.createStatusChangeNotification(
+                                                                    selectedTicket.id,
+                                                                    oldStatus,
+                                                                    'PENDING',
+                                                                    selectedTicket.customer?.fullName || selectedTicket.customer?.name || 'Khách hàng'
+                                                                );
+                                                            } catch (notiError) {
+                                                                console.error('Lỗi tạo notification:', notiError);
+                                                            }
+                                                            
                                                             alert('✅ Đã xác nhận gửi kit thành công!');
                                                             setShowModal(false);
                                                             fetchHistory();
