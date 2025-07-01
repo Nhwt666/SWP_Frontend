@@ -234,6 +234,7 @@ const AdminDashboardPage = () => {
                                             <h3>Tổng tiền đã nạp</h3>
                                             <p>{depositStats ? Number(depositStats.totalDeposits).toLocaleString('vi-VN') : 0}đ</p>
                                             <div style={{color:'#1976d2', fontWeight:600, fontSize:'1.1rem'}}>Tổng tiền xét nghiệm<br/>{stats && stats.totalTicketSpending !== undefined ? Number(stats.totalTicketSpending).toLocaleString('vi-VN') : 0}đ</div>
+                                            <button onClick={() => navigate('/admin/topup-history')} style={{marginTop:18, background:'#7b47d8', color:'#fff', border:'none', borderRadius:10, padding:'12px 32px', fontWeight:700, fontSize:20, cursor:'pointer', boxShadow:'0 2px 8px #eee'}}>Xem chi tiết</button>
                                         </div>
                                     </div>
                                 </div>
