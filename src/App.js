@@ -21,6 +21,7 @@ import PaymentSuccess from './pages/PaymentSuccess';
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffPage from './pages/StaffPage';
 import AdminTicketsPage from "./pages/AdminTicketsPage";
+import AdminTopupHistoryPage from './pages/AdminTopupHistoryPage';
 import { UserProvider } from './UserContext';
 
 // Main App component
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/admin/tickets" element={<AdminTicketsPage />} />
                 <Route path="/admin/reports" element={<AdminReportsPage />} />
                 <Route path="/admin/settings" element={<AdminDashboardPage />} />
+                <Route path="/admin/topup-history" element={<AdminTopupHistoryPage />} />
 
                 {/* Staff Routes */}
                 <Route path="/staff/dashboard" element={<StaffDashboardPage />} />

@@ -11,6 +11,7 @@ const AdminLayout = ({ children }) => {
         { path: '/admin/dashboard', label: 'Bảng điều khiển' },
         { path: '/admin/tickets', label: 'Xét nghiệm ADN' },
         { path: '/admin/users', label: 'Người dùng' },
+        { path: '/admin/topup-history', label: 'Nạp tiền' },
         { path: '/admin/blog', label: 'Quản lý blog' },
         { path: '/admin/reports', label: 'Đánh Giá' },
         { path: '/admin/settings', label: 'Cài đặt' }
