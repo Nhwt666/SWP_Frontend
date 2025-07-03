@@ -8,7 +8,7 @@ import BlogPostPage from './pages/BlogPostPage';
 import GuidePage from './pages/GuidePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
-import AdminBlogPage from './pages/AdminBlogPage';
+
 import AdminReportsPage from './pages/AdminReportsPage';
 import ConfirmRegisterPage from './pages/ConfirmRegisterPage';
 import ProfilePage from './pages/ProfilePage';
@@ -23,6 +23,7 @@ import StaffPage from './pages/StaffPage';
 import AdminTicketsPage from "./pages/AdminTicketsPage";
 import AdminTopupHistoryPage from './pages/AdminTopupHistoryPage';
 import { UserProvider } from './UserContext';
+import AdminVoucherPage from './pages/AdminVoucherPage';
 
 // Main App component
 function App() {
@@ -53,11 +54,12 @@ function App() {
                 {/* Admin Routes */}
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/users" element={<AdminUsersPage />} />
-                <Route path="/admin/blog" element={<AdminBlogPage />} />
+
                 <Route path="/admin/tickets" element={<AdminTicketsPage />} />
                 <Route path="/admin/reports" element={<AdminReportsPage />} />
                 <Route path="/admin/settings" element={<AdminDashboardPage />} />
                 <Route path="/admin/topup-history" element={<AdminTopupHistoryPage />} />
+                <Route path="/admin/voucher" element={<AdminVoucherPage />} />
 
                 {/* Staff Routes */}
                 <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
