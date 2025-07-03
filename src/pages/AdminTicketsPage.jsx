@@ -110,7 +110,7 @@ const AdminTicketsPage = () => {
     };
 
     const filteredTickets = useMemo(() => {
-        return tickets.filter(ticket => {
+        const filtered = tickets.filter(ticket => {
             if (preselectedStaffId && ticket.staff?.id !== preselectedStaffId) {
                 return false;
             }
@@ -126,6 +126,8 @@ const AdminTicketsPage = () => {
             }
             return true;
         });
+        // Sort by createdAt descending (newest first)
+        return filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
     }, [tickets, filters, preselectedStaffId, preselectedCustomerId]);
 
     const handleSaveTicket = async (id, updatedData) => {
