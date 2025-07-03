@@ -41,6 +41,9 @@ const TicketPage = () => {
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [voucherCode, setVoucherCode] = useState('');
+    const [voucherInfo, setVoucherInfo] = useState(null);
+    const [discount, setDiscount] = useState(0);
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -102,6 +105,39 @@ const TicketPage = () => {
         setPrice(calculated);
     }, [category, service]);
 
+    useEffect(() => {
+        if (!voucherCode || price === 0) {
+            setVoucherInfo(null);
+            setDiscount(0);
+            return;
+        }
+        fetch(`/api/vouchers/check?code=${voucherCode}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`
+            }
+        })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (!data) {
+                    setVoucherInfo(null);
+                    setDiscount(0);
+                    return;
+                }
+                setVoucherInfo(data);
+                let d = 0;
+                if (data.type === 'percent') {
+                    d = Math.round(price * data.value / 100);
+                } else if (data.type === 'amount') {
+                    d = Math.min(price, data.value);
+                }
+                setDiscount(d);
+            })
+            .catch(() => {
+                setVoucherInfo(null);
+                setDiscount(0);
+            });
+    }, [voucherCode, price]);
+
     const showConfirm = (amount) => {
         return new Promise((resolve) => {
             setConfirmAmount(amount);
@@ -146,7 +182,7 @@ const TicketPage = () => {
             }
         }
 
-        if (wallet < price) {
+        if (wallet < price - discount) {
             setErrorMsg('❌ Số dư ví không đủ để thanh toán!');
             setShowErrorModal(true);
             setLoading(false);
@@ -178,6 +214,9 @@ const TicketPage = () => {
             sample2Name: sample2Name,
             customerId: userId,
             amount: price,
+            discountAmount: discount,
+            finalAmount: price - discount,
+            voucherCode: voucherCode || undefined,
             status: (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') ? 'CONFIRMED' : 'PENDING',
         };
 
@@ -193,7 +232,7 @@ const TicketPage = () => {
         console.log('=== END DEBUG ===');
 
         try {
-            const paymentSuccess = await payFunction(price);
+            const paymentSuccess = await payFunction(price - discount);
             if (paymentSuccess === 'cancel') {
                 setLoading(false);
                 return;
@@ -208,7 +247,7 @@ const TicketPage = () => {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
                 },
                 body: JSON.stringify(ticketData),
             });
@@ -286,6 +325,9 @@ const TicketPage = () => {
         setSample2Name('');
         setAppointmentDate('');
         setPrice(0);
+        setVoucherCode('');
+        setVoucherInfo(null);
+        setDiscount(0);
     };
 
     return (
@@ -439,8 +481,32 @@ const TicketPage = () => {
                             />
                         </div>
 
+                        <div className="form-group">
+                            <label htmlFor="voucherCode">Mã voucher (nếu có):</label>
+                            <input
+                                id="voucherCode"
+                                type="text"
+                                value={voucherCode}
+                                onChange={e => setVoucherCode(e.target.value)}
+                                placeholder="Nhập mã giảm giá"
+                            />
+                            {voucherInfo && (
+                                <div style={{ color: '#2979ff', fontSize: 14, marginTop: 4 }}>
+                                    Áp dụng: {voucherInfo.type === 'percent' ? `${voucherInfo.value}%` : `${voucherInfo.value.toLocaleString()} VNĐ`}<br/>
+                                    Hiệu lực: {new Date(voucherInfo.start).toLocaleString()} - {new Date(voucherInfo.end).toLocaleString()}
+                                </div>
+                            )}
+                            {voucherCode && !voucherInfo && (
+                                <div style={{ color: '#f44336', fontSize: 14, marginTop: 4 }}>Voucher không hợp lệ hoặc đã hết hạn</div>
+                            )}
+                        </div>
+
                         <div className="price-display">
-                            Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}
+                            Giá dịch vụ: {price > 0 ? price.toLocaleString('vi-VN') + ' VNĐ' : '--'}<br/>
+                            {discount > 0 && (
+                                <span style={{ color: '#2979ff' }}>Giảm giá: -{discount.toLocaleString('vi-VN')} VNĐ</span>
+                            )}<br/>
+                            <b>Số tiền cần trả: {(price - discount > 0 ? (price - discount).toLocaleString('vi-VN') : 0) + ' VNĐ'}</b>
                         </div>
 
                         <button className="submit-btn" type="submit" disabled={loading}>
