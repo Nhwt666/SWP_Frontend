@@ -353,14 +353,17 @@ const AdminDashboardPage = () => {
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {recentCompletedTickets.map(item => (
-                                                    <tr key={item.id}>
-                                                        <td>{item.id}</td>
-                                                        <td>{item.customerName}</td>
-                                                        <td>{item.completedAt ? new Date(item.completedAt).toLocaleString('vi-VN') : ''}</td>
-                                                        <td>{item.status}</td>
-                                                    </tr>
-                                                ))}
+                                                {recentCompletedTickets
+                                                    .slice()
+                                                    .sort((a, b) => new Date(b.completedAt) - new Date(a.completedAt))
+                                                    .map(item => (
+                                                        <tr key={item.id}>
+                                                            <td>{item.id}</td>
+                                                            <td>{item.customerName}</td>
+                                                            <td>{item.completedAt ? new Date(item.completedAt).toLocaleString('vi-VN') : ''}</td>
+                                                            <td>{item.status}</td>
+                                                        </tr>
+                                                    ))}
                                                 </tbody>
                                             </table>
                                         )}
