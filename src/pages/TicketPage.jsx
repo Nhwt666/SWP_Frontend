@@ -206,18 +206,15 @@ const TicketPage = () => {
             type: typeMap[category],
             method: methodMap[method],
             reason: service || customReason,
-            address: method === 'Tự gửi mẫu' ? address : null,
-            phone: method === 'Tự gửi mẫu' ? phone : null,
-            email: method === 'Tự gửi mẫu' ? email : null,
-            appointmentDate: method === 'Tại cơ sở y tế' ? appointmentDate : null,
-            sample1Name: sample1Name,
-            sample2Name: sample2Name,
             customerId: userId,
             amount: price,
-            discountAmount: discount,
-            finalAmount: price - discount,
-            voucherCode: voucherCode || undefined,
+            address: method === 'Tự gửi mẫu' ? address : undefined,
+            phone: method === 'Tự gửi mẫu' ? phone : undefined,
+            email: method === 'Tự gửi mẫu' ? email : undefined,
+            sample1Name: sample1Name,
+            sample2Name: sample2Name,
             status: (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') ? 'CONFIRMED' : 'PENDING',
+            ...(voucherCode ? { voucherCode } : {})
         };
 
         // Debug log để kiểm tra trạng thái được gửi

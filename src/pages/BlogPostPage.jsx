@@ -386,9 +386,21 @@ const BlogPostPage = () => {
             <span className="blogpost-date">{post.createdAt || (post.date ? new Date(post.date).toLocaleDateString('vi-VN') : '')}</span>
           </div>
           <div className="blogpost-content">
-            {(post.content && typeof post.content === 'string') ? (
-              <div style={{whiteSpace: 'pre-line'}}>{post.content}</div>
-            ) : null}
+            {Array.isArray(post.content)
+              ? post.content.map((block, idx) => {
+                  if (block.type === 'h3') return <h3 key={idx}>{block.text}</h3>;
+                  if (block.type === 'h4') return <h4 key={idx}>{block.text}</h4>;
+                  if (block.type === 'p') return <p key={idx}>{block.text}</p>;
+                  if (block.type === 'highlight') return <div key={idx} style={{background:'#e3f0ff',padding:'10px 16px',borderRadius:8,margin:'12px 0',color:'#2979ff'}}><strong>{block.text}</strong></div>;
+                  if (block.type === 'ul' && Array.isArray(block.items)) return <ul key={idx}>{block.items.map((item,i)=><li key={i}>{item}</li>)}</ul>;
+                  if (block.type === 'table' && Array.isArray(block.headers) && Array.isArray(block.rows)) return (
+                    <table key={idx} className="blogpost-table"><thead><tr>{block.headers.map((h,i)=><th key={i}>{h}</th>)}</tr></thead><tbody>{block.rows.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody></table>
+                  );
+                  return null;
+                })
+              : (post.content && typeof post.content === 'string')
+                ? <div style={{whiteSpace: 'pre-line'}}>{post.content}</div>
+                : null}
           </div>
         </div>
       </main>

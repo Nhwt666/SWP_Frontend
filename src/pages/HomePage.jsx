@@ -2,6 +2,9 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../components/Header';
 import '../styles/HomePage.css';
+import AboutSection from '../components/AboutSection';
+import ExpertsSection from '../components/ExpertsSection';
+import ProcessSection from '../components/ProcessSection';
 
 const images = ['/18009999.png'];
 
@@ -20,38 +23,9 @@ const HomePage = () => {
                 </div>
                 <section className="gallery">
                     <div className="container">
-                        <h2 className="section-title">Về Chúng Tôi</h2>
-                        <section className="about-section">
-                            <div className="about-left">
-                                <img src="/nurse.png" alt="Nurse" className="about-avatar" />
-                            </div>
-                            <div className="about-right">
-                                <div className="about-box">
-                                    <span className="about-icon">🌟</span>
-                                    <div>
-                                        <strong>Tiên phong</strong> trong lĩnh vực xét nghiệm ADN tại Việt Nam, với đội ngũ chuyên gia giàu kinh nghiệm.
-                                    </div>
-                                </div>
-                                <div className="about-box">
-                                    <span className="about-icon">🧬</span>
-                                    <div>
-                                        <strong>Thiết bị hiện đại</strong> đạt chuẩn quốc tế, phục vụ các nhu cầu xét nghiệm huyết thống, pháp lý, y tế và di truyền.
-                                    </div>
-                                </div>
-                                <div className="about-box">
-                                    <span className="about-icon">🔒</span>
-                                    <div>
-                                        <strong>Uy tín</strong> qua hàng chục nghìn ca xét nghiệm chính xác và bảo mật, hỗ trợ cho cá nhân và cơ quan pháp luật.
-                                    </div>
-                                </div>
-                                <div className="about-box">
-                                    <span className="about-icon">🚀</span>
-                                    <div>
-                                        Sứ mệnh: <strong>"Chính xác – Bảo mật – Nhanh chóng"</strong>, mang đến dịch vụ ADN đáng tin cậy nhất.
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
+                        <AboutSection />
+                        <ExpertsSection />
+                        <ProcessSection />  
                         {/* Blog Section */}
                         <section className="blog-section" id="blog-section">
                             <h2 className="section-title blog-title">Tin Tức & Bài Viết</h2>
