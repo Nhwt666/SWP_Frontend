@@ -1,70 +1,116 @@
-# Getting Started with Create React App
+# 🧬 DNA Testing Service - Frontend Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A React-based frontend application for a DNA testing service that manages ticket requests, user authentication, payment processing, and administrative functions.
 
-## Available Scripts
+## 🚀 Features
 
-In the project directory, you can run:
+- **User Management** - Registration, authentication, role-based access (Member, Staff, Admin)
+- **Ticket Management** - DNA test requests, status tracking, test history
+- **Payment System** - Wallet top-up, payment processing, transaction history
+- **Admin Dashboard** - User management, ticket oversight, reports, voucher management
+- **Staff Interface** - Request processing, sample management, status updates
+- **Modern UI/UX** - Responsive design, charts, animations, toast notifications
 
-### `npm start`
+## 🛠️ Technology Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- **Frontend**: React 19.1.0, React Router DOM 7.6.1
+- **HTTP Client**: Axios 1.9.0
+- **UI/UX**: Lucide React, React Icons, Framer Motion 12.23.0
+- **Charts**: Chart.js 4.5.0, React Chart.js 2
+- **PDF**: jsPDF, PDFMake, HTML2Canvas
+- **Notifications**: React Toastify 11.0.5
+- **Testing**: React Testing Library
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📦 Installation
 
-### `npm test`
+### Prerequisites
+- Node.js (version 16 or higher)
+- Backend API server running on `http://localhost:8080`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Setup
+```bash
+git clone <repository-url>
+cd SWP_Frontend
+npm install
+npm start
+```
 
-### `npm run build`
+Open [http://localhost:3000](http://localhost:3000) to view the application.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🔧 Available Scripts
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
+- `npm run eject` - Ejects from Create React App (one-way operation)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🌐 API Configuration
 
-### `npm run eject`
+The application proxies API requests to the backend server on `http://localhost:8080`:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+```json
+{
+  "proxy": "http://localhost:8080"
+}
+```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📁 Project Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
+src/
+├── components/          # Reusable UI components
+├── pages/              # Page components (Home, Login, Ticket, Admin, etc.)
+├── services/           # API service functions
+├── hooks/              # Custom React hooks
+├── styles/             # CSS stylesheets
+├── lib/                # Utility libraries
+├── fonts/              # Custom fonts
+└── App.js              # Main application component
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🎯 Key Features by User Role
 
-## Learn More
+### 👤 Member Users
+- Create DNA test requests
+- View test history and status
+- Manage wallet and payments
+- Update profile information
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### 👨‍💼 Staff Users
+- Process incoming test requests
+- Update test statuses
+- Manage sample collection
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 👨‍💻 Admin Users
+- Manage all user accounts
+- Oversee all test requests
+- Generate reports and analytics
+- Manage vouchers and promotions
 
-### Code Splitting
+## 🔐 Authentication
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Uses JWT (JSON Web Tokens) for secure authentication with role-based access control.
 
-### Analyzing the Bundle Size
+## 🧪 Testing
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```bash
+npm test
+```
 
-### Making a Progressive Web App
+## 🚀 Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Production Build
+```bash
+npm run build
+```
 
-### Advanced Configuration
+### Environment Variables
+Create `.env` file:
+```env
+REACT_APP_API_URL=http://localhost:8080
+REACT_APP_ENVIRONMENT=development
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+---
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+**Built with ❤️ using React and modern web technologies**
