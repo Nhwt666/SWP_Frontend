@@ -178,7 +178,9 @@ const Header = () => {
                                                     cursor: noti.ticketId ? 'pointer' : 'default'
                                                 }}
                                                 onClick={() => {
-                                                    if (noti.ticketId) navigate(`/ticket/${noti.ticketId}`);
+                                                    if (noti.ticketId) {
+                                                        navigate('/test-history', { state: { ticketId: noti.ticketId } });
+                                                    }
                                                 }}
                                                 >
                                                     <div>{noti.message}</div>

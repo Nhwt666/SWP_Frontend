@@ -255,12 +255,12 @@ const TicketPage = () => {
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
                 
-                // Thông báo đặc biệt cho CIVIL SELF_TEST tickets
-                if (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') {
-                    alert(`✅ Tạo ticket thành công!\n\n📦 Ticket Dân sự + Tự gửi mẫu\n\nQuy trình mới:\n1. Kit sẽ được gửi đến bạn\n2. Bạn xác nhận nhận kit\n3. Bạn thu thập mẫu và gửi về\n4. Staff xử lý và trả kết quả\n\nVui lòng kiểm tra trạng thái trong "Lịch sử xét nghiệm"`);
-                } else {
-                    alert('✅ Tạo ticket thành công!');
-                }
+                // Remove alert for CIVIL SELF_TEST and normal ticket creation
+                // if (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') {
+                //     alert(`✅ Tạo ticket thành công!\n\n📦 Ticket Dân sự + Tự gửi mẫu\n\nQuy trình mới:\n1. Kit sẽ được gửi đến bạn\n2. Bạn xác nhận nhận kit\n3. Bạn thu thập mẫu và gửi về\n4. Staff xử lý và trả kết quả\n\nVui lòng kiểm tra trạng thái trong "Lịch sử xét nghiệm"`);
+                // } else {
+                //     alert('✅ Tạo ticket thành công!');
+                // }
                 
                 try {
                     const resUser = await fetch('/auth/me', {

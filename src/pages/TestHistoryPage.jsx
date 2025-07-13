@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import '../styles/TestHistoryPage.css';
 import Header from '../components/Header';
 import NotificationService from '../services/NotificationService';
+import { useLocation } from 'react-router-dom';
 
 // Đăng ký fonts mặc định trước
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
@@ -53,6 +54,11 @@ const TestHistoryPage = () => {
     const [feedbackSuccess, setFeedbackSuccess] = useState('');
     const [diagnosticResults, setDiagnosticResults] = useState('');
     const [currentUserId, setCurrentUserId] = useState(null);
+    // State for kit sent success modal
+    const [showKitSentModal, setShowKitSentModal] = useState(false);
+    // State for kit received success modal
+    const [showKitReceivedModal, setShowKitReceivedModal] = useState(false);
+    const location = useLocation();
 
     const fetchHistory = async () => {
         try {
@@ -102,6 +108,17 @@ const TestHistoryPage = () => {
         fetchStaff();
         getCurrentUser();
     }, []);
+
+    // Auto open ticket detail modal if ticketId is passed via navigation state
+    useEffect(() => {
+        if (location.state && location.state.ticketId && history.length > 0) {
+            const found = history.find(t => String(t.id) === String(location.state.ticketId));
+            if (found) {
+                setSelectedTicket(found);
+                setShowModal(true);
+            }
+        }
+    }, [location.state, history]);
 
     const handleRowClick = (item) => {
         setSelectedTicket(item);
@@ -769,17 +786,23 @@ const TestHistoryPage = () => {
                         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
                         background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
                     }}>
-                        <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 350, maxWidth: 500, boxShadow: '0 2px 16px rgba(0,0,0,0.2)' }}>
+                        <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 350, maxWidth: 500, boxShadow: '0 2px 16px rgba(0,0,0,0.2)', maxHeight: '80vh', overflowY: 'auto' }}>
                             <h3>Chi tiết phiếu xét nghiệm</h3>
                             <table style={{ width: '100%' }}>
                                 <tbody>
-                                    <tr><td><b>Ngày tạo:</b></td><td>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : ''}</td></tr>
-                                    <tr><td><b>Loại xét nghiệm:</b></td><td>{selectedTicket.reason || ''}</td></tr>
-                                    <tr><td><b>Phương thức:</b></td><td>{methodMap[selectedTicket.method] || selectedTicket.method || ''}</td></tr>
-                                    <tr><td><b>Tên Mẫu 1:</b></td><td>{selectedTicket.sample1Name || ''}</td></tr>
-                                    <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || ''}</td></tr>
-                                    <tr><td><b>Kết quả:</b></td><td>{getResultInfo(selectedTicket.resultString).conclusion}</td></tr>
-                                    <tr><td><b>Trạng thái:</b></td><td style={selectedTicket.status === 'REJECTED' ? { color: '#e53935', fontWeight: 700 } : {}}>{statusMap[selectedTicket.status] || selectedTicket.status || ''}</td></tr>
+                                    <tr><td><b>Mã phiếu:</b></td><td>{selectedTicket.id || 'N/A'}</td></tr>
+                                    <tr><td><b>Họ tên khách hàng:</b></td><td>{selectedTicket.customer?.fullName || selectedTicket.customer?.name || 'N/A'}</td></tr>
+                                    <tr><td><b>Số điện thoại:</b></td><td>{selectedTicket.customer?.phone || selectedTicket.phone || 'N/A'}</td></tr>
+                                    <tr><td><b>Email:</b></td><td>{selectedTicket.customer?.email || selectedTicket.email || 'N/A'}</td></tr>
+                                    <tr><td><b>Địa chỉ:</b></td><td>{selectedTicket.address || 'N/A'}</td></tr>
+                                    <tr><td><b>Ngày tạo:</b></td><td>{selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleString('vi-VN') : 'N/A'}</td></tr>
+                                    {selectedTicket.appointmentDate && <tr><td><b>Ngày hẹn:</b></td><td>{new Date(selectedTicket.appointmentDate).toLocaleDateString('vi-VN')}</td></tr>}
+                                    <tr><td><b>Loại xét nghiệm:</b></td><td>{selectedTicket.reason || 'N/A'}</td></tr>
+                                    <tr><td><b>Phương thức:</b></td><td>{methodMap[selectedTicket.method] || selectedTicket.method || 'N/A'}</td></tr>
+                                    <tr><td><b>Tên Mẫu 1:</b></td><td>{selectedTicket.sample1Name || 'N/A'}</td></tr>
+                                    <tr><td><b>Tên Mẫu 2:</b></td><td>{selectedTicket.sample2Name || 'N/A'}</td></tr>
+                                    <tr><td><b>Kết quả:</b></td><td>{getResultInfo(selectedTicket.resultString).conclusion || 'N/A'}</td></tr>
+                                    <tr><td><b>Trạng thái:</b></td><td style={selectedTicket.status === 'REJECTED' ? { color: '#e53935', fontWeight: 700 } : {}}>{statusMap[selectedTicket.status] || selectedTicket.status || 'N/A'}</td></tr>
                                     {selectedTicket.status === 'REJECTED' && (
                                         <tr>
                                             <td><b>Lý Do:</b></td>
@@ -787,13 +810,9 @@ const TestHistoryPage = () => {
                                         </tr>
                                     )}
                                     {selectedTicket.staffId && <tr><td><b>Nhân viên xử lý:</b></td><td>{getStaffName(selectedTicket.staffId)}</td></tr>}
-                                    {selectedTicket.method === 'SELF_TEST' && (
-                                        <>
-                                            <tr><td><b>Địa chỉ:</b></td><td>{selectedTicket.address || ''}</td></tr>
-                                            <tr><td><b>Email:</b></td><td>{selectedTicket.email || ''}</td></tr>
-                                            <tr><td><b>Số điện thoại:</b></td><td>{selectedTicket.phone || ''}</td></tr>
-                                        </>
-                                    )}
+                                    {selectedTicket.amount !== undefined && <tr><td><b>Số tiền:</b></td><td>{Number(selectedTicket.amount).toLocaleString('vi-VN')} đ</td></tr>}
+                                    {selectedTicket.note && <tr><td><b>Ghi chú:</b></td><td>{selectedTicket.note}</td></tr>}
+                                    {selectedTicket.feedback && <tr><td><b>Feedback:</b></td><td>{typeof selectedTicket.feedback === 'object' ? (selectedTicket.feedback.feedback || 'Đã đánh giá') : selectedTicket.feedback}</td></tr>}
                                 </tbody>
                             </table>
                             
@@ -826,8 +845,8 @@ const TestHistoryPage = () => {
                                                             } catch (notiError) {
                                                                 console.error('Lỗi tạo notification:', notiError);
                                                             }
-                                                            
-                                                            alert('✅ Đã xác nhận nhận kit thành công!');
+                                                            setShowKitReceivedModal(true);
+                                                            setTimeout(() => setShowKitReceivedModal(false), 2000);
                                                             setShowModal(false);
                                                             fetchHistory();
                                                         } else {
@@ -876,8 +895,8 @@ const TestHistoryPage = () => {
                                                             } catch (notiError) {
                                                                 console.error('Lỗi tạo notification:', notiError);
                                                             }
-                                                            
-                                                            alert('✅ Đã xác nhận gửi kit thành công!');
+                                                            setShowKitSentModal(true);
+                                                            setTimeout(() => setShowKitSentModal(false), 2000);
                                                             setShowModal(false);
                                                             fetchHistory();
                                                         } else {
@@ -1086,56 +1105,7 @@ const TestHistoryPage = () => {
                                     ✅ {feedbackSuccess}
                                 </div>
                             )}
-                            
-                            {/* Debug info */}
-                            <div style={{ 
-                                background: '#f5f5f5', 
-                                padding: 8, 
-                                borderRadius: 4, 
-                                marginBottom: 16, 
-                                fontSize: 12,
-                                color: '#666'
-                            }}>
-                                <strong>Thông tin Ticket:</strong><br/>
-                                ID: {selectedTicket.id}<br/>
-                                Trạng thái: {selectedTicket.status}<br/>
-                                Ngày tạo: {selectedTicket.createdAt ? new Date(selectedTicket.createdAt).toLocaleDateString('vi-VN') : 'N/A'}<br/>
-                                Đã có feedback: {hasFeedback(selectedTicket) ? 'Có' : 'Chưa có'}<br/>
-                                <br/>
-                                <strong>API Endpoint:</strong><br/>
-                                PUT /customer/tickets/{selectedTicket.id}/feedback<br/>
-                                <br/>
-                                <button 
-                                    onClick={checkBackendInfo}
-                                    style={{ 
-                                        padding: '4px 8px', 
-                                        background: '#ff9800', 
-                                        color: '#fff', 
-                                        border: 'none', 
-                                        borderRadius: 3, 
-                                        cursor: 'pointer',
-                                        fontSize: 10
-                                    }}
-                                >
-                                    🔍 Kiểm tra Backend
-                                </button>
-                                {diagnosticResults && (
-                                    <div style={{ 
-                                        marginTop: 8, 
-                                        padding: 6, 
-                                        background: '#fff', 
-                                        border: '1px solid #ddd',
-                                        borderRadius: 3,
-                                        maxHeight: 120,
-                                        overflowY: 'auto',
-                                        whiteSpace: 'pre-wrap',
-                                        fontSize: 10
-                                    }}>
-                                        <strong>Kết quả kiểm tra:</strong><br/>
-                                        {diagnosticResults}
-                                    </div>
-                                )}
-                            </div>
+                            {/* Xoá phần debug info ở đây */}
                             
                             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
                                 <button
@@ -1194,6 +1164,71 @@ const TestHistoryPage = () => {
                                     )}
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Kit sent success modal */}
+                {showKitSentModal && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                        background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000
+                    }}>
+                        <div style={{
+                            background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
+                            boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
+                        }}>
+                            <div style={{ marginBottom: 18 }}>
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
+                                    <circle cx="24" cy="24" r="20" fill="#e8f5e8"/>
+                                    <path d="M20 24l4 4 8-8" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div style={{ fontSize: 18, marginBottom: 18 }}>
+                                ✅ Đã xác nhận gửi kit thành công!
+                            </div>
+                            <button
+                                onClick={() => setShowKitSentModal(false)}
+                                style={{
+                                    background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
+                                    padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
+                                onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
+                            >Đóng</button>
+                        </div>
+                    </div>
+                )}
+                {/* Kit received success modal */}
+                {showKitReceivedModal && (
+                    <div style={{
+                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                        background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 3000
+                    }}>
+                        <div style={{
+                            background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
+                            boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
+                        }}>
+                            <div style={{ marginBottom: 18 }}>
+                                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
+                                    <circle cx="24" cy="24" r="20" fill="#e8f5e8"/>
+                                    <path d="M20 24l4 4 8-8" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                            </div>
+                            <div style={{ fontSize: 18, marginBottom: 18 }}>
+                                ✅ Đã xác nhận nhận kit thành công!
+                            </div>
+                            <button
+                                onClick={() => setShowKitReceivedModal(false)}
+                                style={{
+                                    background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
+                                    padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
+                                    boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
+                                }}
+                                onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
+                                onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
+                            >Đóng</button>
                         </div>
                     </div>
                 )}
