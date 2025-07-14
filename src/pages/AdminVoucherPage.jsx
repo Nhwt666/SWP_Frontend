@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import AdminLayout from '../components/AdminLayout';
 import { FaEdit, FaTrash, FaCheck, FaTimes, FaPlusCircle, FaClock, FaCalendarDay } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
+import '../styles/AdminVoucherPage.css';
 
 const defaultVouchers = [];
 
@@ -14,6 +15,8 @@ export default function AdminVoucherPage() {
   const [timer, setTimer] = useState(Date.now());
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [nameExists, setNameExists] = useState(false);
 
   // Fetch vouchers from backend
   const fetchVouchers = async () => {
@@ -45,6 +48,12 @@ export default function AdminVoucherPage() {
 
   const handleCreate = async e => {
     e.preventDefault();
+    setSubmitted(true);
+    // Kiểm tra trùng tên voucher
+    const nameTrim = form.name.trim().toLowerCase();
+    const isDuplicate = vouchers.some(v => v.name.trim().toLowerCase() === nameTrim);
+    setNameExists(isDuplicate);
+    if (isDuplicate) return;
     if (!form.name || !form.value || !form.start || !form.endDate) return;
     const body = {
       name: form.name,
@@ -142,44 +151,40 @@ export default function AdminVoucherPage() {
           <FaCalendarDay style={{ marginRight: 8, color: '#43a047' }} />
           Đang còn hiệu lực: {activeCount} voucher
         </div>
-        <form onSubmit={handleCreate} style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-          gap: 18,
-          alignItems: 'end',
-          marginBottom: 36,
-          border: '1.5px solid #e3f0ff',
-          borderRadius: 12,
-          padding: 18,
-          background: '#f7fafd',
-          maxWidth: 900,
-        }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Tên voucher</label>
-            <input name="name" value={form.name} onChange={handleChange} required style={{ borderRadius: 8, border: '1.5px solid #b3c6e0', padding: 8, fontSize: 16, width: '100%' }} />
+        <div className="voucher-form-simple-header">
+          <FaPlusCircle style={{marginRight: 12, fontSize: 28, color: '#1976d2'}}/>
+          <span>Tạo voucher mới</span>
+        </div>
+        <div className="voucher-form-simple-desc">Điền thông tin để tạo voucher giảm giá mới</div>
+        <form className="voucher-form-simple" onSubmit={handleCreate} noValidate>
+          <div className="voucher-form-simple-grid">
+            <div className="form-group-simple">
+              <label htmlFor="name">Tên voucher</label>
+              <input id="name" name="name" value={form.name} onChange={handleChange} required placeholder="Nhập tên voucher..." className="input-simple" />
+            </div>
+            <div className="form-group-simple">
+              <label htmlFor="type">Loại giảm giá</label>
+              <select id="type" name="type" value={form.type} onChange={handleChange} required className="input-simple">
+                <option value="%">Phần trăm (%)</option>
+                <option value="VND">Số tiền (VND)</option>
+              </select>
+            </div>
+            <div className="form-group-simple">
+              <label htmlFor="value">Giá trị</label>
+              <input id="value" name="value" type="number" value={form.value} onChange={handleChange} required placeholder="Nhập giá trị..." className="input-simple" />
+            </div>
+            <div className="form-group-simple">
+              <label htmlFor="start">Thời gian bắt đầu</label>
+              <input id="start" name="start" type="datetime-local" value={form.start} onChange={handleChange} required placeholder="mm/dd/yyyy --:-- --" className="input-simple" />
+            </div>
+            <div className="form-group-simple">
+              <label htmlFor="end">Thời gian kết thúc</label>
+              <input id="end" name="endDate" type="datetime-local" value={form.endDate} onChange={handleChange} required placeholder="mm/dd/yyyy --:-- --" className="input-simple" />
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Loại</label>
-            <select name="type" value={form.type} onChange={handleChange} style={{ borderRadius: 8, border: '1.5px solid #b3c6e0', padding: 8, fontSize: 16, width: '100%' }}>
-              <option value="percent">%</option>
-              <option value="amount">VNĐ</option>
-            </select>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Giá trị</label>
-            <input name="value" type="number" value={form.value} onChange={handleChange} required min={1} style={{ borderRadius: 8, border: '1.5px solid #b3c6e0', padding: 8, fontSize: 16, width: '100%' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Bắt đầu</label>
-            <input name="start" type="datetime-local" value={form.start} onChange={handleChange} required style={{ borderRadius: 8, border: '1.5px solid #b3c6e0', padding: 8, fontSize: 16, width: '100%' }} />
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <label style={{ fontWeight: 600 }}>Kết thúc</label>
-            <input name="endDate" type="datetime-local" value={form.endDate} onChange={handleChange} required style={{ borderRadius: 8, border: '1.5px solid #b3c6e0', padding: 8, fontSize: 16, width: '100%' }} />
-          </div>
-          <div style={{ display: 'flex', alignItems: 'flex-end', height: '100%' }}>
-            <button type="submit" style={{ padding: '10px 22px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: 10, fontWeight: 700, fontSize: 17, boxShadow: '0 2px 8px #1976d233', display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}><FaPlusCircle />Tạo voucher</button>
-          </div>
+          <button type="submit" className="btn-create-simple" disabled={!form.name || !form.value || !form.start || !form.endDate}>
+            <FaPlusCircle style={{marginRight: 8, fontSize: 18}}/> Tạo voucher
+          </button>
         </form>
         <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', background: '#f7fafd', borderRadius: 16, overflow: 'hidden', fontSize: 17, minWidth: 700 }}>

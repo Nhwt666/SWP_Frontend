@@ -1,0 +1,108 @@
+.voucher-form-simple-header {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 0;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.voucher-form-simple-desc {
+  color: #9e9e9e;
+  font-size: 1.05rem;
+  margin-bottom: 32px;
+  margin-left: 40px;
+  margin-top: 4px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.voucher-form-simple {
+  margin-top: 0;
+  margin-bottom: 32px;
+  background: #fff;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.voucher-form-simple-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px 48px;
+  margin-bottom: 32px;
+}
+.form-group-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.voucher-form-simple label {
+  font-size: 1.08rem;
+  color: #222;
+  font-weight: 700;
+  margin-bottom: 6px;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.input-simple {
+  border: 1.8px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 16px 18px;
+  font-size: 1.08rem;
+  transition: border 0.18s;
+  outline: none;
+  font-family: 'Roboto', Arial, sans-serif;
+  color: #222;
+  box-sizing: border-box;
+  width: 98%;
+  margin-left: 0;
+  margin-right: 0;
+}
+.input-simple::placeholder {
+  color: #bdbdbd;
+  opacity: 1;
+  font-size: 1.08rem;
+}
+.input-simple:focus {
+  border: 1.8px solid #1976d2;
+  background: #fff;
+}
+.btn-create-simple {
+  margin-top: 18px;
+  background: #bdbdbd;
+  color: #fff;
+  padding: 15px 36px;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.13rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.18s, opacity 0.18s;
+  box-shadow: none;
+  font-family: 'Roboto', Arial, sans-serif;
+}
+.btn-create-simple:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #bdbdbd;
+}
+.btn-create-simple:not(:disabled):hover {
+  background: #9e9e9e;
+}
+@media (max-width: 700px) {
+  .voucher-form-simple-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .form-group-simple[style] {
+    grid-column: span 1 !important;
+  }
+  .btn-create-simple {
+    width: 100%;
+    justify-content: center;
+  }
+  .input-simple {
+    width: 100%;
+  }
+} 

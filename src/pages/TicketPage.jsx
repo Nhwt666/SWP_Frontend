@@ -12,7 +12,7 @@ const pricingData = {
     'Xác minh danh tính': 1300000,
     'Xác minh quyền lợi bảo hiểm': 1600000,
     'Xác minh quyền thừa kế trong di chúc': 1700000,
-    'Khác': 900000,
+    'Khác': 1900000,
 };
 
 const TicketPage = () => {
