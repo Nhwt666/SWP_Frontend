@@ -268,7 +268,7 @@ const StaffPage = () => {
             const oldStatus = ticket.status;
             const detailedResult = generateDetailedResult(ticket, result);
             
-            const res = await fetch(`${API_BASE}/tickets/${id}/complete`, {
+            const res = await fetch(`${API_BASE}/staff/${id}/complete`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
                 body: JSON.stringify(detailedResult),
