@@ -214,7 +214,8 @@ const TicketPage = () => {
             sample1Name: sample1Name,
             sample2Name: sample2Name,
             status: (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') ? 'CONFIRMED' : 'PENDING',
-            ...(voucherCode ? { voucherCode } : {})
+            ...(voucherCode ? { voucherCode } : {}),
+            appointmentDate: method === 'Tại cơ sở y tế' ? appointmentDate : undefined
         };
 
         // Debug log để kiểm tra trạng thái được gửi
