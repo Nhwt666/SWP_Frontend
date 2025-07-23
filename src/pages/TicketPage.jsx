@@ -5,15 +5,7 @@ import TicketCreateModal from '../components/TicketCreateModal';
 import TicketEditModal from '../components/TicketEditModal';
 import Header from '../components/Header';
 
-const pricingData = {
-    'Xác minh quyền thừa kế': 1200000,
-    'Xác minh quan hệ huyết thống': 1500000,
-    'Giám định ADN cho con nuôi': 1000000,
-    'Xác minh danh tính': 1300000,
-    'Xác minh quyền lợi bảo hiểm': 1600000,
-    'Xác minh quyền thừa kế trong di chúc': 1700000,
-    'Khác': 1900000,
-};
+// Remove static pricingData
 
 const TicketPage = () => {
     const [category, setCategory] = useState('');
@@ -44,6 +36,9 @@ const TicketPage = () => {
     const [voucherCode, setVoucherCode] = useState('');
     const [voucherInfo, setVoucherInfo] = useState(null);
     const [discount, setDiscount] = useState(0);
+    const [prices, setPrices] = useState([]);
+    const [pricesLoading, setPricesLoading] = useState(true);
+    const [pricesError, setPricesError] = useState(null);
 
     const civilServices = [
         'Xác minh quyền thừa kế',
@@ -56,6 +51,41 @@ const TicketPage = () => {
         'Xác minh quyền lợi bảo hiểm',
         'Xác minh quyền thừa kế trong di chúc',
     ];
+
+    // Fetch price list from API
+    useEffect(() => {
+        const fetchPrices = async () => {
+            setPricesLoading(true);
+            setPricesError(null);
+            try {
+                const res = await fetch('/api/prices');
+                if (!res.ok) throw new Error('Không thể tải dữ liệu bảng giá');
+                const data = await res.json();
+                setPrices(data);
+            } catch (err) {
+                setPricesError(err.message || 'Lỗi không xác định');
+            } finally {
+                setPricesLoading(false);
+            }
+        };
+        fetchPrices();
+    }, []);
+
+    // Set price based on selected service/category and fetched prices
+    useEffect(() => {
+        if (!prices || prices.length === 0) {
+            setPrice(0);
+            return;
+        }
+        let selectedName = '';
+        if (category === 'Khác') {
+            selectedName = 'Khác';
+        } else if (service) {
+            selectedName = service;
+        }
+        const found = prices.find(p => p.name === selectedName);
+        setPrice(found ? found.value : 0);
+    }, [category, service, prices]);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
@@ -94,16 +124,6 @@ const TicketPage = () => {
             setEmail('');
         }
     }, [method, userInfo]);
-
-    useEffect(() => {
-        let calculated = 0;
-        if (category === 'Khác') {
-            calculated = pricingData['Khác'];
-        } else if (service && pricingData[service]) {
-            calculated = pricingData[service];
-        }
-        setPrice(calculated);
-    }, [category, service]);
 
     useEffect(() => {
         if (!voucherCode || price === 0) {
@@ -173,7 +193,7 @@ const TicketPage = () => {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             const appointmentDateObj = new Date(appointmentDate);
-            
+
             if (appointmentDateObj < today) {
                 setErrorMsg('❌ Ngày hẹn không được nhỏ hơn ngày hiện tại! Vui lòng chọn ngày hẹn từ hôm nay trở đi.');
                 setShowErrorModal(true);
@@ -255,14 +275,14 @@ const TicketPage = () => {
                 const history = JSON.parse(localStorage.getItem('ticketHistory')) || [];
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
-                
+
                 // Remove alert for CIVIL SELF_TEST and normal ticket creation
                 // if (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') {
                 //     alert(`✅ Tạo ticket thành công!\n\n📦 Ticket Dân sự + Tự gửi mẫu\n\nQuy trình mới:\n1. Kit sẽ được gửi đến bạn\n2. Bạn xác nhận nhận kit\n3. Bạn thu thập mẫu và gửi về\n4. Staff xử lý và trả kết quả\n\nVui lòng kiểm tra trạng thái trong "Lịch sử xét nghiệm"`);
                 // } else {
                 //     alert('✅ Tạo ticket thành công!');
                 // }
-                
+
                 try {
                     const resUser = await fetch('/auth/me', {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -284,7 +304,7 @@ const TicketPage = () => {
                 console.error('Error response body:', errText);
                 console.error('Request data sent:', ticketData);
                 console.error('=== END ERROR DEBUG ===');
-                
+
                 let errorMessage = 'Lỗi không xác định';
                 try {
                     const errorData = JSON.parse(errText);
@@ -292,7 +312,7 @@ const TicketPage = () => {
                 } catch (e) {
                     errorMessage = errText || 'Lỗi không xác định';
                 }
-                
+
                 setErrorMsg(`❌ Tạo ticket thất bại:\n\n${errorMessage}\n\n📋 Chi tiết:\n- Status: ${res.status}\n- Type: ${ticketData.type}\n- Method: ${ticketData.method}\n- Status: ${ticketData.status}`);
                 setShowErrorModal(true);
             }
@@ -303,7 +323,7 @@ const TicketPage = () => {
             console.error('Error stack:', err.stack);
             console.error('Request data that failed:', ticketData);
             console.error('=== END NETWORK ERROR ===');
-            
+
             setErrorMsg(`❌ Không thể kết nối đến máy chủ:\n\n${err.message}\n\n📋 Chi tiết:\n- Error type: ${err.name}\n- Type: ${ticketData.type}\n- Method: ${ticketData.method}\n- Status: ${ticketData.status}`);
             setShowErrorModal(true);
         } finally {
@@ -513,7 +533,7 @@ const TicketPage = () => {
                     </form>
                 </div>
             </div>
-            
+
             {/* Footer with Map */}
             <footer className="member-footer">
                 <div className="member-footer-content">
@@ -536,7 +556,7 @@ const TicketPage = () => {
                     </div>
                 </div>
             </footer>
-            
+
             {showConfirmModal && (
                 <div style={{
                     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',

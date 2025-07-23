@@ -1,109 +1,76 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import '../styles/PricingPage.css';
 
 const PricingPage = () => {
+    const [prices, setPrices] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchPrices = async () => {
+            setLoading(true);
+            setError(null);
+            try {
+                const res = await fetch('/api/prices');
+                if (!res.ok) throw new Error('Không thể tải dữ liệu bảng giá');
+                const data = await res.json();
+                setPrices(data);
+                console.log('Fetched prices:', data); // For debugging structure
+            } catch (err) {
+                setError(err.message || 'Lỗi không xác định');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPrices();
+    }, []);
+
+    // Vietnamese headers
+    const headers = [
+        { key: 'id', label: 'STT' },
+        { key: 'value', label: 'GIÁ TRỊ' },
+        { key: 'currency', label: 'TIỀN TỆ' },
+        { key: 'name', label: 'TÊN DỊCH VỤ' },
+    ];
+
     return (
         <>
             <Header />
             <div className="pricing-page">
                 <div className="pricing-container">
                     <h1 className="pricing-title">Bảng Giá Xét Nghiệm ADN</h1>
-
-                    <section className="pricing-section">
-                        <h2 className="pricing-section-title">Huyết Thống Cha – Con, Mẹ – Con Dân Sự</h2>
-                        <div className="pricing-table-wrap">
-                            <table className="pricing-table">
-                                <thead>
+                    {loading && <div>Đang tải dữ liệu...</div>}
+                    {error && <div style={{color: 'red'}}>Lỗi: {error}</div>}
+                    {!loading && !error && prices && Array.isArray(prices) && prices.length > 0 && (
+                        <section className="pricing-section">
+                            <div className="pricing-table-wrap">
+                                <table className="pricing-table">
+                                    <thead>
                                     <tr>
-                                        <th>QUY CÁCH</th>
-                                        <th>THỜI GIAN</th>
-                                        <th>CHI PHÍ (VNĐ)</th>
+                                        {headers.map(h => (
+                                            <th key={h.key}>{h.label}</th>
+                                        ))}
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Tiêu Chuẩn</td><td>02 Ngày</td><td>2.500.000</td></tr>
-                                    <tr><td>Làm Nhanh</td><td>06 – 08 Tiếng</td><td>5.000.000</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <ul className="pricing-note-list">
-                            <li>Giá trên áp dụng cho mẫu niêm mạc miệng và máu.</li>
-                            <li>Đối với mẫu tóc, móng tay, chân, cuống rốn, cộng thêm <strong>500.000 VNĐ</strong>/ trường hợp.</li>
-                            <li>Đối với các mẫu đặc biệt (dao cạo râu, đầu lọc thuốc lá, bã kẹo cao su, bàn chải đánh răng, mẫu tinh trùng) cộng thêm <strong>2.000.000 VNĐ</strong>/ trường hợp. Trong trường hợp 2 mẫu đều là mẫu đặc biệt thì cộng thêm <strong>500.000 VNĐ</strong>.</li>
-                        </ul>
-                    </section>
-
-                    <section className="pricing-section">
-                        <h2 className="pricing-section-title">Huyết Thống Cha – Con, Mẹ – Con Hành Chính Khai Sinh</h2>
-                        <div className="pricing-table-wrap">
-                            <table className="pricing-table">
-                                <thead>
-                                    <tr><th>QUY CÁCH</th><th>THỜI GIAN</th><th>CHI PHÍ (VNĐ)</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Tiêu chuẩn</td><td>02 Ngày</td><td>3.500.000</td></tr>
-                                    <tr><td>Làm Nhanh</td><td>06 – 08 Tiếng</td><td>6.000.000</td></tr>
-                                    <tr><td>Cần hợp pháp hóa lãnh sự</td><td>7 Ngày</td><td>5.000.000</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="pricing-note">Đối với xét nghiệm thủ tục hành chính chỉ sử dụng mẫu máu hoặc mẫu niêm mạc miệng.</div>
-                    </section>
-
-                    <section className="pricing-section">
-                        <h2 className="pricing-section-title">Xét Nghiệm ADN Theo Dòng Cha (Dân Sự)</h2>
-                        <div className="pricing-table-wrap">
-                            <table className="pricing-table">
-                                <thead>
-                                    <tr><th>QUY CÁCH</th><th>THỜI GIAN</th><th>CHI PHÍ (VNĐ)</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Tiêu chuẩn</td><td>05 Ngày</td><td>4.000.000</td></tr>
-                                    <tr><td>Làm Nhanh</td><td>03 Ngày</td><td>6.500.000</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="pricing-section">
-                        <h2 className="pricing-section-title">Xét Nghiệm ADN Theo Dòng Cha (Hành Chính)</h2>
-                        <div className="pricing-table-wrap">
-                            <table className="pricing-table">
-                                <thead>
-                                    <tr><th>QUY CÁCH</th><th>THỜI GIAN</th><th>CHI PHÍ (VNĐ)</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>Tiêu chuẩn</td><td>05 Ngày</td><td>5.000.000</td></tr>
-                                    <tr><td>Làm Nhanh</td><td>03 Ngày</td><td>7.500.000</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <section className="pricing-section">
-                        <h2 className="pricing-section-title">Xét Nghiệm ADN Theo Dòng Mẹ</h2>
-                        <div className="pricing-table-wrap">
-                            <table className="pricing-table">
-                                <thead>
-                                    <tr><th>LOẠI</th><th>THỜI GIAN</th><th>CHI PHÍ (VNĐ)</th></tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td>ADN Ty thể (Dân sự)</td><td>07 Ngày</td><td>4.000.000</td></tr>
-                                    <tr><td>ADN Ty thể (Hành chính)</td><td>07 Ngày</td><td>5.000.000</td></tr>
-                                    <tr><td>Giám định hài cốt</td><td>30 Ngày</td><td>7.000.000</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <div className="pricing-summary">
-                        <p>Giá xét nghiệm ADN từ <strong>3.000.000 VNĐ</strong> đến <strong>6.000.000 VNĐ</strong>. Chi phí cho một lần Xét Nghiệm ADN làm nhanh giao động từ <strong>5.500.000 VNĐ</strong> đến <strong>8.500.000 VNĐ</strong>.</p>
-                        <p><strong>Ghi chú:</strong> Trường hợp làm thủ tục hành chính, pháp lý sẽ do nhân viên trung tâm trực tiếp thu mẫu. Vui lòng xem hướng dẫn thủ tục xét nghiệm ADN.</p>
-                    </div>
+                                    </thead>
+                                    <tbody>
+                                    {prices.map((row, i) => (
+                                        <tr key={row.id || i}>
+                                            {headers.map(h => (
+                                                <td key={h.key}>{row[h.key]}</td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                    )}
+                    {!loading && !error && (!prices || prices.length === 0) && (
+                        <div>Không có dữ liệu bảng giá.</div>
+                    )}
                 </div>
             </div>
-            
             {/* Footer with Map */}
             <footer className="member-footer">
                 <div className="member-footer-content">
