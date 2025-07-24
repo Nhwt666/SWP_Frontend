@@ -782,11 +782,8 @@ const TestHistoryPage = () => {
                 )}
 
                 {showModal && selectedTicket && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                        background: 'rgba(0,0,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-                    }}>
-                        <div style={{ background: '#fff', borderRadius: 8, padding: 32, minWidth: 350, maxWidth: 500, boxShadow: '0 2px 16px rgba(0,0,0,0.2)', maxHeight: '80vh', overflowY: 'auto' }}>
+                    <div className="modal-overlay">
+                        <div className="modal-content" style={{maxWidth: 500, minWidth: 350, maxHeight: '80vh', overflowY: 'auto'}}>
                             <h3>Chi tiết phiếu xét nghiệm</h3>
                             <table style={{ width: '100%' }}>
                                 <tbody>
@@ -1009,20 +1006,8 @@ const TestHistoryPage = () => {
 
                 {/* Feedback Modal */}
                 {showFeedbackModal && selectedTicket && (
-                    <div style={{
-                        position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                        background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-                    }}>
-                        <div style={{ 
-                            background: '#fff', 
-                            borderRadius: 12, 
-                            padding: 32, 
-                            minWidth: 400, 
-                            maxWidth: 500, 
-                            boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
-                            maxHeight: '90vh',
-                            overflowY: 'auto'
-                        }}>
+                    <div className="modal-overlay">
+                        <div className="modal-content" style={{maxWidth: 420}}>
                             <div style={{ textAlign: 'center', marginBottom: 24 }}>
                                 <h3 style={{ color: '#233a7d', margin: '0 0 8px 0', fontSize: '1.5rem' }}>
                                     ⭐ Đánh giá dịch vụ
@@ -1079,31 +1064,11 @@ const TestHistoryPage = () => {
                             </div>
                             
                             {feedbackError && (
-                                <div style={{ 
-                                    background: '#ffebee', 
-                                    color: '#c62828', 
-                                    padding: 12, 
-                                    borderRadius: 8, 
-                                    marginBottom: 16,
-                                    border: '1px solid #ffcdd2',
-                                    fontSize: 14
-                                }}>
-                                    ❌ {feedbackError}
-                                </div>
+                                <div className="modal-error-box">❌ {feedbackError}</div>
                             )}
                             
                             {feedbackSuccess && (
-                                <div style={{ 
-                                    background: '#e8f5e8', 
-                                    color: '#2e7d32', 
-                                    padding: 12, 
-                                    borderRadius: 8, 
-                                    marginBottom: 16,
-                                    border: '1px solid #c8e6c9',
-                                    fontSize: 14
-                                }}>
-                                    ✅ {feedbackSuccess}
-                                </div>
+                                <div className="modal-success-box">✅ {feedbackSuccess}</div>
                             )}
                             {/* Xoá phần debug info ở đây */}
                             

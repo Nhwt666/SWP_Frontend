@@ -12,6 +12,7 @@ const RegisterPage = () => {
     const [message, setMessage] = useState('');
     const [showOtpForm, setShowOtpForm] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [errorMessages, setErrorMessages] = useState([]);
 
     const navigate = useNavigate();
 
@@ -19,6 +20,7 @@ const RegisterPage = () => {
         e.preventDefault();
         setIsLoading(true);
         setMessage('');
+        setErrorMessages([]);
 
         try {
             const res = await fetch('/auth/request-register', {
@@ -36,11 +38,22 @@ const RegisterPage = () => {
                 setMessage('✅ OTP đã được gửi tới email. Vui lòng nhập để xác nhận.');
                 setShowOtpForm(true);
             } else {
-                const err = await res.text();
-                setMessage('❌' + err);
+                let errText = await res.text();
+                let errors = [];
+                try {
+                    const errObj = JSON.parse(errText);
+                    if (typeof errObj === 'object' && errObj !== null) {
+                        errors = Object.values(errObj);
+                    } else {
+                        errors = [errText];
+                    }
+                } catch {
+                    errors = [errText];
+                }
+                setErrorMessages(errors);
             }
         } catch (error) {
-            setMessage('❌ Không thể kết nối đến server.');
+            setErrorMessages(['Không thể kết nối đến server.']);
         } finally {
             setIsLoading(false);
         }
@@ -100,6 +113,13 @@ const RegisterPage = () => {
             <div className="register-bg">
                 <div className="register-container flex-col">
                     <h2 className="register-title" style={{ fontFamily: 'Be Vietnam Pro, Inter, Arial, sans-serif', fontWeight: 900 }}>Đăng Ký</h2>
+                    {errorMessages.length > 0 && (
+                        <div className="member-error-box">
+                            {errorMessages.map((msg, idx) => (
+                                <div key={idx} className="member-error-line">❌ {msg}</div>
+                            ))}
+                        </div>
+                    )}
                     {!showOtpForm ? (
                         <form className="register-form" onSubmit={handleRegister} autoComplete="off">
                             <input

@@ -558,15 +558,9 @@ const TicketPage = () => {
             </footer>
 
             {showConfirmModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-                }}>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
-                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
-                    }}>
-                        <div style={{ marginBottom: 18 }}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
                                 <rect x="4" y="12" width="40" height="24" rx="8" fill="#e0f2fe"/>
                                 <rect x="4" y="12" width="40" height="24" rx="8" stroke="#22c55e" strokeWidth="2"/>
@@ -574,102 +568,51 @@ const TicketPage = () => {
                                 <text x="24" y="28" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#22c55e">₫</text>
                             </svg>
                         </div>
-                        <div style={{ fontSize: 18, marginBottom: 18 }}>
+                        <div className="modal-title-confirm">
                             Xác nhận thanh toán <b style={{ fontSize: 22 }}>{confirmAmount.toLocaleString('vi-VN')}</b> VNĐ?
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'center', gap: 16 }}>
-                            <button
-                                onClick={handleConfirm}
-                                style={{
-                                    background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
-                                    padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-                                    boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
-                                }}
-                                onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
-                                onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
-                            >Xác nhận</button>
-                            <button
-                                onClick={handleCancel}
-                                style={{
-                                    background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: 8,
-                                    padding: '10px 28px', fontWeight: 600, fontSize: 16, cursor: 'pointer',
-                                    boxShadow: '0 2px 8px rgba(30,58,138,0.06)', transition: 'background 0.2s',
-                                }}
-                                onMouseOver={e => e.currentTarget.style.background = '#e5e7eb'}
-                                onMouseOut={e => e.currentTarget.style.background = '#f3f4f6'}
-                            >Huỷ</button>
+                            <button className="modal-btn" onClick={handleConfirm}>Xác nhận</button>
+                            <button className="modal-btn modal-btn-cancel" onClick={handleCancel}>Huỷ</button>
                         </div>
                     </div>
                 </div>
             )}
             {showSuccessModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-                }}>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
-                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
-                    }}>
-                        <div style={{ marginBottom: 18 }}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
                                 <circle cx="24" cy="24" r="20" fill="#e8f5e8"/>
                                 <path d="M20 24l4 4 8-8" stroke="#22c55e" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
-                        <div style={{ fontSize: 18, marginBottom: 18 }}>
+                        <div className="modal-title-success">
                             ✅ Yêu cầu đã được tạo thành công!
                         </div>
-                        <div style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
+                        <div className="modal-desc">
                             Chúng tôi sẽ liên hệ với bạn sớm nhất có thể.
                         </div>
-                        <button
-                            onClick={() => {
-                                setShowSuccessModal(false);
-                                resetForm();
-                            }}
-                            style={{
-                                background: '#22c55e', color: '#fff', border: 'none', borderRadius: 8,
-                                padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(34,197,94,0.10)', transition: 'background 0.2s',
-                            }}
-                            onMouseOver={e => e.currentTarget.style.background = '#16a34a'}
-                            onMouseOut={e => e.currentTarget.style.background = '#22c55e'}
-                        >Đóng</button>
+                        <button className="modal-btn" onClick={() => { setShowSuccessModal(false); resetForm(); }}>Đóng</button>
                     </div>
                 </div>
             )}
             {showErrorModal && (
-                <div style={{
-                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
-                    background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000
-                }}>
-                    <div style={{
-                        background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380,
-                        boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative'
-                    }}>
-                        <div style={{ marginBottom: 18 }}>
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <div className="modal-icon">
                             <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{marginBottom: 8}}>
                                 <circle cx="24" cy="24" r="20" fill="#fee2e2"/>
                                 <path d="M18 18l12 12m0-12l-12 12" stroke="#ef4444" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                             </svg>
                         </div>
-                        <div style={{ fontSize: 18, marginBottom: 18, color: '#ef4444' }}>
+                        <div className="modal-title-error">
                             ❌ Có lỗi xảy ra!
                         </div>
-                        <div style={{ fontSize: 14, color: '#666', marginBottom: 24 }}>
+                        <div className="modal-desc">
                             {errorMsg}
                         </div>
-                        <button
-                            onClick={() => setShowErrorModal(false)}
-                            style={{
-                                background: '#ef4444', color: '#fff', border: 'none', borderRadius: 8,
-                                padding: '10px 28px', fontWeight: 700, fontSize: 16, cursor: 'pointer',
-                                boxShadow: '0 2px 8px rgba(239,68,68,0.10)', transition: 'background 0.2s',
-                            }}
-                            onMouseOver={e => e.currentTarget.style.background = '#dc2626'}
-                            onMouseOut={e => e.currentTarget.style.background = '#ef4444'}
-                        >Đóng</button>
+                        <button className="modal-btn modal-btn-error" onClick={() => setShowErrorModal(false)}>Đóng</button>
                     </div>
                 </div>
             )}

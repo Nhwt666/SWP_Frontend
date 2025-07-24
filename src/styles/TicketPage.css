@@ -188,3 +188,78 @@
 .ticket-form .date-picker {
     cursor: pointer;
 }
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 36px;
+  min-width: 320px;
+  max-width: 380px;
+  box-shadow: 0 4px 32px rgba(30,58,138,0.18);
+  text-align: center;
+  position: relative;
+}
+.modal-icon {
+  margin-bottom: 18px;
+}
+.modal-title-success {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #22c55e;
+}
+.modal-title-error {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #ef4444;
+}
+.modal-title-confirm {
+  font-size: 18px;
+  margin-bottom: 18px;
+  color: #222;
+}
+.modal-desc {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 24px;
+}
+.modal-btn {
+  background: #22c55e;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 28px;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(34,197,94,0.10);
+  transition: background 0.2s;
+  margin: 0 8px;
+}
+.modal-btn:hover {
+  background: #16a34a;
+}
+.modal-btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  box-shadow: 0 2px 8px rgba(30,58,138,0.06);
+}
+.modal-btn-cancel:hover {
+  background: #e5e7eb;
+}
+.modal-btn-error {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(239,68,68,0.10);
+}
+.modal-btn-error:hover {
+  background: #dc2626;
+}
