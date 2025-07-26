@@ -674,3 +674,36 @@ body {
         padding: 6px 14px;
     }
 }
+
+/* Pagination controls for admin blog page */
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 18px;
+  gap: 4px;
+}
+.pagination-controls button {
+  background: linear-gradient(90deg, #6c47d8 60%, #17a2b8 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 6px 16px;
+  margin: 0 2px;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px 0 rgba(108, 71, 216, 0.10);
+}
+.pagination-controls button[disabled] {
+  background: #e0e0e0;
+  color: #aaa;
+  cursor: not-allowed;
+}
+.pagination-controls .active-page {
+  background: #17a2b8;
+  color: #fff;
+  font-weight: 800;
+  border: 2px solid #6c47d8;
+}

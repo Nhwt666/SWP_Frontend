@@ -26,6 +26,7 @@ import AdminReportsPage from './pages/AdminReportsPage';
 import AdminTopupHistoryPage from './pages/AdminTopupHistoryPage';
 import AdminVoucherPage from './pages/AdminVoucherPage';
 import AdminPricesPage from './pages/AdminPricesPage';
+import AdminBlogsPage from './pages/AdminBlogsPage';
 
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffPage from './pages/StaffPage';
@@ -68,6 +69,7 @@ function App() {
             <Route path="/admin/topup-history" element={<AdminTopupHistoryPage />} />
             <Route path="/admin/voucher" element={<AdminVoucherPage />} />
             <Route path="/admin/prices" element={<AdminPricesPage />} />
+            <Route path="/admin/blogs" element={<AdminBlogsPage />} />
 
             {/* Staff Routes */}
             <Route path="/staff/dashboard" element={<StaffDashboardPage />} />
