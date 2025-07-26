@@ -29,6 +29,7 @@ import AdminPricesPage from './pages/AdminPricesPage';
 
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffPage from './pages/StaffPage';
+import AllBlogsPage from './pages/AllBlogsPage';
 
 import { UserProvider } from './UserContext';
 
@@ -43,6 +44,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/blogs" element={<AllBlogsPage />} />
             <Route path="/blog" element={<BlogPostPage />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/guide" element={<GuidePage />} />

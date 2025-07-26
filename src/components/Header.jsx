@@ -232,7 +232,7 @@ const Header = () => {
                         <Link to="/ticket" className="nav-btn">Đăng ký xét nghiệm</Link>
                         <Link to="/pricing" className="nav-btn">Bảng giá</Link>
                         <Link to="/guide" className="nav-btn">Hướng dẫn tự thu mẫu</Link>
-                        <a href="#blog-section" className="nav-btn" onClick={handleBlogClick}>Blog chia sẻ</a>
+                        <Link to="/blogs" className="nav-btn">Blog chia sẻ</Link>
                     </div>
                 </nav>
             )}
