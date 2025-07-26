@@ -25,6 +25,7 @@ import AdminTicketsPage from "./pages/AdminTicketsPage";
 import AdminReportsPage from './pages/AdminReportsPage';
 import AdminTopupHistoryPage from './pages/AdminTopupHistoryPage';
 import AdminVoucherPage from './pages/AdminVoucherPage';
+import AdminPricesPage from './pages/AdminPricesPage';
 
 import StaffDashboardPage from './pages/StaffDashboardPage';
 import StaffPage from './pages/StaffPage';
@@ -64,6 +65,7 @@ function App() {
             <Route path="/admin/settings" element={<AdminDashboardPage />} />
             <Route path="/admin/topup-history" element={<AdminTopupHistoryPage />} />
             <Route path="/admin/voucher" element={<AdminVoucherPage />} />
+            <Route path="/admin/prices" element={<AdminPricesPage />} />
 
             {/* Staff Routes */}
             <Route path="/staff/dashboard" element={<StaffDashboardPage />} />

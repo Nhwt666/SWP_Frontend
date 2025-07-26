@@ -15,6 +15,7 @@ const AdminLayout = ({ children }) => {
         { path: '/admin/reports', label: 'Đánh Giá' },
         { path: '/admin/settings', label: 'Cài đặt' },
         { path: '/admin/voucher', label: 'Voucher' },
+        { path: '/admin/prices', label: 'Bảng giá' }, // Added menu item
     ];
 
     const isActive = (path) => {

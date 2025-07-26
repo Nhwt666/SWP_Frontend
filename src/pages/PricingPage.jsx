@@ -32,6 +32,7 @@ const PricingPage = () => {
         { key: 'value', label: 'GIÁ TRỊ' },
         { key: 'currency', label: 'TIỀN TỆ' },
         { key: 'name', label: 'TÊN DỊCH VỤ' },
+        { key: 'type', label: 'LOẠI' },
     ];
 
     return (
@@ -57,7 +58,15 @@ const PricingPage = () => {
                                     {prices.map((row, i) => (
                                         <tr key={row.id || i}>
                                             {headers.map(h => (
-                                                <td key={h.key}>{row[h.key]}</td>
+                                                <td key={h.key}>
+                                                    {h.key === 'type' ? (
+                                                        row[h.key] === 'CIVIL' ? 'Dân Sự' :
+                                                        row[h.key] === 'ADMINISTRATIVE' ? 'Hành Chính' :
+                                                        'Khác'
+                                                    ) : h.key === 'value' ? (
+                                                        Number(row[h.key]).toLocaleString('vi-VN')
+                                                    ) : row[h.key]}
+                                                </td>
                                             ))}
                                         </tr>
                                     ))}
