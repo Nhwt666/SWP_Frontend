@@ -40,17 +40,22 @@ const TicketPage = () => {
     const [pricesLoading, setPricesLoading] = useState(true);
     const [pricesError, setPricesError] = useState(null);
 
-    const civilServices = [
-        'Xác minh quyền thừa kế',
-        'Xác minh quan hệ huyết thống',
-        'Giám định ADN cho con nuôi',
-    ];
-
-    const adminServices = [
-        'Xác minh danh tính',
-        'Xác minh quyền lợi bảo hiểm',
-        'Xác minh quyền thừa kế trong di chúc',
-    ];
+    // Get services filtered by type
+    const getServicesByType = (type) => {
+        if (!prices || prices.length === 0) return [];
+        
+        const typeMap = {
+            'Dân sự': 'CIVIL',
+            'Hành chính': 'ADMINISTRATIVE'
+        };
+        
+        const mappedType = typeMap[type];
+        if (!mappedType) return [];
+        
+        return prices
+            .filter(price => price.type === mappedType)
+            .map(price => price.name);
+    };
 
     // Fetch price list from API
     useEffect(() => {
@@ -384,7 +389,7 @@ const TicketPage = () => {
                                     required
                                 >
                                     <option value="">-- Chọn dịch vụ --</option>
-                                    {(category === 'Dân sự' ? civilServices : adminServices).map((srv, idx) => (
+                                    {getServicesByType(category).map((srv, idx) => (
                                         <option key={idx} value={srv}>{srv}</option>
                                     ))}
                                 </select>
