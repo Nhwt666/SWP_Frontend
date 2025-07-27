@@ -12,10 +12,23 @@ const paymentOptions = [
         )
     },
     {
-        key: 'momo',
-        label: 'MoMo',
+        key: 'vnpay',
+        label: 'VNPay',
         icon: (
-            <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" style={{ width: 32, height: 32, borderRadius: 6 }} />
+            <div style={{ 
+                width: 32, 
+                height: 32, 
+                backgroundColor: '#1a73e8', 
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontWeight: 'bold',
+                fontSize: '12px'
+            }}>
+                VN
+            </div>
         )
     }
 ];
@@ -54,32 +67,30 @@ const TopUpPage = () => {
                 });
                 if (res.ok) {
                     link = await res.text();
-                    localStorage.setItem('momoAmount', value);
+                    localStorage.setItem('vnpayAmount', value);
                     window.location.href = link + (link.includes('?') ? '&' : '?') + 'returnUrl=' + encodeURIComponent(window.location.origin + '/paypal-success');
                 } else {
                     const errText = await res.text();
                     setErrorMessage(`❌ Lỗi: ${errText}`);
                 }
-            } else if (paymentMethod === 'momo') {
-                res = await fetch(`/api/momo/pay?amount=${value}`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            });
-            if (res.ok) {
-                    const data = await res.json();
-                    if (data && data.payUrl && data.orderId) {
-                        localStorage.setItem('momoOrderId', data.orderId);
-                        localStorage.setItem('momoAmount', value);
-                        window.open(data.payUrl, '_blank');
-                        navigate('/payment-success?method=momo');
-                    } else {
-                        setErrorMessage('❌ Không nhận được thông tin thanh toán MoMo.');
+            } else if (paymentMethod === 'vnpay') {
+                res = await fetch(`/api/vnpay/pay?amount=${value}`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`
                     }
-            } else {
-                const errText = await res.text();
-                setErrorMessage(`❌ Lỗi: ${errText}`);
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && data.paymentUrl) {
+                        localStorage.setItem('vnpayAmount', value);
+                        window.location.href = data.paymentUrl;
+                    } else {
+                        setErrorMessage('❌ Không nhận được thông tin thanh toán VNPay.');
+                    }
+                } else {
+                    const errText = await res.text();
+                    setErrorMessage(`❌ Lỗi: ${errText}`);
                 }
             }
         } catch (err) {

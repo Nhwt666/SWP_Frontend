@@ -1,8 +1,8 @@
+/* Adjust main content to work with AdminLayout */
 .admin-tickets-page {
-    padding: 2rem;
-    font-family: 'Be Vietnam Pro', sans-serif;
-    background-color: #f8f9fa;
+    padding: 20px;
     min-height: 100vh;
+    background: #f8fafc;
 }
 
 .tickets-header {
@@ -161,16 +161,37 @@ tbody tr:hover {
 .status-pending {
     background-color: #fff0c2;
     color: #a67900;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 4px 14px;
+    display: inline-block;
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
 }
 
 .status-completed {
     background-color: #d4edda;
     color: #155724;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 4px 14px;
+    display: inline-block;
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
 }
 
 .status-cancelled {
     background-color: #f8d7da;
     color: #721c24;
+    font-weight: 700;
+    border-radius: 14px;
+    padding: 4px 14px;
+    display: inline-block;
+    font-size: 1rem;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
 }
 
 .status-rejected {

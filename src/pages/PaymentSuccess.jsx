@@ -10,12 +10,52 @@ const PaymentSuccess = () => {
     const navigate = useNavigate();
     const { updateFullName, updateWallet } = useContext(UserContext);
     const [status, setStatus] = useState('PENDING');
-    const [message, setMessage] = useState('Vui lòng thanh toán trên app MoMo, sau đó bấm nút bên dưới để xác nhận.');
-    const [checking, setChecking] = useState(false);
-    const [manualCheckMsg, setManualCheckMsg] = useState('');
-    const query = useQuery();
-    const method = query.get('method'); // 'paypal' hoặc 'momo'
+    const [message, setMessage] = useState('Đang xử lý thanh toán...');
     const [amount, setAmount] = useState(null);
+    const query = useQuery();
+    const method = query.get('method'); // 'paypal' hoặc 'vnpay'
+    const paymentStatus = query.get('status'); // 'success' hoặc 'failed'
+
+    // Xử lý kết quả từ backend (sau khi VnPayCallback forward)
+    useEffect(() => {
+        if (method === 'vnpay' && paymentStatus) {
+            if (paymentStatus === 'success') {
+                setStatus('SUCCESS');
+                setMessage('✅ Nạp tiền thành công!');
+                
+                // Lấy số tiền từ query param
+                const amountValue = query.get('amount');
+                if (amountValue) {
+                    setAmount(Number(amountValue));
+                }
+                
+                // Cập nhật lại thông tin người dùng
+                (async () => {
+                    try {
+                        const resUser = await fetch('/auth/me', {
+                            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                        });
+                        if (resUser.ok) {
+                            const user = await resUser.json();
+                            updateFullName(user.fullName);
+                            updateWallet(user.walletBalance);
+                        }
+                    } catch {}
+                })();
+                
+                // Redirect về trang nạp tiền sau 3 giây
+                setTimeout(() => {
+                    navigate('/topup');
+                }, 3000);
+            } else {
+                setStatus('FAILED');
+                setMessage('❌ Thanh toán thất bại! Vui lòng thử lại.');
+                setTimeout(() => {
+                    navigate('/topup');
+                }, 3000);
+            }
+        }
+    }, [method, paymentStatus, query, updateFullName, updateWallet, navigate]);
 
     // Tự động chuyển về /topup sau khi thanh toán paypal thành công
     useEffect(() => {
@@ -47,68 +87,9 @@ const PaymentSuccess = () => {
         }
     }, [method, updateFullName, updateWallet, navigate]);
 
-    // Xử lý khi user bấm nút "Tôi đã thanh toán" (chỉ cho momo)
-    const handleUserConfirm = async () => {
-        setChecking(true);
-        setManualCheckMsg('');
-        const orderId = localStorage.getItem('momoOrderId');
-        try {
-            const res = await fetch(`/api/momo/confirm?orderId=${orderId}`, {
-                method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-            const msg = await res.text();
-                if (res.ok) {
-                // Cập nhật lại context số dư và tên
-                try {
-                    const resUser = await fetch('/auth/me', {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                    });
-                    if (resUser.ok) {
-                        const user = await resUser.json();
-                        updateFullName(user.fullName);
-                        updateWallet(user.walletBalance);
-                    }
-                } catch {}
-                setStatus('SUCCESS');
-                setMessage('✅ Nạp tiền thành công! Đang chuyển hướng...');
-                setManualCheckMsg('');
-                setTimeout(() => {
-                    localStorage.removeItem('momoOrderId');
-                    navigate('/');
-                }, 2000);
-            } else {
-                setManualCheckMsg(msg || 'Không thể xác nhận giao dịch, vui lòng thử lại sau hoặc liên hệ hỗ trợ.');
-            }
-        } catch (err) {
-            setManualCheckMsg('Không thể kết nối tới máy chủ hoặc xác nhận giao dịch.');
-        }
-        setChecking(false);
-    };
-
-    // Luôn fetch lại user info khi status chuyển sang SUCCESS (MoMo)
-    useEffect(() => {
-        if (method === 'momo' && status === 'SUCCESS') {
-            (async () => {
-                try {
-                    const resUser = await fetch('/auth/me', {
-                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                    });
-                    if (resUser.ok) {
-                        const user = await resUser.json();
-                        updateFullName(user.fullName);
-                        updateWallet(user.walletBalance);
-                    }
-                } catch {}
-            })();
-        }
-    }, [method, status, updateFullName, updateWallet]);
-
     useEffect(() => {
         // Lấy số tiền nạp từ localStorage hoặc query param (nếu có)
-        const storedAmount = localStorage.getItem('momoAmount');
+        const storedAmount = localStorage.getItem('vnpayAmount');
         const queryAmount = query.get('amount');
         if (queryAmount) setAmount(Number(queryAmount));
         else if (storedAmount) setAmount(Number(storedAmount));
@@ -156,7 +137,7 @@ const PaymentSuccess = () => {
                     </div>
                 </div>
             )}
-            {method === 'momo' && (
+            {method === 'vnpay' && (
                 <>
                     {status === 'SUCCESS' ? (
                         <div style={{
@@ -188,28 +169,62 @@ const PaymentSuccess = () => {
                             }}>
                                 <span style={{fontWeight:700}}>&#8358;</span>
                             </div>
-                            <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#219653', marginBottom: 8 }}>Xác nhận nạp tiền MoMo thành công!</div>
-                            {amount && <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#e53e9f', marginBottom: 8 }}>{amount.toLocaleString('vi-VN')}<span style={{fontSize:'1.1rem', fontWeight:600}}>đ</span></div>}
+                            <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#219653', marginBottom: 8 }}>Nạp tiền VNPay thành công!</div>
+                            {amount && <div style={{ fontSize: '2.1rem', fontWeight: 900, color: '#1a73e8', marginBottom: 8 }}>{amount.toLocaleString('vi-VN')}<span style={{fontSize:'1.1rem', fontWeight:600}}>đ</span></div>}
                             <div style={{ color: '#219653', fontWeight: 500, marginBottom: 6 }}>Số tiền đã được cộng vào ví của bạn.</div>
                             <div style={{ color: '#888', fontSize: 15, marginTop: 8 }}>
-                                {amount ? (
-                                    <span style={{color:'#e53e9f', fontWeight:700, fontSize:'1.15rem'}}>Bạn vừa nạp thành công: {amount.toLocaleString('vi-VN')}đ</span>
-                                ) : 'Đang chuyển hướng...'}
+                                <span style={{color:'#1a73e8', fontWeight:700, fontSize:'1.15rem'}}>Bạn vừa nạp thành công: {amount.toLocaleString('vi-VN')}đ</span>
+                            </div>
+                            <div style={{ color: '#666', fontSize: 14, marginTop: 16 }}>
+                                Đang chuyển hướng về trang nạp tiền...
+                            </div>
+                        </div>
+                    ) : status === 'FAILED' ? (
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: '#fff',
+                            borderRadius: 18,
+                            boxShadow: '0 4px 24px 0 rgba(220, 53, 69, 0.13)',
+                            padding: '38px 32px 32px 32px',
+                            minWidth: 340,
+                            maxWidth: 420,
+                            margin: '60px auto 0 auto',
+                            border: '2px solid #dc3545',
+                        }}>
+                            <div style={{
+                                width: 54,
+                                height: 54,
+                                background: '#f8d7da',
+                                borderRadius: '16px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                marginBottom: 18,
+                                fontSize: 32,
+                                color: '#dc3545',
+                                border: '2px solid #dc3545'
+                            }}>
+                                ❌
+                            </div>
+                            <div style={{ fontWeight: 800, fontSize: '1.35rem', color: '#dc3545', marginBottom: 8 }}>Thanh toán VNPay thất bại!</div>
+                            <div style={{ color: '#dc3545', fontWeight: 500, marginBottom: 6 }}>Vui lòng thử lại sau.</div>
+                            <div style={{ marginTop: 16 }}>
+                                <button onClick={() => navigate('/topup')} style={{ padding: '10px 24px', fontSize: 16, fontWeight: 600, background: '#007bff', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}>
+                                    Quay lại nạp tiền
+                                </button>
                             </div>
                         </div>
                     ) : (
                         <div style={{ marginTop: 24, color: '#1976d2', fontWeight: 500 }}>
-                            <p>🔄 Sau khi thanh toán trên app MoMo, vui lòng bấm nút bên dưới để xác nhận.</p>
-                            <p>Bạn có thể đóng tab QR MoMo sau khi đã thanh toán xong.</p>
+                            <p>🔄 Đang xử lý thanh toán VNPay...</p>
                             <div style={{ display: 'flex', justifyContent: 'center', gap: 12, marginTop: 16 }}>
-                                <button onClick={handleUserConfirm} disabled={checking} style={{ padding: '10px 24px', fontSize: 16, fontWeight: 600, background: '#e53e9f', color: '#fff', border: 'none', borderRadius: 6, cursor: 'pointer' }}>
-                                    {checking ? 'Đang kiểm tra...' : 'Tôi đã thanh toán'}
-                                </button>
-                                <button onClick={() => navigate('/topup')} style={{ padding: '10px 18px', fontSize: 14, fontWeight: 500, background: '#eee', color: '#e53e9f', border: '1px solid #e53e9f', borderRadius: 6, cursor: 'pointer' }}>
-                                    Huỷ
+                                <button onClick={() => navigate('/topup')} style={{ padding: '10px 18px', fontSize: 14, fontWeight: 500, background: '#eee', color: '#1a73e8', border: '1px solid #1a73e8', borderRadius: 6, cursor: 'pointer' }}>
+                                    Quay lại
                                 </button>
                             </div>
-                            {manualCheckMsg && <div style={{ color: '#d9534f', marginTop: 10 }}>{manualCheckMsg}</div>}
                         </div>
                     )}
                 </>

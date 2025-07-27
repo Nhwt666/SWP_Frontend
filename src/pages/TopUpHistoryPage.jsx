@@ -23,16 +23,78 @@ const TopUpHistoryPage = () => {
                     return;
                 }
 
-                // Gọi API topup history (BE đã trả về cả PayPal và MoMo)
-                const historyRes = await fetch(`/api/paypal/topup-history?userId=${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                // Gọi cả API PayPal và VNPay để lấy lịch sử
+                const [paypalRes, vnpayRes] = await Promise.allSettled([
+                    fetch(`/api/paypal/topup-history?userId=${userId}`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    }),
+                    fetch(`/api/vnpay/topup-history`, {
+                        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                    })
+                ]);
 
-                if (!historyRes.ok) throw new Error("Không thể tải lịch sử nạp tiền");
-                const data = await historyRes.json();
-                setHistory(data);
+                let allHistory = [];
+
+                // Xử lý kết quả PayPal
+                if (paypalRes.status === 'fulfilled' && paypalRes.value.ok) {
+                    const paypalData = await paypalRes.value.json();
+                    console.log('PayPal history data:', paypalData);
+                    // Thêm payment method cho PayPal
+                    const paypalHistory = paypalData.map(item => ({
+                        ...item,
+                        paymentMethod: 'PAYPAL'
+                    }));
+                    allHistory = [...allHistory, ...paypalHistory];
+                }
+
+                // Xử lý kết quả VNPay
+                if (vnpayRes.status === 'fulfilled' && vnpayRes.value.ok) {
+                    const vnpayData = await vnpayRes.value.json();
+                    console.log('VNPay history data:', vnpayData);
+                    // Thêm payment method cho VNPay
+                    const vnpayHistory = vnpayData.map(item => ({
+                        ...item,
+                        paymentMethod: 'VNPAY'
+                    }));
+                    allHistory = [...allHistory, ...vnpayHistory];
+                }
+
+                // Sắp xếp theo thời gian (mới nhất trước)
+                allHistory.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                // Loại bỏ duplicate đơn giản dựa trên PayID
+                const uniqueHistory = allHistory.filter((item, index, self) => {
+                    if (item.paymentId) {
+                        // Nếu có PayID, chỉ giữ lại item đầu tiên tìm thấy
+                        return index === self.findIndex(t => t.paymentId === item.paymentId);
+                    }
+                    // Nếu không có PayID, giữ lại tất cả
+                    return true;
+                });
+                
+                // Xác định payment method dựa trên PayerID
+                const correctedHistory = uniqueHistory.map(item => {
+                    const payerId = item.payerId || item.payer_id;
+                    
+                    // Nếu PayerID là NCB hoặc Vk5QQVIFUjQ, đó là VNPay
+                    if (payerId === 'NCB' || payerId === 'Vk5QQVIFUjQ') {
+                        return { ...item, paymentMethod: 'VNPAY' };
+                    }
+                    
+                    // Nếu PayerID bắt đầu bằng PAYID- hoặc là PayPal, đó là PayPal
+                    if (payerId && (payerId.startsWith('PAYID-') || payerId === 'PayPal' || payerId === '2F643AXYGRS6G')) {
+                        return { ...item, paymentMethod: 'PAYPAL' };
+                    }
+                    
+                    // Giữ nguyên payment method từ backend
+                    return item;
+                });
+                
+                console.log('Combined history data:', allHistory);
+                console.log('Unique history data:', uniqueHistory);
+                console.log('Corrected history data:', correctedHistory);
+
+                setHistory(correctedHistory);
             } catch (err) {
                 console.error(err);
                 setMessage(err.message);
@@ -41,6 +103,31 @@ const TopUpHistoryPage = () => {
 
         fetchHistory();
     }, []);
+
+    const getPaymentMethodDisplay = (paymentMethod) => {
+        if (!paymentMethod) return 'VNPay';
+        
+        const method = paymentMethod.toUpperCase();
+        switch (method) {
+            case 'MOMO':
+                return 'MoMo';
+            case 'PAYPAL':
+                return 'PayPal';
+            case 'VNPAY':
+                return 'VNPay';
+            default:
+                return 'VNPay';
+        }
+    };
+
+    const formatAmount = (amount, paymentMethod) => {
+        if (!amount) return '0';
+        
+        const numAmount = Number(amount);
+        
+        // Tất cả phương thức đều hiển thị bằng VND
+        return `${numAmount.toLocaleString('vi-VN')} đ`;
+    };
 
     return (
         <>
@@ -67,20 +154,24 @@ const TopUpHistoryPage = () => {
                                     {new Date(item.createdAt).toLocaleString('vi-VN')}
                                 </td>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                                    {`${Number(item.amount).toLocaleString('vi-VN')} đ`}
+                                    {formatAmount(item.amount, item.paymentMethod)}
                                 </td>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
-                                    {item.paymentMethod === 'MOMO' ? 'MoMo' : item.paymentMethod === 'PAYPAL' ? 'PayPal' : (item.payment_method === 'MOMO' ? 'MoMo' : item.payment_method === 'PAYPAL' ? 'PayPal' : '')}
+                                    {getPaymentMethodDisplay(item.paymentMethod)}
                                 </td>
                                 <td style={{ border: '1px solid #ccc', padding: '8px' }}>
                                     {item.paymentId ? (
                                         <>
                                             PayID: {item.paymentId} <br />
-                                            PayerID: {item.payerId}
+                                            PayerID: {item.payerId || item.payer_id || (item.paymentMethod === 'PAYPAL' ? 'PayPal' : 'VNPay')}
+                                        </>
+                                    ) : item.orderId ? (
+                                        <>
+                                            OrderID: {item.orderId}
                                         </>
                                     ) : (
                                         <>
-                                            OrderID: {item.orderId}
+                                            TransactionID: {item.transactionId || item.id || 'N/A'}
                                         </>
                                     )}
                                 </td>

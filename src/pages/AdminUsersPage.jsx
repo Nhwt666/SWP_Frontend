@@ -4,6 +4,7 @@ import '../styles/AdminUsersPage.css';
 import UserCreateModal from '../components/UserCreateModal';
 import UserEditModal from '../components/UserEditModal';
 import Header from '../components/Header';
+import AdminLayout from '../components/AdminLayout';
 
 const AdminUsersPage = () => {
     const [users, setUsers] = useState([]);
@@ -188,125 +189,124 @@ const AdminUsersPage = () => {
     return (
         <>
             <Header />
-            <div className="admin-users-page">
-                <header className="users-header">
-                    <button className="back-btn" onClick={() => navigate('/admin/dashboard')}>&larr;</button>
-                    <h1>Quản lý người dùng</h1>
-                    <button className="add-user-btn" onClick={handleCreateNew}>+ Thêm người dùng mới</button>
-                </header>
+            <AdminLayout>
+                <div className="admin-users-page">
+                    <header className="users-header">
+                        <button className="back-btn" onClick={() => navigate('/admin/dashboard')}>&larr;</button>
+                        <h1>Quản lý người dùng</h1>
+                        <button className="add-user-btn" onClick={handleCreateNew}>+ Thêm người dùng mới</button>
+                    </header>
 
-                <div className="filters-container">
-                    <div className="filter-group">
-                        <label htmlFor="role-filter">Lọc theo vai trò</label>
-                        <select id="role-filter" name="role" value={filters.role} onChange={handleFilterChange}>
-                            <option value="">Tất cả vai trò</option>
-                            <option value="CUSTOMER">Customer</option>
-                            <option value="STAFF">Staff</option>
-                            <option value="ADMIN">Admin</option>
-                        </select>
+                    <div className="filters-container">
+                        <div className="filter-group">
+                            <label htmlFor="role-filter">Lọc theo vai trò</label>
+                            <select id="role-filter" name="role" value={filters.role} onChange={handleFilterChange}>
+                                <option value="">Tất cả vai trò</option>
+                                <option value="CUSTOMER">Customer</option>
+                                <option value="STAFF">Staff</option>
+                                <option value="ADMIN">Admin</option>
+                            </select>
+                        </div>
+                        <div className="filter-group">
+                            <label htmlFor="search-filter">Tìm kiếm</label>
+                            <input type="text" id="search-filter" name="search" placeholder="Tên hoặc email..." value={filters.search} onChange={handleFilterChange} />
+                        </div>
+                        <button className="reset-filters-btn" onClick={resetFilters}>Xóa bộ lọc</button>
                     </div>
-                    <div className="filter-group">
-                        <label htmlFor="search-filter">Tìm kiếm</label>
-                        <input type="text" id="search-filter" name="search" placeholder="Tên hoặc email..." value={filters.search} onChange={handleFilterChange} />
-                    </div>
-                    <button className="reset-filters-btn" onClick={resetFilters}>Xóa bộ lọc</button>
-                </div>
 
-                {error && <div className="error-container">❌ Lỗi: {error}</div>}
+                    {error && <div className="error-container">❌ Lỗi: {error}</div>}
 
-                <div className="users-table-container">
-                    {loading ? (
-                        <div className="loading-container">⏳ Đang tải dữ liệu...</div>
-                    ) : (
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Họ tên</th>
-                                    <th>Email</th>
-                                    <th>Số điện thoại</th>
-                                    <th>Vai trò</th>
-                                    <th>Ticket</th>
-                                    <th>Hành động</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {users.length > 0 ? users.map(item => {
-                                    const user = item.user ? item.user : item;
-                                    const inProgressTickets = item.inProgressTickets ?? '0';
-                                    const completedTickets = item.completedTickets ?? '0';
-
-                                    return (
-                                        <tr key={user.id}>
-                                            <td>{user.id}</td>
-                                            <td>{user.fullName}</td>
-                                            <td>{user.email}</td>
-                                            <td>{user.phone || 'Chưa Có Thông Tin'}</td>
-                                            <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{user.role}</span></td>
-                                            <td className="ticket-cell">
-                                                {user.role === 'STAFF' ? (
-                                                    <button 
-                                                        className="view-tickets-btn" 
-                                                        onClick={() => navigate('/admin/tickets', { 
-                                                            state: { 
-                                                                staffId: user.id, 
-                                                                staffName: user.fullName,
-                                                                filterStatus: 'IN_PROGRESS' 
-                                                            } 
-                                                        })}
-                                                    >
-                                                        Xem
-                                                    </button>
-                                                ) : user.role === 'CUSTOMER' ? (
-                                                    <button
-                                                        className="view-tickets-btn"
-                                                        onClick={() => navigate('/admin/tickets', {
-                                                            state: {
-                                                                customerId: user.id,
-                                                                customerName: user.fullName,
-                                                                filterStatus: ''
-                                                            }
-                                                        })}
-                                                    >
-                                                        Xem
-                                                    </button>
-                                                ) : (
-                                                    <button className="view-tickets-btn" disabled style={{opacity: 1, cursor: 'default', background: '#e57373', color: '#fff'}}>None</button>
-                                                )}
-                                            </td>
-                                            <td>
-                                                <button className="edit-btn" onClick={() => handleEditUser(user)}>Sửa</button>
-                                                <button className="delete-btn" onClick={() => handleDeleteUser(user.id)}>Xóa</button>
-                                            </td>
-                                        </tr>
-                                    );
-                                }) : (
+                    <div className="users-table-container">
+                        {loading ? (
+                            <div className="loading-container">⏳ Đang tải dữ liệu...</div>
+                        ) : (
+                            <table>
+                                <thead>
                                     <tr>
-                                        <td colSpan="7">Không tìm thấy người dùng nào.</td>
+                                        <th>ID</th>
+                                        <th>Họ tên</th>
+                                        <th>Email</th>
+                                        <th>Số điện thoại</th>
+                                        <th>Vai trò</th>
+                                        <th>Hành động</th>
                                     </tr>
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {users.length > 0 ? users.map(item => {
+                                        const user = item.user ? item.user : item;
+                                        const inProgressTickets = item.inProgressTickets ?? '0';
+                                        const completedTickets = item.completedTickets ?? '0';
+
+                                        return (
+                                            <tr key={user.id}>
+                                                <td>{user.id}</td>
+                                                <td>{user.fullName}</td>
+                                                <td>{user.email}</td>
+                                                <td>{user.phone || 'Chưa Có Thông Tin'}</td>
+                                                <td><span className={`role-badge role-${user.role?.toLowerCase()}`}>{user.role}</span></td>
+                                                <td>
+                                                    {user.role === 'STAFF' ? (
+                                                        <button 
+                                                            className="view-tickets-btn" 
+                                                            onClick={() => navigate('/admin/tickets', { 
+                                                                state: { 
+                                                                    staffId: user.id, 
+                                                                    staffName: user.fullName,
+                                                                    filterStatus: 'IN_PROGRESS' 
+                                                                } 
+                                                            })}
+                                                        >
+                                                            Xem
+                                                        </button>
+                                                    ) : user.role === 'CUSTOMER' ? (
+                                                        <button
+                                                            className="view-tickets-btn"
+                                                            onClick={() => navigate('/admin/tickets', {
+                                                                state: {
+                                                                    customerId: user.id,
+                                                                    customerName: user.fullName,
+                                                                    filterStatus: ''
+                                                                }
+                                                            })}
+                                                        >
+                                                            Xem
+                                                        </button>
+                                                    ) : (
+                                                        <button className="view-tickets-btn" disabled style={{opacity: 1, cursor: 'default', background: '#e57373', color: '#fff'}}>None</button>
+                                                    )}
+                                                    <button className="edit-btn" onClick={() => handleEditUser(user)}>Sửa</button>
+                                                    <button className="delete-btn" onClick={() => handleDeleteUser(user.id)}>Xóa</button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    }) : (
+                                        <tr>
+                                            <td colSpan="6">Không tìm thấy người dùng nào.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    {isCreateModalOpen && (
+                        <UserCreateModal
+                            onClose={handleCloseModal}
+                            onSave={handleSaveUser}
+                            error={createUserError}
+                        />
+                    )}
+
+                    {isEditModalOpen && (
+                        <UserEditModal
+                            user={editingUser}
+                            onClose={handleCloseModal}
+                            onSave={handleUpdateUser}
+                            error={editUserError}
+                        />
                     )}
                 </div>
-
-                {isCreateModalOpen && (
-                    <UserCreateModal
-                        onClose={handleCloseModal}
-                        onSave={handleSaveUser}
-                        error={createUserError}
-                    />
-                )}
-
-                {isEditModalOpen && (
-                    <UserEditModal
-                        user={editingUser}
-                        onClose={handleCloseModal}
-                        onSave={handleUpdateUser}
-                        error={editUserError}
-                    />
-                )}
-            </div>
+            </AdminLayout>
             <footer className="member-footer">
                 <div className="member-footer-content">
                     <div className="member-footer-info">

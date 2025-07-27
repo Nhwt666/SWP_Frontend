@@ -18,6 +18,7 @@ import TopUpPage from './pages/TopUpPage';
 import TopUpHistoryPage from './pages/TopUpHistoryPage';
 import TestHistoryPage from './pages/TestHistoryPage';
 import PaymentSuccess from './pages/PaymentSuccess';
+import VnPayCallback from './pages/VnPayCallback';
 
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
@@ -59,6 +60,7 @@ function App() {
             <Route path="/topup-history" element={<TopUpHistoryPage />} />
             <Route path="/test-history" element={<TestHistoryPage />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/api/vnpay/success" element={<VnPayCallback />} />
 
             {/* Admin Routes */}
             <Route path="/admin/dashboard" element={<AdminDashboardPage />} />

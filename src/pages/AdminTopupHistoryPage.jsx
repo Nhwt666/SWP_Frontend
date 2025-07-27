@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import Header from '../components/Header';
 import { useNavigate } from 'react-router-dom';
-import '../styles/AdminDashboardPage.css';
+import '../styles/AdminTopupHistoryPage.css';
+import AdminLayout from '../components/AdminLayout';
 
 const AdminTopupHistoryPage = () => {
     const [data, setData] = useState([]);
@@ -58,8 +59,8 @@ const AdminTopupHistoryPage = () => {
     return (
         <>
             <Header />
-            <div className="admin-dashboard-container">
-                <main className="dashboard-content" style={{display:'flex', flexDirection:'column', alignItems:'flex-start', justifyContent:'flex-start', minHeight:'80vh', width:'100%'}}>
+            <AdminLayout>
+                <div className="admin-topup-history-page">
                     <div style={{width:'100%', maxWidth:1200, display:'flex', alignItems:'center', marginBottom:24, marginLeft:0}}>
                         <button onClick={() => navigate('/admin/dashboard')} style={{marginRight:18, background:'#6c47d8', color:'#fff', border:'none', borderRadius:8, padding:'10px 28px', fontWeight:700, fontSize:18, cursor:'pointer', boxShadow:'0 2px 8px #eee'}}>← Quay lại</button>
                         <h2 style={{color:'#6c47d8', fontWeight:900, fontSize: '2.5rem', margin:0, flex:1, textAlign:'center', letterSpacing:1}}>Lịch sử nạp tiền</h2>
@@ -111,7 +112,6 @@ const AdminTopupHistoryPage = () => {
                                             <td style={{padding:'16px', color:'#e53e9f', fontWeight:700}}>{Number(item.amount).toLocaleString('vi-VN')}đ</td>
                                             <td style={{padding:'16px', display:'flex', alignItems:'center', gap:8}}>
                                                 {(item.paymentMethod === 'MOMO') && <img src="https://upload.wikimedia.org/wikipedia/vi/f/fe/MoMo_Logo.png" alt="MoMo" style={{width:24, height:24, borderRadius:4}} />}
-                                                {(item.paymentMethod === 'PAYPAL') && <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" style={{width:24, height:24, borderRadius:4}} />}
                                                 <span style={{fontSize:26}}>{item.paymentMethod === 'MOMO' ? 'MoMo' : item.paymentMethod === 'PAYPAL' ? 'PayPal' : item.paymentMethod || '-'}</span>
                                             </td>
                                             <td style={{padding:'16px', minWidth:140, whiteSpace:'nowrap'}}>{item.payerId || '-'}</td>
@@ -122,8 +122,8 @@ const AdminTopupHistoryPage = () => {
                             </table>
                         </div>
                     )}
-                </main>
-            </div>
+                </div>
+            </AdminLayout>
         </>
     );
 };

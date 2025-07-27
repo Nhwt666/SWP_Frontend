@@ -98,6 +98,7 @@
 .user-info-container {
   display: flex;
   align-items: center;
+  position: relative;
   gap: 12px;
 }
 
@@ -155,6 +156,7 @@
   top: 40px;
   right: 0;
   z-index: 2000;
+  transform: translateX(0);
 }
 
 .dropdown-menu button {
