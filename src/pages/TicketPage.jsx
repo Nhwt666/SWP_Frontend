@@ -66,6 +66,8 @@ const TicketPage = () => {
                 const res = await fetch('/api/prices');
                 if (!res.ok) throw new Error('Không thể tải dữ liệu bảng giá');
                 const data = await res.json();
+                console.log('💰 Fetched prices data:', data);
+                console.log('🔍 Looking for "Khác" entry:', data.find(p => p.name === 'Khác'));
                 setPrices(data);
             } catch (err) {
                 setPricesError(err.message || 'Lỗi không xác định');
@@ -85,10 +87,14 @@ const TicketPage = () => {
         let selectedName = '';
         if (category === 'Khác') {
             selectedName = 'Khác';
+            console.log('🎯 Selected category: Khác (Yêu cầu khác)');
+            console.log('🔍 Looking for price with name: Khác');
         } else if (service) {
             selectedName = service;
         }
         const found = prices.find(p => p.name === selectedName);
+        console.log('📊 Available prices:', prices.map(p => ({ name: p.name, value: p.value })));
+        console.log('✅ Found price for', selectedName, ':', found);
         setPrice(found ? found.value : 0);
     }, [category, service, prices]);
 

@@ -31,6 +31,9 @@ const AdminTicketsPage = () => {
     const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
     const [rejectingTicket, setRejectingTicket] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
+    const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+    const [acceptingTicket, setAcceptingTicket] = useState(null);
+    const [acceptLoading, setAcceptLoading] = useState(false);
 
 
     const typeDisplayMap = {
@@ -338,6 +341,72 @@ const AdminTicketsPage = () => {
         }
     };
 
+    const handleAcceptTicket = async (ticketId) => {
+        const ticket = tickets.find(t => t.id === ticketId);
+        setAcceptingTicket(ticket);
+        setIsAcceptModalOpen(true);
+    };
+
+    const confirmAcceptTicket = async () => {
+        if (!acceptingTicket) return;
+        
+        setAcceptLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            
+            const staffRes = await fetch('/admin/all-users?role=STAFF', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            
+            if (!staffRes.ok) {
+                throw new Error('Không thể lấy danh sách nhân viên');
+            }
+            
+            const staffData = await staffRes.json();
+            const staffList = staffData.map(s => s.user);
+            
+            if (staffList.length === 0) {
+                alert('Không có nhân viên nào để gán. Vui lòng thêm nhân viên trước.');
+                return;
+            }
+            
+            const selectedStaff = staffList[0];
+            
+            const updateRes = await fetch(`/admin/tickets/${acceptingTicket.id}`, {
+                method: 'PUT',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}` 
+                },
+                body: JSON.stringify({
+                    staffId: selectedStaff.id,
+                    status: 'IN_PROGRESS'
+                })
+            });
+            
+            if (!updateRes.ok) {
+                const errorData = await updateRes.json();
+                throw new Error(errorData.message || 'Không thể chấp nhận ticket');
+            }
+            
+            alert(`Đã chấp nhận ticket và gán cho nhân viên ${selectedStaff.fullName}!`);
+            setIsAcceptModalOpen(false);
+            setAcceptingTicket(null);
+            fetchTickets();
+        } catch (err) {
+            console.error('Error accepting ticket:', err);
+            alert(`Lỗi khi chấp nhận ticket: ${err.message}`);
+        } finally {
+            setAcceptLoading(false);
+        }
+    };
+
+    const closeAcceptModal = () => {
+        setIsAcceptModalOpen(false);
+        setAcceptingTicket(null);
+        setAcceptLoading(false);
+    };
+
     if (loading) {
         return <div className="loading-container">⏳ Đang tải dữ liệu...</div>;
     }
@@ -424,6 +493,18 @@ const AdminTicketsPage = () => {
                                             <td>{new Date(ticket.createdAt).toLocaleDateString('vi-VN')}</td>
                                             <td className="action-buttons">
                                                 <button className="delete-btn" onClick={() => handleDelete(ticket.id)}>Xóa</button>
+                                                
+                                                {/* Accept button for PENDING tickets */}
+                                                {ticket.status === 'PENDING' && (
+                                                    <button
+                                                        className="accept-btn"
+                                                        onClick={() => handleAcceptTicket(ticket.id)}
+                                                    >
+                                                        Chấp nhận
+                                                    </button>
+                                                )}
+                                                
+                                                {/* Legacy staff assignment for preselected customer */}
                                                 {preselectedCustomerId && (
                                                     ticket.status === 'IN_PROGRESS' ? (
                                                         <button className="edit-btn" style={{background: '#fb8c00', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Đổi staff</button>
@@ -431,6 +512,8 @@ const AdminTicketsPage = () => {
                                                         <button className="edit-btn" style={{background: '#43a047', color: '#fff'}} onClick={() => handleOpenStaffModal(ticket.id)}>Thêm staff</button>
                                                     )
                                                 )}
+                                                
+                                                {/* Reject button for PENDING tickets */}
                                                 {ticket.status === 'PENDING' && (
                                                     <button
                                                         className="reject-btn"
@@ -571,6 +654,188 @@ const AdminTicketsPage = () => {
                                         )}
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    )}
+
+                    {isAcceptModalOpen && acceptingTicket && (
+                        <div className="modal-overlay" onClick={closeAcceptModal}>
+                            <div className="modal-content" onClick={e => e.stopPropagation()} style={{
+                                maxWidth: 480, 
+                                borderRadius: 20, 
+                                padding: 32, 
+                                boxShadow: '0 8px 40px rgba(34,197,94,0.15)',
+                                background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+                                border: '1px solid #bbf7d0'
+                            }}>
+                                <div style={{
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    gap: 16, 
+                                    marginBottom: 24,
+                                    padding: '16px 20px',
+                                    background: 'linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)',
+                                    borderRadius: 12,
+                                    border: '1px solid #86efac'
+                                }}>
+                                    <div style={{
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 4px 12px rgba(34,197,94,0.3)'
+                                    }}>
+                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M9 12l2 2 4-4" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h2 style={{
+                                            color: '#166534', 
+                                            fontWeight: 800, 
+                                            fontSize: 22, 
+                                            margin: '0 0 4px 0',
+                                            letterSpacing: '-0.5px'
+                                        }}>
+                                            Chấp nhận Yêu Cầu #{acceptingTicket.id}
+                                        </h2>
+                                        <p style={{
+                                            color: '#15803d',
+                                            fontSize: 14,
+                                            margin: 0,
+                                            fontWeight: 500
+                                        }}>
+                                            Xác nhận chấp nhận và gán nhân viên xử lý
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div style={{
+                                    background: 'white',
+                                    borderRadius: 12,
+                                    padding: 20,
+                                    border: '1px solid #e5e7eb',
+                                    marginBottom: 24
+                                }}>
+                                    <div style={{ marginBottom: 16 }}>
+                                        <strong style={{ color: '#374151', fontSize: 14 }}>Khách hàng:</strong>
+                                        <div style={{ color: '#6b7280', fontSize: 16, marginTop: 4 }}>
+                                            {acceptingTicket.customer?.fullName || 'Chưa có thông tin'}
+                                        </div>
+                                    </div>
+                                    <div style={{ marginBottom: 16 }}>
+                                        <strong style={{ color: '#374151', fontSize: 14 }}>Loại yêu cầu:</strong>
+                                        <div style={{ color: '#6b7280', fontSize: 16, marginTop: 4 }}>
+                                            {typeDisplayMap[acceptingTicket.type] || acceptingTicket.type}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <strong style={{ color: '#374151', fontSize: 14 }}>Ngày tạo:</strong>
+                                        <div style={{ color: '#6b7280', fontSize: 16, marginTop: 4 }}>
+                                            {new Date(acceptingTicket.createdAt).toLocaleDateString('vi-VN')}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style={{
+                                    background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
+                                    borderRadius: 12,
+                                    padding: 16,
+                                    border: '1px solid #fbbf24',
+                                    marginBottom: 24
+                                }}>
+                                    <div style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: 8,
+                                        marginBottom: 8
+                                    }}>
+                                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                            <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" fill="#d97706"/>
+                                        </svg>
+                                        <strong style={{ color: '#92400e', fontSize: 14 }}>Thông tin xử lý</strong>
+                                    </div>
+                                    <p style={{
+                                        color: '#a16207',
+                                        fontSize: 14,
+                                        margin: 0,
+                                        lineHeight: 1.5
+                                    }}>
+                                        Ticket sẽ được chuyển sang trạng thái "Đang xử lý" và tự động gán cho nhân viên đầu tiên có sẵn trong hệ thống.
+                                    </p>
+                                </div>
+
+                                <div style={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'flex-end', 
+                                    gap: 12 
+                                }}>
+                                    <button 
+                                        onClick={closeAcceptModal}
+                                        disabled={acceptLoading}
+                                        style={{
+                                            background: '#f3f4f6', 
+                                            color: '#374151', 
+                                            border: 'none', 
+                                            borderRadius: 10, 
+                                            padding: '12px 24px', 
+                                            fontWeight: 600, 
+                                            fontSize: 15, 
+                                            cursor: acceptLoading ? 'not-allowed' : 'pointer', 
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.06)', 
+                                            transition: 'all 0.2s',
+                                            opacity: acceptLoading ? 0.6 : 1
+                                        }}
+                                    >
+                                        Hủy
+                                    </button>
+                                    <button
+                                        onClick={confirmAcceptTicket}
+                                        disabled={acceptLoading}
+                                        style={{
+                                            minWidth: 140,
+                                            background: acceptLoading 
+                                                ? '#9ca3af' 
+                                                : 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+                                            color: '#fff', 
+                                            border: 'none', 
+                                            borderRadius: 10, 
+                                            padding: '12px 24px', 
+                                            fontWeight: 700, 
+                                            fontSize: 15, 
+                                            cursor: acceptLoading ? 'not-allowed' : 'pointer', 
+                                            boxShadow: acceptLoading 
+                                                ? 'none' 
+                                                : '0 4px 12px rgba(34,197,94,0.3)', 
+                                            transition: 'all 0.2s',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 8
+                                        }}
+                                    >
+                                        {acceptLoading ? (
+                                            <>
+                                                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeDasharray="31.416" strokeDashoffset="31.416">
+                                                        <animate attributeName="stroke-dasharray" dur="2s" values="0 31.416;15.708 15.708;0 31.416" repeatCount="indefinite"/>
+                                                        <animate attributeName="stroke-dashoffset" dur="2s" values="0;-15.708;-31.416" repeatCount="indefinite"/>
+                                                    </circle>
+                                                </svg>
+                                                Đang xử lý...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                    <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                                                </svg>
+                                                Chấp nhận
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     )}
