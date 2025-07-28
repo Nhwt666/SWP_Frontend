@@ -68,6 +68,34 @@ const TicketCreateModal = ({ onClose, onSave }) => {
             setError("Vui lòng chọn một khách hàng.");
             return;
         }
+
+        // Validation cho số điện thoại (chỉ bao gồm số và có 10 số)
+        if (formData.phone) {
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(formData.phone)) {
+                setError("❌ Số điện thoại không hợp lệ! Số điện thoại phải có đúng 10 chữ số.");
+                return;
+            }
+        }
+
+        // Validation cho Tên Mẫu 1 (không được chứa số và ký tự đặc biệt)
+        if (formData.sample1Name) {
+            const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
+            if (!nameRegex.test(formData.sample1Name)) {
+                setError("❌ Tên Mẫu 1 không hợp lệ! Tên chỉ được chứa chữ cái và khoảng trắng.");
+                return;
+            }
+        }
+
+        // Validation cho Tên Mẫu 2 (không được chứa số và ký tự đặc biệt)
+        if (formData.sample2Name) {
+            const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
+            if (!nameRegex.test(formData.sample2Name)) {
+                setError("❌ Tên Mẫu 2 không hợp lệ! Tên chỉ được chứa chữ cái và khoảng trắng.");
+                return;
+            }
+        }
+
         onSave(formData);
     };
 
@@ -111,7 +139,19 @@ const TicketCreateModal = ({ onClose, onSave }) => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="phone">Số điện thoại</label>
-                        <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleChange} required />
+                        <input 
+                            type="tel" 
+                            name="phone" 
+                            id="phone" 
+                            value={formData.phone} 
+                            onChange={handleChange} 
+                            placeholder="VD: 0123456789"
+                            title="Số điện thoại phải có đúng 10 chữ số"
+                            required 
+                        />
+                        <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                            ⚠️ Số điện thoại phải có đúng 10 chữ số
+                        </small>
                     </div>
                     <div className="form-group">
                         <label htmlFor="address">Địa chỉ</label>
@@ -119,11 +159,35 @@ const TicketCreateModal = ({ onClose, onSave }) => {
                     </div>
                     <div className="form-group">
                         <label htmlFor="sample1Name">Tên mẫu 1</label>
-                        <input type="text" name="sample1Name" id="sample1Name" value={formData.sample1Name} onChange={handleChange} required />
+                        <input 
+                            type="text" 
+                            name="sample1Name" 
+                            id="sample1Name" 
+                            value={formData.sample1Name} 
+                            onChange={handleChange} 
+                            placeholder="VD: Nguyễn Văn A"
+                            title="Tên chỉ được chứa chữ cái và khoảng trắng"
+                            required 
+                        />
+                        <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                            ⚠️ Tên chỉ được chứa chữ cái và khoảng trắng
+                        </small>
                     </div>
                     <div className="form-group">
                         <label htmlFor="sample2Name">Tên mẫu 2</label>
-                        <input type="text" name="sample2Name" id="sample2Name" value={formData.sample2Name} onChange={handleChange} required />
+                        <input 
+                            type="text" 
+                            name="sample2Name" 
+                            id="sample2Name" 
+                            value={formData.sample2Name} 
+                            onChange={handleChange} 
+                            placeholder="VD: Trần Thị B"
+                            title="Tên chỉ được chứa chữ cái và khoảng trắng"
+                            required 
+                        />
+                        <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                            ⚠️ Tên chỉ được chứa chữ cái và khoảng trắng
+                        </small>
                     </div>
                     <div className="form-group">
                         <label htmlFor="reason">Lý do xét nghiệm</label>

@@ -194,6 +194,39 @@ const TicketPage = () => {
             return;
         }
 
+        // Validation cho số điện thoại (chỉ bao gồm số và có 10 số)
+        if (method === 'Tự gửi mẫu' && phone) {
+            const phoneRegex = /^\d{10}$/;
+            if (!phoneRegex.test(phone)) {
+                setErrorMsg('❌ Số điện thoại không hợp lệ! Số điện thoại phải có đúng 10 chữ số.');
+                setShowErrorModal(true);
+                setLoading(false);
+                return;
+            }
+        }
+
+        // Validation cho Tên Mẫu 1 (không được chứa số và ký tự đặc biệt)
+        if (sample1Name) {
+            const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
+            if (!nameRegex.test(sample1Name)) {
+                setErrorMsg('❌ Tên Mẫu 1 không hợp lệ! Tên chỉ được chứa chữ cái và khoảng trắng.');
+                setShowErrorModal(true);
+                setLoading(false);
+                return;
+            }
+        }
+
+        // Validation cho Tên Mẫu 2 (không được chứa số và ký tự đặc biệt)
+        if (sample2Name) {
+            const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
+            if (!nameRegex.test(sample2Name)) {
+                setErrorMsg('❌ Tên Mẫu 2 không hợp lệ! Tên chỉ được chứa chữ cái và khoảng trắng.');
+                setShowErrorModal(true);
+                setLoading(false);
+                return;
+            }
+        }
+
         if (method === 'Tại cơ sở y tế' && appointmentDate) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -439,9 +472,13 @@ const TicketPage = () => {
                                         type="tel"
                                         value={phone}
                                         onChange={(e) => setPhone(e.target.value)}
-                                        placeholder="Nhập số điện thoại"
+                                        placeholder="VD: 0123456789"
+                                        title="Số điện thoại phải có đúng 10 chữ số"
                                         required
                                     />
+                                    <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                        ⚠️ Số điện thoại phải có đúng 10 chữ số
+                                    </small>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="email"><strong>Email:</strong></label>
@@ -482,9 +519,13 @@ const TicketPage = () => {
                                 type="text"
                                 value={sample1Name}
                                 onChange={(e) => setSample1Name(e.target.value)}
-                                placeholder="Nhập tên người cung cấp mẫu 1"
+                                placeholder="VD: Nguyễn Văn A"
+                                title="Tên chỉ được chứa chữ cái và khoảng trắng"
                                 required
                             />
+                            <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                ⚠️ Tên chỉ được chứa chữ cái và khoảng trắng
+                            </small>
                         </div>
 
                         <div className="form-group">
@@ -494,9 +535,13 @@ const TicketPage = () => {
                                 type="text"
                                 value={sample2Name}
                                 onChange={(e) => setSample2Name(e.target.value)}
-                                placeholder="Nhập tên người cung cấp mẫu 2"
+                                placeholder="VD: Trần Thị B"
+                                title="Tên chỉ được chứa chữ cái và khoảng trắng"
                                 required
                             />
+                            <small style={{ color: '#666', fontSize: '12px', marginTop: '4px', display: 'block' }}>
+                                ⚠️ Tên chỉ được chứa chữ cái và khoảng trắng
+                            </small>
                         </div>
 
                         <div className="form-group">
