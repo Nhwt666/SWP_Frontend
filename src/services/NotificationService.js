@@ -4,7 +4,7 @@ class NotificationService {
         this.token = localStorage.getItem('token');
     }
 
-    // Tạo notification mới
+
     async createNotification(data) {
         try {
             const response = await fetch('/notifications', {

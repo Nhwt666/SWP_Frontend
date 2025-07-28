@@ -420,7 +420,6 @@ const AdminTicketsPage = () => {
                                 <option value="RECEIVED">Đã nhận kit</option>
                                 <option value="CONFIRMED">Đã xác nhận Yêu Cầu</option>
                                 <option value="COMPLETED">Đã hoàn thành</option>
-                                <option value="CANCELLED">Đã hủy</option>
                                 <option value="REJECTED">Đã từ chối</option>
                             </select>
                         </div>
