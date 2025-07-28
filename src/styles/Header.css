@@ -2,16 +2,18 @@
 
 /* ===== Header Chính ===== */
 .header {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: linear-gradient(90deg, #00d4ff 0%, #0099ff 100%);
-  color: white;
-  padding: 0;
-  box-shadow: 0 6px 32px rgba(0,212,255,0.25), 0 1.5px 6px rgba(0,0,0,0.04);
-  border-radius: 0 0 22px 22px;
-  font-family: 'Be Vietnam Pro', 'Inter', Arial, sans-serif;
-  transition: background 0.3s;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(90deg, #00d4ff 0%, #0099ff 100%);
+    color: white;
+    padding: 0;
+    box-shadow: 0 6px 32px rgba(0,212,255,0.25), 0 1.5px 6px rgba(0,0,0,0.04);
+    border-radius: 0 0 22px 22px;
+    font-family: 'Be Vietnam Pro', 'Inter', Arial, sans-serif;
+    transition: background 0.3s;
+    height: auto; /* Đảm bảo chiều cao phù hợp */
+    min-height: 60px;
 }
 
 .header-container {

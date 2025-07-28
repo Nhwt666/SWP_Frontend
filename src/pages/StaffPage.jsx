@@ -601,7 +601,7 @@ const StaffPage = () => {
         <>
             <Header />
             <StaffLayout>
-                <div className="staff-page">
+                <div className="staff-page" style={{ marginTop: '40px' }}>
                     <h2 className="staff-title-modern">Quản lý Yêu Cầu (Staff)</h2>
                     <div className="modern-tabs-row">
                         {tabOptions.map(tab => (
@@ -627,51 +627,53 @@ const StaffPage = () => {
                         <p style={{ color: 'red' }}>{error}</p>
                     ) : (
                         <div className="ticket-list-modern fade-in">
-                            <table className="modern-table">
-                                <thead>
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Khách hàng</th>
-                                        <th>Loại yêu cầu</th>
-                                        <th>Trạng thái</th>
-                                        <th>Hành động</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredTickets.length === 0 ? (
+                            <div style={{ width: '100%', overflowX: 'auto' }}>
+                                <table className="modern-table">
+                                    <thead>
                                         <tr>
-                                            <td colSpan="5" className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</td>
+                                            <th>ID</th>
+                                            <th>Khách hàng</th>
+                                            <th>Loại yêu cầu</th>
+                                            <th>Trạng thái</th>
+                                            <th>Hành động</th>
                                         </tr>
-                                    ) : (
-                                        filteredTickets.map((ticket) => (
-                                            <tr key={ticket.id}>
-                                                <td>#{ticket.id}</td>
-                                                <td>{ticket.customer?.fullName || ticket.customer?.name || 'Chưa Có Thông Tin'}</td>
-                                                <td>{typeServiceMap[ticket.type] || typeDisplayMap[ticket.type] || ticket.type}</td>
-                                                <td>
-                                                    <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
-                                                        {(() => {
-                                                            switch(ticket.status) {
-                                                                case 'PENDING': return 'Chờ xử lý';
-                                                                case 'IN_PROGRESS': return 'Đang xử lý';
-                                                                case 'RECEIVED': return 'Đã nhận kit';
-                                                                case 'CONFIRMED': return 'Đã xác nhận Yêu Cầu';
-                                                                case 'COMPLETED': return 'Đã hoàn thành';
-                                                                default: return ticket.status;
-                                                            }
-                                                        })()}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <button className="btn-details" onClick={() => handleOpenModal(ticket)}>
-                                                        {activeTab === 'completed' ? 'Xem chi tiết' : 'Xử lý'}
-                                                    </button>
-                                                </td>
+                                    </thead>
+                                    <tbody>
+                                        {filteredTickets.length === 0 ? (
+                                            <tr>
+                                                <td colSpan="5" className="ticket-empty-modern">Không có yêu cầu nào phù hợp.</td>
                                             </tr>
-                                        ))
-                                    )}
-                                </tbody>
-                            </table>
+                                        ) : (
+                                            filteredTickets.map((ticket) => (
+                                                <tr key={ticket.id}>
+                                                    <td>#{ticket.id}</td>
+                                                    <td>{ticket.customer?.fullName || ticket.customer?.name || 'Chưa Có Thông Tin'}</td>
+                                                    <td>{typeServiceMap[ticket.type] || typeDisplayMap[ticket.type] || ticket.type}</td>
+                                                    <td>
+                                                        <span className={`ticket-status-badge-list status-${ticket.status.toLowerCase()}`}>
+                                                            {(() => {
+                                                                switch(ticket.status) {
+                                                                    case 'PENDING': return 'Chờ xử lý';
+                                                                    case 'IN_PROGRESS': return 'Đang xử lý';
+                                                                    case 'RECEIVED': return 'Đã nhận kit';
+                                                                    case 'CONFIRMED': return 'Đã xác nhận Yêu Cầu';
+                                                                    case 'COMPLETED': return 'Đã hoàn thành';
+                                                                    default: return ticket.status;
+                                                                }
+                                                            })()}
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <button className="btn-details" onClick={() => handleOpenModal(ticket)}>
+                                                            {activeTab === 'completed' ? 'Xem chi tiết' : 'Xử lý'}
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     )}
                     

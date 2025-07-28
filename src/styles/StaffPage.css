@@ -3,6 +3,9 @@
 body {
     background: linear-gradient(135deg, #e3f0ff 0%, #f7faff 100%);
     min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
 }
 
 .staff-page {
@@ -10,9 +13,17 @@ body {
     box-shadow: 0 8px 32px 0 rgba(25, 118, 210, 0.10);
     border-radius: 28px;
     padding: 36px 32px 32px 32px;
-    max-width: 900px;
-    margin: 48px auto 32px auto;
+    width: 100%;
+    max-width: 1200px;
+    margin: 80px auto 80px auto; /* Tăng margin trên và dưới */
     font-family: 'Be Vietnam Pro', 'Inter', 'Arial', 'Helvetica Neue', 'Segoe UI', sans-serif;
+    box-sizing: border-box;
+}
+
+/* Thêm padding cho footer để tránh nội dung bị che */
+.member-footer {
+    margin-top: 100px;
+    padding-bottom: 20px;
 }
 
 .staff-page h2 {
@@ -572,6 +583,8 @@ textarea {
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0, 70, 170, 0.08);
     margin-top: 20px;
+    width: 100%;
+    overflow-x: auto;
 }
 
 .ticket-list-title-modern {
@@ -761,6 +774,7 @@ textarea {
     border-collapse: collapse;
     margin-top: 20px;
     font-size: 0.95rem;
+    overflow-x: auto;
 }
 
 .modern-table th, .modern-table td {
