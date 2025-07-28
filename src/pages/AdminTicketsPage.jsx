@@ -354,24 +354,6 @@ const AdminTicketsPage = () => {
         try {
             const token = localStorage.getItem('token');
             
-            const staffRes = await fetch('/admin/all-users?role=STAFF', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            
-            if (!staffRes.ok) {
-                throw new Error('Không thể lấy danh sách nhân viên');
-            }
-            
-            const staffData = await staffRes.json();
-            const staffList = staffData.map(s => s.user);
-            
-            if (staffList.length === 0) {
-                alert('Không có nhân viên nào để gán. Vui lòng thêm nhân viên trước.');
-                return;
-            }
-            
-            const selectedStaff = staffList[0];
-            
             const updateRes = await fetch(`/admin/tickets/${acceptingTicket.id}`, {
                 method: 'PUT',
                 headers: { 
@@ -379,8 +361,7 @@ const AdminTicketsPage = () => {
                     'Authorization': `Bearer ${token}` 
                 },
                 body: JSON.stringify({
-                    staffId: selectedStaff.id,
-                    status: 'IN_PROGRESS'
+                    status: 'CONFIRMED'
                 })
             });
             
@@ -389,7 +370,7 @@ const AdminTicketsPage = () => {
                 throw new Error(errorData.message || 'Không thể chấp nhận ticket');
             }
             
-            alert(`Đã chấp nhận ticket và gán cho nhân viên ${selectedStaff.fullName}!`);
+            alert('Đã chấp nhận ticket! Ticket đã sẵn sàng cho nhân viên nhận xử lý.');
             setIsAcceptModalOpen(false);
             setAcceptingTicket(null);
             fetchTickets();
@@ -764,7 +745,7 @@ const AdminTicketsPage = () => {
                                         margin: 0,
                                         lineHeight: 1.5
                                     }}>
-                                        Ticket sẽ được chuyển sang trạng thái "Đang xử lý" và tự động gán cho nhân viên đầu tiên có sẵn trong hệ thống.
+                                        Ticket sẽ được chuyển sang trạng thái "Đã xác nhận Yêu Cầu" và hiển thị cho nhân viên để họ có thể nhận xử lý.
                                     </p>
                                 </div>
 
