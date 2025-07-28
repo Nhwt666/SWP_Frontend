@@ -8,13 +8,13 @@ import Header from '../components/Header';
 import NotificationService from '../services/NotificationService';
 import { useLocation } from 'react-router-dom';
 
-// Đăng ký fonts mặc định trước
+
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
 
-// Sau đó merge với font Roboto Việt hóa
+
 pdfMake.vfs = { ...pdfMake.vfs, ...vfs };
 
-// Đăng ký font Roboto
+
 pdfMake.fonts = {
     Roboto: {
         normal: 'Roboto-Regular.ttf',
@@ -37,7 +37,7 @@ const statusMap = {
 const methodMap = {
     SELF_TEST: 'Tự gửi mẫu',
     AT_FACILITY: 'Tại cơ sở y tế',
-    // Thêm các phương thức khác nếu có
+
 };
 
 const TestHistoryPage = () => {
@@ -54,15 +54,15 @@ const TestHistoryPage = () => {
     const [feedbackSuccess, setFeedbackSuccess] = useState('');
     const [diagnosticResults, setDiagnosticResults] = useState('');
     const [currentUserId, setCurrentUserId] = useState(null);
-    // State for kit sent success modal
+
     const [showKitSentModal, setShowKitSentModal] = useState(false);
-    // State for kit received success modal
+
     const [showKitReceivedModal, setShowKitReceivedModal] = useState(false);
     const location = useLocation();
 
     const fetchHistory = async () => {
         try {
-            // Gọi đúng endpoint BE: /tickets/history (dựa vào token)
+
             const historyRes = await fetch('/tickets/history', {
                 headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
             });
@@ -89,7 +89,7 @@ const TestHistoryPage = () => {
             }
         };
         
-        // Get current user info
+
         const getCurrentUser = async () => {
             try {
                 const res = await fetch('/auth/me', {
@@ -109,7 +109,7 @@ const TestHistoryPage = () => {
         getCurrentUser();
     }, []);
 
-    // Auto open ticket detail modal if ticketId is passed via navigation state
+
     useEffect(() => {
         if (location.state && location.state.ticketId && history.length > 0) {
             const found = history.find(t => String(t.id) === String(location.state.ticketId));
@@ -440,21 +440,21 @@ const TestHistoryPage = () => {
         }
     };
 
-    // Helper to check if feedback exists
+
     const hasFeedback = (ticket) => {
         console.log('Checking feedback for ticket:', ticket.id, 'Feedback data:', ticket.feedback);
         
-        // Check various possible feedback properties
+
         if (ticket.feedback && typeof ticket.feedback === 'object') {
             return ticket.feedback.rating != null || ticket.feedback.feedback != null;
         }
         
-        // Check if feedback is a string
+
         if (typeof ticket.feedback === 'string' && ticket.feedback.trim() !== '') {
             return true;
         }
         
-        // Check other possible feedback properties
+
         if (ticket.rating != null || ticket.review != null) {
             return true;
         }
@@ -462,7 +462,7 @@ const TestHistoryPage = () => {
         return false;
     };
 
-    // Open feedback modal
+
     const openFeedbackModal = () => {
         setFeedbackRating(5);
         setFeedbackComment('');
@@ -470,12 +470,12 @@ const TestHistoryPage = () => {
         setFeedbackSuccess('');
         setShowFeedbackModal(true);
     };
-    // Close feedback modal
+
     const closeFeedbackModal = () => {
         setShowFeedbackModal(false);
     };
 
-    // Test API connection
+
     const testAPIConnection = async () => {
         try {
             const testRes = await fetch('/tickets/history', {
@@ -492,12 +492,12 @@ const TestHistoryPage = () => {
         }
     };
 
-    // Check backend information
+
     const checkBackendInfo = async () => {
         console.log('=== BACKEND DIAGNOSTIC ===');
         let results = [];
         
-        // 1. Check if server is running
+
         try {
             const healthCheck = await fetch('/actuator/health', { method: 'GET' });
             console.log('Health check status:', healthCheck.status);
@@ -507,7 +507,7 @@ const TestHistoryPage = () => {
             results.push(`Health check: ERROR - ${err.message}`);
         }
 
-        // 2. Check authentication
+
         const token = localStorage.getItem('token');
         console.log('Token exists:', !!token);
         results.push(`Token exists: ${!!token}`);
@@ -517,7 +517,7 @@ const TestHistoryPage = () => {
             results.push(`Token length: ${token.length}`);
         }
 
-        // 3. Check available endpoints
+
         const endpointsToTest = [
             '/tickets/history',
             '/tickets',
@@ -541,7 +541,7 @@ const TestHistoryPage = () => {
             }
         }
 
-        // 4. Check feedback endpoint specifically
+
         if (selectedTicket) {
             const feedbackEndpoints = [
                 `/customer/tickets/${selectedTicket.id}/feedback`,
@@ -562,7 +562,7 @@ const TestHistoryPage = () => {
                     results.push(`${feedbackEndpoint} OPTIONS: ${res.status} ${res.statusText}`);
                     results.push(`Allowed methods: ${res.headers.get('allow') || 'None'}`);
                     
-                    // Also try GET to see if endpoint exists
+
                     try {
                         const getRes = await fetch(feedbackEndpoint, {
                             method: 'GET',
@@ -587,7 +587,7 @@ const TestHistoryPage = () => {
         setDiagnosticResults(results.join('\n'));
     };
 
-    // Submit feedback
+
     const handleSubmitFeedback = async () => {
         if (!feedbackRating || feedbackRating < 1 || feedbackRating > 5) {
             setFeedbackError('Vui lòng chọn số sao từ 1 đến 5.');
@@ -604,11 +604,11 @@ const TestHistoryPage = () => {
                 feedback: feedbackComment
             });
 
-            // Thêm timeout để tránh chờ quá lâu
+
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 giây timeout
 
-            // Sử dụng endpoint đã được backend implement
+
             const res = await fetch(`/customer/tickets/${selectedTicket.id}/feedback`, {
                 method: 'PUT',
                 headers: {
@@ -631,7 +631,7 @@ const TestHistoryPage = () => {
                     const responseText = await res.text();
                     console.log('Error response text:', responseText);
                     
-                    // Try to parse as JSON
+
                     try {
                         errorData = JSON.parse(responseText);
                         console.log('Error response JSON:', errorData);
@@ -645,7 +645,7 @@ const TestHistoryPage = () => {
                 
                 const errorMessage = errorData?.message || errorData || `HTTP ${res.status}: ${res.statusText}`;
                 
-                // Xử lý lỗi cụ thể dựa trên status code
+
                 if (res.status === 403) {
                     setFeedbackError(`Lỗi quyền truy cập: ${errorMessage}`);
                 } else if (res.status === 401) {
@@ -669,7 +669,7 @@ const TestHistoryPage = () => {
                     const responseText = await res.text();
                     console.log('Success response text:', responseText);
                     
-                    // Try to parse as JSON
+
                     try {
                         successData = JSON.parse(responseText);
                         console.log('Success response JSON:', successData);
@@ -683,7 +683,7 @@ const TestHistoryPage = () => {
 
                 setFeedbackSuccess('Gửi phản hồi thành công! Cảm ơn bạn đã đánh giá dịch vụ của chúng tôi.');
                 
-                // Update ticket in history to reflect feedback
+
                 setHistory(prev => prev.map(t => 
                     t.id === selectedTicket.id 
                         ? { 
@@ -813,7 +813,7 @@ const TestHistoryPage = () => {
                                 </tbody>
                             </table>
                             
-                            {/* Kit confirmation buttons for CIVIL SELF_TEST tickets */}
+
                             {selectedTicket.type === 'CIVIL' && selectedTicket.method === 'SELF_TEST' && (
                                 <div style={{ marginTop: '20px', padding: '16px', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #dee2e6' }}>
                                     <h4 style={{ margin: '0 0 12px 0', color: '#495057', fontSize: '1rem' }}>📦 Quản lý Kit xét nghiệm</h4>
@@ -831,7 +831,7 @@ const TestHistoryPage = () => {
                                                             }
                                                         });
                                                         if (res.ok) {
-                                                            // Tạo notification cho thay đổi trạng thái
+
                                                             try {
                                                                 await NotificationService.createStatusChangeNotification(
                                                                     selectedTicket.id,
@@ -881,7 +881,7 @@ const TestHistoryPage = () => {
                                                             }
                                                         });
                                                         if (res.ok) {
-                                                            // Tạo notification cho thay đổi trạng thái
+
                                                             try {
                                                                 await NotificationService.createStatusChangeNotification(
                                                                     selectedTicket.id,
@@ -957,7 +957,7 @@ const TestHistoryPage = () => {
                                         📄 Tải PDF
                                     </button>
                                 )}
-                                {/* Feedback button: only show if COMPLETED, no feedback yet */}
+
                                 {selectedTicket.status === 'COMPLETED' && !hasFeedback(selectedTicket) && (
                                     <button
                                         onClick={openFeedbackModal}
@@ -1004,7 +1004,7 @@ const TestHistoryPage = () => {
                     </div>
                 )}
 
-                {/* Feedback Modal */}
+
                 {showFeedbackModal && selectedTicket && (
                     <div className="modal-overlay">
                         <div className="modal-content" style={{maxWidth: 420}}>
@@ -1133,7 +1133,7 @@ const TestHistoryPage = () => {
                     </div>
                 )}
 
-                {/* Kit sent success modal */}
+
                 {showKitSentModal && (
                     <div style={{
                         position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',

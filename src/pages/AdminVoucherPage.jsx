@@ -18,7 +18,7 @@ export default function AdminVoucherPage() {
   const [submitted, setSubmitted] = useState(false);
   const [nameExists, setNameExists] = useState(false);
 
-  // Fetch vouchers from backend
+
   const fetchVouchers = async () => {
     try {
       const res = await fetch('/api/vouchers', {
@@ -49,7 +49,7 @@ export default function AdminVoucherPage() {
   const handleCreate = async e => {
     e.preventDefault();
     setSubmitted(true);
-    // Kiểm tra trùng tên voucher
+
     const nameTrim = form.name.trim().toLowerCase();
     const isDuplicate = vouchers.some(v => v.name.trim().toLowerCase() === nameTrim);
     setNameExists(isDuplicate);
@@ -137,7 +137,7 @@ export default function AdminVoucherPage() {
     return `${days > 0 ? days + 'd ' : ''}${hours}h ${minutes}m ${seconds}s`;
   }
 
-  // Responsive: tính số voucher còn hiệu lực
+
   const now = Date.now();
   const activeCount = vouchers.filter(v => new Date(v.endDate) > now).length;
 
@@ -247,7 +247,7 @@ export default function AdminVoucherPage() {
           </tbody>
         </table>
         </div>
-        {/* Modal xác nhận xóa voucher */}
+
         {showDeleteModal && (
           <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 2000 }}>
             <div style={{ background: '#fff', borderRadius: 16, padding: 36, minWidth: 320, maxWidth: 380, boxShadow: '0 4px 32px rgba(30,58,138,0.18)', textAlign: 'center', position: 'relative' }}>

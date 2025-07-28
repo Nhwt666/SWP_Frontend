@@ -140,7 +140,7 @@ const LoginPage = () => {
             <div className="login-bg">
                 <div className="login-container flex-col">
                     <div className="login-avatar-section">
-                        {/* <img src="/logo192.png" alt="Logo" className="login-avatar" /> */}
+
                     </div>
                     <h2 className="login-title">
                         {step === 'login' && 'Đăng Nhập'}

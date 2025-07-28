@@ -32,7 +32,7 @@ const AdminDashboardPage = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                // Fetch general stats
+
                 const statsRes = await fetch('/admin/stats', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const AdminDashboardPage = () => {
                     throw new Error('Could not fetch stats');
                 }
 
-                // Fetch all users to count customers
+
                 const usersRes = await fetch('/admin/all-users', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const AdminDashboardPage = () => {
                     throw new Error('Could not fetch users');
                 }
 
-                // Fetch all tickets to count pending
+
                 const ticketsRes = await fetch('/admin/tickets', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ const AdminDashboardPage = () => {
 
         const fetchDepositStats = async () => {
             try {
-                // Fetch deposit stats
+
                 const depositStatsRes = await fetch('/admin/deposits/stats', {
                     headers: {
                         'Content-Type': 'application/json',
@@ -161,7 +161,7 @@ const AdminDashboardPage = () => {
             }
         };
 
-        // Fetch recent completed tickets for 7 days
+
         const fetchRecentCompletedTickets = async () => {
             try {
                 const res = await fetch('/admin/recent-completed-tickets', {
@@ -307,10 +307,10 @@ const AdminDashboardPage = () => {
                                                             {
                                                                 data: ticketStatusStats.map(item => item.count),
                                                                 backgroundColor: [
-                                                                    '#fbc02d', // PENDING
-                                                                    '#1976d2', // IN_PROGRESS
-                                                                    '#43a047', // COMPLETED
-                                                                    '#e53935'  // REJECTED
+                                                                    '#fbc02d',
+                                                                    '#1976d2',
+                                                                    '#43a047',
+                                                                    '#e53935'
                                                                 ],
                                                                 borderWidth: 2,
                                                                 borderColor: '#fff',

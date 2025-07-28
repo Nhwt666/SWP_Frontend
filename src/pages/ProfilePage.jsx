@@ -33,7 +33,7 @@ const ProfilePage = () => {
         return <p className="loading-text">Đang tải thông tin...</p>;
     }
 
-    // Lấy role từ localStorage
+
     const role = localStorage.getItem('role');
 
     return (

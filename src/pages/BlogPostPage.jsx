@@ -28,7 +28,7 @@ const BlogPostPage = () => {
     fetchBlogs();
   }, []);
 
-  // Nếu không có slug, show blog list
+
   if (!slug) {
     return (
       <>
@@ -89,7 +89,7 @@ const BlogPostPage = () => {
     );
   }
 
-  // Nếu slug tồn tại, show blog chi tiết
+
   const post = blogs.find((b) => (b.id && b.id.toString() === slug) || b.slug === slug);
 
   if (!post) {

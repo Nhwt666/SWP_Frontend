@@ -73,12 +73,12 @@ const RegisterPage = () => {
             if (res.ok) {
                 const data = await res.json();
 
-                // ✅ Lưu token & thông tin user vào localStorage
+
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('email', data.email);
                 localStorage.setItem('role', data.role);
 
-                // ✅ Gọi /me để lấy thêm thông tin
+
                 const meRes = await fetch('/auth/me', {
                     headers: {
                         Authorization: `Bearer ${data.token}`

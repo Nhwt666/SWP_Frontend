@@ -16,7 +16,7 @@ const PricingPage = () => {
                 if (!res.ok) throw new Error('Không thể tải dữ liệu bảng giá');
                 const data = await res.json();
                 setPrices(data);
-                console.log('Fetched prices:', data); // For debugging structure
+                console.log('Fetched prices:', data);
             } catch (err) {
                 setError(err.message || 'Lỗi không xác định');
             } finally {
@@ -26,7 +26,7 @@ const PricingPage = () => {
         fetchPrices();
     }, []);
 
-    // Vietnamese headers
+
     const headers = [
         { key: 'id', label: 'STT' },
         { key: 'value', label: 'GIÁ TRỊ' },
@@ -80,7 +80,7 @@ const PricingPage = () => {
                     )}
                 </div>
             </div>
-            {/* Footer with Map */}
+
             <footer className="member-footer">
                 <div className="member-footer-content">
                     <div className="member-footer-info">

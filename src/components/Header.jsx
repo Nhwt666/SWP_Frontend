@@ -74,7 +74,7 @@ const Header = () => {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
-    // Smooth scroll to blog section if on homepage
+
     const handleBlogClick = (e) => {
         if (location.pathname === '/') {
             e.preventDefault();
@@ -87,7 +87,7 @@ const Header = () => {
         }
     };
 
-    // Đánh dấu đã đọc khi mở dropdown nếu có noti chưa đọc
+
     useEffect(() => {
         if (showNotiDropdown && unreadCount > 0) {
             markAllAsRead();
@@ -134,7 +134,7 @@ const Header = () => {
                                 </div>
                                 <div className="noti-bell-container" style={{ position: 'relative' }} ref={notiDropdownRef}>
                                     <FaBell className="noti-bell-icon" style={{ fontSize: 24, cursor: 'pointer' }} onClick={() => setShowNotiDropdown(v => !v)} />
-                                    {/* Nếu có notification chưa đọc, hiển thị chấm đỏ */}
+
                                     {unreadCount > 0 && (
                                         <span className="noti-dot" style={{
                                             position: 'absolute',

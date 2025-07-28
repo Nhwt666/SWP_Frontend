@@ -9,13 +9,13 @@ import pdfFonts from 'pdfmake/build/vfs_fonts';
 import Header from '../components/Header';
 import NotificationService from '../services/NotificationService';
 
-// Đăng ký fonts mặc định trước
+
 pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs;
 
-// Sau đó merge với font Roboto Việt hóa
+
 pdfMake.vfs = { ...pdfMake.vfs, ...vfs };
 
-// Đăng ký font Roboto
+
 pdfMake.fonts = {
     Roboto: {
         normal: 'Roboto-Regular.ttf',
@@ -103,7 +103,7 @@ const StaffPage = () => {
             const updated = await statusRes.json();
             setTickets((prev) => prev.map(t => t.id === id ? updated : t));
             
-            // Tạo notification cho thay đổi trạng thái
+
             try {
                 await NotificationService.createStatusChangeNotification(
                     id, 
@@ -155,11 +155,11 @@ const StaffPage = () => {
         const result = getDisplayResult(resultString);
         const lines = result.split('\n');
         
-        // Phân tích kết quả để xác định loại
+
         const isPositive = result.includes('Có quan hệ huyết thống') || result.includes('trùng khớp');
         const isNegative = result.includes('Không có quan hệ huyết thống') || result.includes('không trùng khớp');
         
-        // Trích xuất thông tin
+
         const conclusion = lines[0] || '';
         const probability = lines.find(line => line.includes('Tỉ lệ xác suất:')) || '';
         const purpose = lines.find(line => line.includes('Lý do xét nghiệm:')) || '';
@@ -277,7 +277,7 @@ const StaffPage = () => {
             const updated = await res.json();
             setTickets((prev) => prev.map(t => (t.id === id ? updated : t)));
             
-            // Tạo notification cho thay đổi trạng thái
+
             try {
                 await NotificationService.createStatusChangeNotification(
                     id, 
@@ -310,7 +310,7 @@ const StaffPage = () => {
 
     const methodMap = { SELF_TEST: 'Tự gửi mẫu', AT_FACILITY: 'Tại cơ sở y tế' };
 
-    // Mappings for request type display and service names
+
     const typeDisplayMap = {
         'CIVIL': 'Dân sự',
         'ADMINISTRATIVE': 'Hành chính',

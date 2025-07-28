@@ -16,7 +16,7 @@ const AdminLayout = ({ children }) => {
         { path: '/admin/settings', label: 'Cài đặt' },
         { path: '/admin/voucher', label: 'Voucher' },
         { path: '/admin/prices', label: 'Bảng giá' },
-        { path: '/admin/blogs', label: 'Blog' }, // New menu item
+        { path: '/admin/blogs', label: 'Blog' },
     ];
 
     const isActive = (path) => {

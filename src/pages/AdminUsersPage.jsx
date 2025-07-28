@@ -109,7 +109,7 @@ const AdminUsersPage = () => {
             
             alert('Tạo người dùng mới thành công!');
             handleCloseModal();
-            fetchUsers(); // Re-fetch with current filters
+            fetchUsers();
 
         } catch (err) {
             console.error('Error creating user:', err);
@@ -136,7 +136,7 @@ const AdminUsersPage = () => {
             
             alert('Cập nhật người dùng thành công!');
             handleCloseModal();
-            fetchUsers(); // Re-fetch data
+            fetchUsers();
 
         } catch (err) {
             console.error('Error updating user:', err);
@@ -160,7 +160,7 @@ const AdminUsersPage = () => {
 
                 if (response.ok) {
                     alert('Xóa người dùng thành công!');
-                    fetchUsers(); // Re-fetch with current filters
+                    fetchUsers();
                 } else {
                     const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.message || 'Không thể xóa người dùng.');

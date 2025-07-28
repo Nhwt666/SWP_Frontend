@@ -9,20 +9,20 @@ const AdminBlogsPage = () => {
   const [error, setError] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Create modal state
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [createForm, setCreateForm] = useState({ title: '', content: '', imageUrl: '', });
 
-  // Edit modal state
+
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editRow, setEditRow] = useState(null);
   const [editForm, setEditForm] = useState({ title: '', content: '', imageUrl: '' });
 
-  // Catbox image upload helper
+
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
 
-  // Pagination state
+
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 5;
   const totalPages = Math.ceil(blogs.length / blogsPerPage);
@@ -52,7 +52,7 @@ const AdminBlogsPage = () => {
     fetchBlogs();
   }, []);
 
-  // Create
+
   const openCreateModal = () => {
     setCreateForm({ title: '', content: '', imageUrl: '' });
     setCreateModalOpen(true);
@@ -61,7 +61,7 @@ const AdminBlogsPage = () => {
   const handleCreateChange = (e) => {
     setCreateForm({ ...createForm, [e.target.name]: e.target.value });
   };
-  // Create blog handler
+
   const handleCreateSubmit = async (e) => {
     e.preventDefault();
     setActionLoading(true);
@@ -95,7 +95,7 @@ const AdminBlogsPage = () => {
     }
   };
 
-  // Edit
+
   const openEditModal = (row) => {
     setEditRow(row);
     setEditForm({ title: row.title, content: row.content, imageUrl: row.imageUrl || '' });
@@ -129,7 +129,6 @@ const AdminBlogsPage = () => {
     }
   };
 
-  // Delete
   const handleDelete = async (id) => {
     if (!window.confirm('Bạn có chắc muốn xóa bài viết này?')) return;
     setActionLoading(true);
@@ -148,7 +147,7 @@ const AdminBlogsPage = () => {
     }
   };
 
-  // Image upload helper (use backend endpoint)
+
   const handleImageUpload = async (e, setForm) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -237,7 +236,7 @@ const AdminBlogsPage = () => {
                     ))}
                   </tbody>
                 </table>
-                {/* Pagination controls */}
+
                 <div className="pagination-controls">
                   <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
                     Previous
@@ -263,7 +262,7 @@ const AdminBlogsPage = () => {
           </div>
         </div>
       </AdminLayout>
-      {/* Create Modal */}
+
       {createModalOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(60, 40, 120, 0.22)', backdropFilter: 'blur(2px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeInAnim 0.25s',
@@ -290,7 +289,7 @@ const AdminBlogsPage = () => {
           </form>
         </div>
       )}
-      {/* Edit Modal */}
+
       {editModalOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(60, 40, 120, 0.22)', backdropFilter: 'blur(2px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'fadeInAnim 0.25s',

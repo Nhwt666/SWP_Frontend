@@ -26,12 +26,12 @@ const HomePage = () => {
                         <AboutSection />
                         <ExpertsSection />
                         <ProcessSection />  
-                        {/* Blog Section removed */}
+
                     </div>
                 </section>
             </main>
             
-            {/* Footer with Map */}
+
             <footer className="member-footer">
                 <div className="member-footer-content">
                     <div className="member-footer-info">

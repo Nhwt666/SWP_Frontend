@@ -20,7 +20,7 @@ const StaffDashboardPage = () => {
             setLoading(true);
             setError('');
             try {
-                // Lấy danh sách ticket PENDING chưa có staff
+
                 const resPending = await fetch(`/tickets/unassigned`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -31,7 +31,7 @@ const StaffDashboardPage = () => {
                 setPendingCount(dataPending.length);
                 setPendingTickets(dataPending);
 
-                // Lấy danh sách ticket IN_PROGRESS
+
                 const resInProgress = await fetch(`/tickets/status/IN_PROGRESS`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -41,7 +41,7 @@ const StaffDashboardPage = () => {
                 const dataInProgress = await resInProgress.json();
                 setProcessingCount(dataInProgress.length);
 
-                // Lấy danh sách ticket COMPLETED
+
                 const resCompleted = await fetch(`/tickets/status/COMPLETED`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,

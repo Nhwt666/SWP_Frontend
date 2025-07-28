@@ -28,8 +28,8 @@
     padding-top: 3rem !important;
     padding-left: 2.5rem !important;
     padding-right: 2.5rem !important;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .user-create-brand-popin::-webkit-scrollbar {
@@ -102,7 +102,7 @@
 }
 
 .user-form-modern select {
-    padding-left: 2.8rem !important; /* Đồng bộ với input */
+    padding-left: 2.8rem !important;
 }
 
 .user-create-actions {

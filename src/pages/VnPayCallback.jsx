@@ -6,14 +6,14 @@ const VnPayCallback = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Forward callback về backend
+
         const forwardToBackend = async () => {
             try {
-                // Lấy tất cả query parameters từ URL
+
                 const queryString = location.search;
                 console.log('VNPay Callback - Query string:', queryString);
                 
-                // Gọi API backend với các tham số VNPay (để backend xử lý)
+
                 await fetch(`/api/vnpay/success${queryString}`, {
                     method: 'GET',
                     headers: {
@@ -21,19 +21,19 @@ const VnPayCallback = () => {
                     }
                 });
 
-                // Đơn giản: luôn coi như thành công khi VNPay callback về
+
                 console.log('VNPay Callback - Always redirecting to success');
                 
-                // Lấy amount từ URL gốc
+
                 const urlParams = new URLSearchParams(queryString);
                 const amount = urlParams.get('vnp_Amount') ? Number(urlParams.get('vnp_Amount')) / 100 : 0;
                 
-                // Redirect về trang success
+
                 navigate(`/payment-success?method=vnpay&status=success&amount=${amount}`);
                 
             } catch (error) {
                 console.error('VNPay Callback - Network error:', error);
-                // Ngay cả khi có lỗi network, vẫn coi như thành công
+
                 const urlParams = new URLSearchParams(location.search);
                 const amount = urlParams.get('vnp_Amount') ? Number(urlParams.get('vnp_Amount')) / 100 : 0;
                 navigate(`/payment-success?method=vnpay&status=success&amount=${amount}`);

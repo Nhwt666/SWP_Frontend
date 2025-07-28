@@ -6,7 +6,7 @@ const NotificationManager = () => {
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
 
-    // Lấy danh sách notification
+
     const fetchNotifications = async () => {
         setLoading(true);
         try {
@@ -20,7 +20,7 @@ const NotificationManager = () => {
         }
     };
 
-    // Đánh dấu đã đọc
+
     const markAsRead = async (notificationId) => {
         try {
             await NotificationService.markAsRead(notificationId);
@@ -33,7 +33,7 @@ const NotificationManager = () => {
         }
     };
 
-    // Đánh dấu tất cả đã đọc
+
     const markAllAsRead = async () => {
         try {
             await NotificationService.markAllAsRead();
@@ -44,7 +44,7 @@ const NotificationManager = () => {
         }
     };
 
-    // Xóa notification hết hạn
+
     const cleanupExpiredNotifications = async () => {
         try {
             await NotificationService.cleanupExpiredNotifications();
@@ -54,7 +54,7 @@ const NotificationManager = () => {
         }
     };
 
-    // Format thời gian
+
     const formatTime = (timeString) => {
         const date = new Date(timeString);
         const now = new Date();
@@ -70,7 +70,7 @@ const NotificationManager = () => {
         }
     };
 
-    // Kiểm tra notification có hết hạn chưa
+
     const isExpired = (notification) => {
         if (!notification.expiresAt) return false;
         const expiresAt = new Date(notification.expiresAt);
@@ -78,19 +78,19 @@ const NotificationManager = () => {
         return now > expiresAt;
     };
 
-    // Lọc notification không hết hạn
+
     const validNotifications = notifications.filter(n => !isExpired(n));
 
     useEffect(() => {
         fetchNotifications();
         
-        // Cleanup expired notifications mỗi giờ
+
         const cleanupInterval = setInterval(cleanupExpiredNotifications, 60 * 60 * 1000);
         
         return () => clearInterval(cleanupInterval);
     }, []);
 
-    // Auto cleanup khi component mount
+
     useEffect(() => {
         cleanupExpiredNotifications();
     }, []);

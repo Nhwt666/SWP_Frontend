@@ -8,7 +8,7 @@ const TopUpHistoryPage = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                // Gọi /auth/me lấy user info
+
                 const meRes = await fetch('/auth/me', {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`
@@ -23,7 +23,7 @@ const TopUpHistoryPage = () => {
                     return;
                 }
 
-                // Gọi cả API PayPal và VNPay để lấy lịch sử
+
                 const [paypalRes, vnpayRes] = await Promise.allSettled([
                     fetch(`/api/paypal/topup-history?userId=${userId}`, {
                         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
@@ -35,7 +35,7 @@ const TopUpHistoryPage = () => {
 
                 let allHistory = [];
 
-                // Xử lý kết quả PayPal
+
                 if (paypalRes.status === 'fulfilled' && paypalRes.value.ok) {
                     const paypalData = await paypalRes.value.json();
                     console.log('PayPal history data:', paypalData);
@@ -47,7 +47,7 @@ const TopUpHistoryPage = () => {
                     allHistory = [...allHistory, ...paypalHistory];
                 }
 
-                // Xử lý kết quả VNPay
+
                 if (vnpayRes.status === 'fulfilled' && vnpayRes.value.ok) {
                     const vnpayData = await vnpayRes.value.json();
                     console.log('VNPay history data:', vnpayData);
@@ -59,34 +59,34 @@ const TopUpHistoryPage = () => {
                     allHistory = [...allHistory, ...vnpayHistory];
                 }
 
-                // Sắp xếp theo thời gian (mới nhất trước)
+
                 allHistory.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 
-                // Loại bỏ duplicate đơn giản dựa trên PayID
+
                 const uniqueHistory = allHistory.filter((item, index, self) => {
                     if (item.paymentId) {
-                        // Nếu có PayID, chỉ giữ lại item đầu tiên tìm thấy
+
                         return index === self.findIndex(t => t.paymentId === item.paymentId);
                     }
-                    // Nếu không có PayID, giữ lại tất cả
+
                     return true;
                 });
                 
-                // Xác định payment method dựa trên PayerID
+
                 const correctedHistory = uniqueHistory.map(item => {
                     const payerId = item.payerId || item.payer_id;
                     
-                    // Nếu PayerID là NCB hoặc Vk5QQVIFUjQ, đó là VNPay
+
                     if (payerId === 'NCB' || payerId === 'Vk5QQVIFUjQ') {
                         return { ...item, paymentMethod: 'VNPAY' };
                     }
                     
-                    // Nếu PayerID bắt đầu bằng PAYID- hoặc là PayPal, đó là PayPal
+
                     if (payerId && (payerId.startsWith('PAYID-') || payerId === 'PayPal' || payerId === '2F643AXYGRS6G')) {
                         return { ...item, paymentMethod: 'PAYPAL' };
                     }
                     
-                    // Giữ nguyên payment method từ backend
+
                     return item;
                 });
                 
@@ -125,7 +125,7 @@ const TopUpHistoryPage = () => {
         
         const numAmount = Number(amount);
         
-        // Tất cả phương thức đều hiển thị bằng VND
+
         return `${numAmount.toLocaleString('vi-VN')} đ`;
     };
 

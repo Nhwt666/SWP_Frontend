@@ -13,7 +13,7 @@ const GuidePage = () => {
                 </p>
                 <h2>1. Cách lấy mẫu niêm mạc miệng</h2>
 
-                {/* Chèn ảnh ở đây */}
+
                 <div style={{ textAlign: 'center' }}>
                     <img
                         src={process.env.PUBLIC_URL + "/niemmacmieng.jpg"}
@@ -42,7 +42,7 @@ const GuidePage = () => {
 
                 <h2>2. Hướng dẫn lẫy mẫu máu để xét nghiệm ADN</h2>
 
-                {/* Chèn ảnh ở đây */}
+
                 <div style={{ textAlign: 'center' }}>
                     <img
                         src={process.env.PUBLIC_URL + "/maukho.jpg"}
@@ -71,7 +71,7 @@ const GuidePage = () => {
 
                 <h2>3. Cách thu mẫu móng tay, móng chân xét nghiệm ADN</h2>
 
-                {/* Chèn ảnh ở đây */}
+
                 <div style={{ textAlign: 'center' }}>
                     <img
                         src={process.env.PUBLIC_URL + "/mongtay.jpg"}
@@ -98,7 +98,7 @@ const GuidePage = () => {
 
                 <h2>4. Cách lấy mẫu tóc để xét nghiệm ADN</h2>
 
-                {/* Chèn ảnh ở đây */}
+
                 <div style={{ textAlign: 'center' }}>
                     <img
                         src={process.env.PUBLIC_URL + "/toc.jpg"}
@@ -125,7 +125,7 @@ const GuidePage = () => {
 
                 <h2>5. Cách thu mẫu nước súc miệng xét nghiệm ADN</h2>
 
-                {/* Chèn ảnh ở đây */}
+
                 <div style={{ textAlign: 'center' }}>
                     <img
                         src={process.env.PUBLIC_URL + "/sucmieng.jpg"}

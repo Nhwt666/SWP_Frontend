@@ -5,7 +5,7 @@ import TicketCreateModal from '../components/TicketCreateModal';
 import TicketEditModal from '../components/TicketEditModal';
 import Header from '../components/Header';
 
-// Remove static pricingData
+
 
 const TicketPage = () => {
     const [category, setCategory] = useState('');
@@ -40,7 +40,7 @@ const TicketPage = () => {
     const [pricesLoading, setPricesLoading] = useState(true);
     const [pricesError, setPricesError] = useState(null);
 
-    // Get services filtered by type
+
     const getServicesByType = (type) => {
         if (!prices || prices.length === 0) return [];
         
@@ -57,7 +57,7 @@ const TicketPage = () => {
             .map(price => price.name);
     };
 
-    // Fetch price list from API
+
     useEffect(() => {
         const fetchPrices = async () => {
             setPricesLoading(true);
@@ -76,7 +76,7 @@ const TicketPage = () => {
         fetchPrices();
     }, []);
 
-    // Set price based on selected service/category and fetched prices
+
     useEffect(() => {
         if (!prices || prices.length === 0) {
             setPrice(0);
@@ -281,12 +281,7 @@ const TicketPage = () => {
                 history.push(ticket.id);
                 localStorage.setItem('ticketHistory', JSON.stringify(history));
 
-                // Remove alert for CIVIL SELF_TEST and normal ticket creation
-                // if (typeMap[category] === 'CIVIL' && methodMap[method] === 'SELF_TEST') {
-                //     alert(`✅ Tạo ticket thành công!\n\n📦 Ticket Dân sự + Tự gửi mẫu\n\nQuy trình mới:\n1. Kit sẽ được gửi đến bạn\n2. Bạn xác nhận nhận kit\n3. Bạn thu thập mẫu và gửi về\n4. Staff xử lý và trả kết quả\n\nVui lòng kiểm tra trạng thái trong "Lịch sử xét nghiệm"`);
-                // } else {
-                //     alert('✅ Tạo ticket thành công!');
-                // }
+
 
                 try {
                     const resUser = await fetch('/auth/me', {

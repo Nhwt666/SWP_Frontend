@@ -13,23 +13,23 @@ const PaymentSuccess = () => {
     const [message, setMessage] = useState('Đang xử lý thanh toán...');
     const [amount, setAmount] = useState(null);
     const query = useQuery();
-    const method = query.get('method'); // 'paypal' hoặc 'vnpay'
-    const paymentStatus = query.get('status'); // 'success' hoặc 'failed'
+    const method = query.get('method');
+    const paymentStatus = query.get('status');
 
-    // Xử lý kết quả từ backend (sau khi VnPayCallback forward)
+
     useEffect(() => {
         if (method === 'vnpay' && paymentStatus) {
             if (paymentStatus === 'success') {
                 setStatus('SUCCESS');
                 setMessage('✅ Nạp tiền thành công!');
                 
-                // Lấy số tiền từ query param
+
                 const amountValue = query.get('amount');
                 if (amountValue) {
                     setAmount(Number(amountValue));
                 }
                 
-                // Cập nhật lại thông tin người dùng
+
                 (async () => {
                     try {
                         const resUser = await fetch('/auth/me', {
@@ -43,7 +43,7 @@ const PaymentSuccess = () => {
                     } catch {}
                 })();
                 
-                // Redirect về trang nạp tiền sau 3 giây
+
                 setTimeout(() => {
                     navigate('/topup');
                 }, 3000);
@@ -57,7 +57,7 @@ const PaymentSuccess = () => {
         }
     }, [method, paymentStatus, query, updateFullName, updateWallet, navigate]);
 
-    // Tự động chuyển về /topup sau khi thanh toán paypal thành công
+
     useEffect(() => {
         if (method === 'paypal') {
             const timer = setTimeout(() => {
@@ -67,7 +67,7 @@ const PaymentSuccess = () => {
         }
     }, [method, navigate]);
 
-    // Khi thanh toán PayPal thành công, delay 1s rồi fetch lại user info để cập nhật context
+
     useEffect(() => {
         if (method === 'paypal') {
             const timer = setTimeout(async () => {
@@ -88,7 +88,7 @@ const PaymentSuccess = () => {
     }, [method, updateFullName, updateWallet, navigate]);
 
     useEffect(() => {
-        // Lấy số tiền nạp từ localStorage hoặc query param (nếu có)
+
         const storedAmount = localStorage.getItem('vnpayAmount');
         const queryAmount = query.get('amount');
         if (queryAmount) setAmount(Number(queryAmount));

@@ -22,7 +22,7 @@ const AdminReportsPage = () => {
             setLoading(true);
             setError('');
             
-            // Thử endpoint /admin/reviews trước
+
             let response = await fetch('/admin/reviews', {
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -30,7 +30,7 @@ const AdminReportsPage = () => {
                 }
             });
 
-            // Nếu /admin/reviews không tồn tại, sử dụng /admin/tickets và lọc feedback
+
             if (!response.ok && response.status === 404) {
                 console.log('Endpoint /admin/reviews không tồn tại, sử dụng /admin/tickets...');
                 response = await fetch('/admin/tickets', {
@@ -42,7 +42,7 @@ const AdminReportsPage = () => {
                 
                 if (response.ok) {
                     const tickets = await response.json();
-                    // Lọc ra các ticket có feedback
+
                     const reviewsWithFeedback = tickets.filter(ticket => 
                         ticket.feedback && (ticket.rating || ticket.feedback)
                     ).map(ticket => ({
@@ -195,7 +195,7 @@ const AdminReportsPage = () => {
                         </div>
                     </div>
 
-                    {/* Thống kê tổng quan */}
+
                     <div className="stats-overview">
                         <div className="stat-card">
                             <div className="stat-icon">⭐</div>
@@ -231,7 +231,7 @@ const AdminReportsPage = () => {
                         </div>
                     </div>
 
-                    {/* Phân bố đánh giá */}
+
                     <div className="rating-distribution">
                         <h3>Phân Bố Đánh Giá</h3>
                         <div className="distribution-bars">
@@ -258,7 +258,7 @@ const AdminReportsPage = () => {
                         </div>
                     </div>
 
-                    {/* Danh sách đánh giá */}
+
                     <div className="reviews-section">
                         <h3>Danh Sách Đánh Giá ({totalReviews})</h3>
                         

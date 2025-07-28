@@ -32,14 +32,14 @@ const AdminTicketsPage = () => {
     const [rejectingTicket, setRejectingTicket] = useState(null);
     const [rejectReason, setRejectReason] = useState('');
 
-    // Mapping để chuyển đổi loại ticket từ tiếng Anh sang tiếng Việt
+
     const typeDisplayMap = {
         'CIVIL': 'Dân sự',
         'ADMINISTRATIVE': 'Hành chính', 
         'OTHER': 'Yêu cầu khác'
     };
 
-    // Mapping để chuyển đổi trạng thái từ tiếng Anh sang tiếng Việt
+
     const statusDisplayMap = {
         'PENDING': 'Chờ xử lý',
         'IN_PROGRESS': 'Đang xử lý',
@@ -136,12 +136,12 @@ const AdminTicketsPage = () => {
         const originalTicket = tickets.find(t => t.id === id);
 
         try {
-            // 1. Handle staff assignment/unassignment
+
             const newStaffId = updatedData.staffId;
             const oldStaffId = originalTicket.staff?.id;
 
             if (String(newStaffId || '') !== String(oldStaffId || '')) {
-                if (newStaffId) { // Assign or re-assign
+                if (newStaffId) {
                     const assignRes = await fetch(`/admin/tickets/${id}/assign/${newStaffId}`, {
                         method: 'PUT',
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -150,7 +150,7 @@ const AdminTicketsPage = () => {
                         const errorData = await assignRes.json();
                         throw new Error(errorData.message || 'Không thể gán nhân viên');
                     }
-                } else { // Unassign
+                } else {
                     const unassignRes = await fetch(`/admin/tickets/${id}/unassign`, {
                         method: 'PUT',
                         headers: { 'Authorization': `Bearer ${token}` }
@@ -162,10 +162,10 @@ const AdminTicketsPage = () => {
                 }
             }
 
-            // 2. Handle other data updates
+
             const { staffId, ...otherData } = updatedData;
             
-            // Prepare data for submission
+
             const dataToUpdate = { ...otherData };
             if (dataToUpdate.appointmentDate === '') dataToUpdate.appointmentDate = null;
             if (dataToUpdate.amount === '' || dataToUpdate.amount === null) {
@@ -270,7 +270,7 @@ const AdminTicketsPage = () => {
         }
     };
 
-    // Fetch all pending tickets (not assigned to any staff)
+
     const fetchPendingTickets = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -285,14 +285,14 @@ const AdminTicketsPage = () => {
         }
     };
 
-    // Open modal and fetch pending tickets
+
     const handleOpenPendingModal = () => {
         fetchPendingTickets();
         setIsPendingModalOpen(true);
     };
     const handleClosePendingModal = () => setIsPendingModalOpen(false);
 
-    // Fetch staff list
+
     const fetchStaffList = async () => {
         try {
             const token = localStorage.getItem('token');
@@ -307,7 +307,7 @@ const AdminTicketsPage = () => {
         }
     };
 
-    // Open staff modal for a ticket
+
     const handleOpenStaffModal = (ticketId) => {
         setSelectedTicketId(ticketId);
         fetchStaffList();
@@ -318,7 +318,7 @@ const AdminTicketsPage = () => {
         setSelectedTicketId(null);
     };
 
-    // Assign staff to ticket
+
     const handleAssignStaff = async (staffId) => {
         if (!selectedTicketId) return;
         setAssigningStaffId(staffId);
@@ -443,7 +443,7 @@ const AdminTicketsPage = () => {
                                                         Từ chối
                                                     </button>
                                                 )}
-                                                {/* Thông báo cho CIVIL SELF_TEST tickets */}
+
                                                 {ticket.type === 'CIVIL' && ticket.method === 'SELF_TEST' && (ticket.status === 'CONFIRMED' || ticket.status === 'RECEIVED') && (
                                                     <span style={{ 
                                                         fontSize: '0.8rem', 
@@ -475,7 +475,7 @@ const AdminTicketsPage = () => {
                             onSave={handleSaveTicket}
                         />
                     )}
-                    {/* Pending Tickets Modal */}
+
                     {isPendingModalOpen && (
                         <div className="modal-overlay" onClick={handleClosePendingModal}>
                             <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
@@ -528,7 +528,7 @@ const AdminTicketsPage = () => {
                             </div>
                         </div>
                     )}
-                    {/* Staff Assign Modal for customer tickets */}
+
                     {isStaffModalOpen && (
                         <div className="modal-overlay" onClick={handleCloseStaffModal}>
                             <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
@@ -574,7 +574,7 @@ const AdminTicketsPage = () => {
                             </div>
                         </div>
                     )}
-                    {/* Reject Ticket Modal */}
+
                     {isRejectModalOpen && (
                         <div className="modal-overlay" onClick={() => setIsRejectModalOpen(false)}>
                             <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: 440, borderRadius: 16, padding: 32, boxShadow: '0 4px 32px rgba(239,68,68,0.13)'}}>
